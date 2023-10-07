@@ -29,21 +29,17 @@ public class LogicCenter : MonoBehaviour
     public Text redPixelText;
     public Text greenPixelText;
     public Text bluePixelText;
-    public Text fulllist;
-    public Text chosenColorText;
 
     public GameObject SelectMenu;
     public GameObject StakingMenu;
     public GameObject UIbackground;
     public GameObject CanvasGO;
 
-    //CURRENTLY TESTING
-    public GameObject eventGroup;
+    //v0.2
     public GameObject[] panels = new GameObject[8];
     public GameObject[] group = new GameObject[8];
     public UnityEngine.UI.Text[] timestamps = new Text[8];
-    public GameObject [] tstamps = new GameObject[8];
-    //CURRENTLY TESTING
+    //.v0.2
 
     public Machine[] machines = new Machine[10];
     public Employee[] employees = new Employee[10];
@@ -52,9 +48,6 @@ public class LogicCenter : MonoBehaviour
 
     public int timelineIndex = 0;
     public UnityEngine.UI.Image panelImage;
-
-    public GameObject eventElement;
-    public Transform parentTransform;
 
     public GameObject[] box = new GameObject[8];
     public GameObject[] eventTextGO = new GameObject[8];
@@ -74,10 +67,10 @@ public class LogicCenter : MonoBehaviour
     {
         r = new System.Random();
 
-        SelectMenu.SetActive(true);
+       // SelectMenu.SetActive(true);
         StakingMenu.SetActive(false);
         UIbackground.SetActive(true);
-        eventGroup.SetActive(false);
+       // eventGroup.SetActive(false);
     }
 
     public void updateMenu()
@@ -154,6 +147,8 @@ public class LogicCenter : MonoBehaviour
     public void updateEvents(int status)
     {
         //Debug.Log(DateTime.Now.ToString("hh:MM:ss tt"));
+
+        /*
         for (int i = timelineEvents.Length-1; i > 0; i--)
         {
             timelineEvents[i] = timelineEvents[i-1];
@@ -168,8 +163,8 @@ public class LogicCenter : MonoBehaviour
         currentTime = DateTime.Now;
         timeString = currentTime.ToString("hh:MM:sstt");
         timestamps[0].text = timeString;
-
-        updateMenu();
+        */
+       // updateMenu();
     }
     void Update()
     {
@@ -217,7 +212,7 @@ public class LogicCenter : MonoBehaviour
         SelectMenu.SetActive(false);
         StakingMenu.SetActive(true);
         UIbackground.SetActive(true);
-        eventGroup.SetActive(true);
+      //  eventGroup.SetActive(true);
 
 
         if (chosenColor == 1)
