@@ -35,7 +35,7 @@ public class LogicCenter : MonoBehaviour
     public GameObject UIbackground;
     public GameObject CanvasGO;
 
-    //v0.2
+    //v0.2   && v0.3
     public GameObject[] panels = new GameObject[8];
     public GameObject[] group = new GameObject[8];
     public UnityEngine.UI.Text[] timestamps = new Text[8];
@@ -63,6 +63,10 @@ public class LogicCenter : MonoBehaviour
     public DateTime currentTime;
     String timeString;
 
+
+    /// <summary>
+    /// </summary>
+
     void Start()
     {
         r = new System.Random();
@@ -70,7 +74,37 @@ public class LogicCenter : MonoBehaviour
        // SelectMenu.SetActive(true);
         StakingMenu.SetActive(false);
         UIbackground.SetActive(true);
-       // eventGroup.SetActive(false);
+        // eventGroup.SetActive(false);
+
+        GameObject eventslayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
+        if (eventslayout == null)
+        {
+            Debug.LogError("Could not find GameObject named 'eventslayout'");
+            return;
+        }
+
+        GameObject bg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
+        if (eventslayout == null)
+        {
+            Debug.LogError("Could not find GameObject named 'eventslayout'");
+            return;
+        }
+
+
+        for (int i = 0; i < 8; i++)
+        {
+            GameObject e = Resources.Load<GameObject>("Prefabs/event");
+            panels[i] = Instantiate(e,new Vector3(0f,0f,0f), Quaternion.identity);
+
+            panels[i].transform.SetParent(eventslayout.transform, false);
+            Debug.Log("Is this assigning?");
+            timestamps[i] = panels[i].transform.Find("time").GetComponent<Text>();
+            group[i] = panels[i].transform.Find("bg/message").gameObject;
+            //timelineEvents[i].eventType = panels[i].transform.Find("bg/message").GetComponent<Text>().text;
+
+        }
+       
+
     }
 
     public void updateMenu()
@@ -81,13 +115,14 @@ public class LogicCenter : MonoBehaviour
 
             
             eventText[i] = group[i].GetComponent<Text>();
-            eventImg[i] = panels[i].GetComponent<UnityEngine.UI.Image>();
+            eventImg[i] = panels[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>();
 
             eventText[i].text = ft.eventStatuses[timelineEvents[i].eventType].ToUpper();  // Assuming ft is an array or list
 
             switch (timelineEvents[i].eventType)
             {
                 case 1:
+
                     eventImg[i].color = Color.red;
                     eventText[i].color = Color.cyan;
                     break;
@@ -148,7 +183,7 @@ public class LogicCenter : MonoBehaviour
     {
         //Debug.Log(DateTime.Now.ToString("hh:MM:ss tt"));
 
-        /*
+        
         for (int i = timelineEvents.Length-1; i > 0; i--)
         {
             timelineEvents[i] = timelineEvents[i-1];
@@ -163,8 +198,8 @@ public class LogicCenter : MonoBehaviour
         currentTime = DateTime.Now;
         timeString = currentTime.ToString("hh:MM:sstt");
         timestamps[0].text = timeString;
-        */
-       // updateMenu();
+        
+        updateMenu();
     }
     void Update()
     {

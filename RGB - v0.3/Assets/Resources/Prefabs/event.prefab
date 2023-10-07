@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 4866064775735117438}
   - component: {fileID: 402208516942415795}
   m_Layer: 5
-  m_Name: Text (Legacy)
+  m_Name: message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -183,7 +183,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 266.72, y: -37.5}
-  m_SizeDelta: {x: 0, y: 45}
+  m_SizeDelta: {x: 0, y: 58.1}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &4561638079505828295
 CanvasRenderer:
