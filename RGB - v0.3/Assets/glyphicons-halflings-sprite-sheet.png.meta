@@ -1,0 +1,3308 @@
+fileFormatVersion: 2
+guid: 9f46660d8558d3240b93865e06a9c9c6
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_0
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 185
+        width: 16
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d159105b0bf4d541b91b0b3a507be17
+      internalID: 807217744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 185
+        width: 15
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd4648e25335d7b4ea5fedc3907441e7
+      internalID: 1150394261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_2
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 185
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0c32ac1167e2ae4ea75ea3790dfa0fa
+      internalID: 264433421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_3
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 188
+        width: 17
+        height: 12
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3dc6a0175f0007e4eb9a5c03380af4a9
+      internalID: 935406999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_4
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 185
+        width: 17
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1fd63f18212851a4a841f989bac759a2
+      internalID: -1353510658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_5
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 186
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9baa4f3e7a3c6c24b958930a06e98003
+      internalID: -2133684947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_6
+      rect:
+        serializedVersion: 2
+        x: 185
+        y: 186
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87b52f32533438248834883f94ed95b5
+      internalID: -170363260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_7
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 186
+        width: 17
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c2e309953b46cf4fbdd13ab24825c0e
+      internalID: -1546694249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_8
+      rect:
+        serializedVersion: 2
+        x: 247
+        y: 184
+        width: 16
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60e9bab6dbc74664fadbc1f635103445
+      internalID: -870873781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_9
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 184
+        width: 16
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66c5453835205a54095568f5c36f2f0b
+      internalID: -724071671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_10
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 184
+        width: 16
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c44cc857b95fe54dbec04f77c323278
+      internalID: 498789134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_11
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 187
+        width: 18
+        height: 12
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 001291cac43a4784db962e9d43e13a85
+      internalID: 1004301913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_12
+      rect:
+        serializedVersion: 2
+        x: 370
+        y: 186
+        width: 16
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea7e3a9cdcfaf044ca7d651ccae6be78
+      internalID: -1619253253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_13
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 186
+        width: 13
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d015425e73e0c15499ddd0ee1db2054e
+      internalID: -1856006206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_14
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 184
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec5765309e0776d4faee1f3dd7b8bd0e
+      internalID: 249781873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_15
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 185
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b231aaafb6c72374caf63c92ec7dbf05
+      internalID: -1100378954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_16
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 186
+        width: 15
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e149a7fcc4d4a04eb85dfb8bd434943
+      internalID: -1496825712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_17
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 185
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 68d289c8c3b0c6a4590726258f1fd26e
+      internalID: 768945707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_18
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 185
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2ee93cccae335047918cd0578185459
+      internalID: 1039753463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_19
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 184
+        width: 15
+        height: 19
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4fd4804d3c1fa5b49ad1060f443d659f
+      internalID: -858067090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 154
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ecdf74312e691eb48afe696b22eef6c1
+      internalID: -22100450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_21
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 154
+        width: 14
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 045752ac6c3de4b4081396f83839594e
+      internalID: -213433227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_22
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 155
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2019a75d32195ca4295ec432e7dde7d1
+      internalID: 527692405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_23
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 154
+        width: 19
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9229d09469a83649838b3ac19ba752a
+      internalID: 1041092363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_24
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 155
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c2aa7f69bb05b54d9464d467ef227d2
+      internalID: -870686279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_25
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 154
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19e5da5fcd713904192ecaef32d9a790
+      internalID: -1486190001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_26
+      rect:
+        serializedVersion: 2
+        x: 185
+        y: 154
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7d0bc9b45676cf489ab2ddfc69a766d
+      internalID: 1327676236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_27
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 155
+        width: 17
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b04a5f38c0834ee47a4f2b4b7f246c5a
+      internalID: 952563703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_28
+      rect:
+        serializedVersion: 2
+        x: 246
+        y: 154
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76b95650c0f3d65438383bce2cce00d0
+      internalID: 2059088490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_29
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 155
+        width: 16
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6685bd3f15f642d40943f11b1c293d41
+      internalID: -1971830714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_30
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 154
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0749a07e9c4dd54bb922f78af3700b2
+      internalID: -505303187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_31
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 155
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db7b67dae316d4743bce5b5652ba3b40
+      internalID: 1771146253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_32
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 154
+        width: 15
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eed1187e5424f4949819fefb01f467f5
+      internalID: -1402574282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_33
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 153
+        width: 16
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76f92334702e2f04ca4a9be226205b7e
+      internalID: 1608507074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_34
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 155
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 95a6811cd750e3947a9afceead6fc796
+      internalID: -624074519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_35
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 158
+        width: 15
+        height: 11
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 132f5e49cbad3ac49829310a56803e22
+      internalID: -1938501103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_36
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 158
+        width: 11
+        height: 11
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a6526f47a4fd924f99e6f8392b081d2
+      internalID: -301824706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_37
+      rect:
+        serializedVersion: 2
+        x: 522
+        y: 154
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f01bf88aed9a8443acfadc69b29bb31
+      internalID: 1868806223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_38
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 154
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ebd9d5f0ac55dd24c9d99299b4102ebb
+      internalID: -568902101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_39
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 154
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c494bca867fc0ed4f8160f0b65b29e7c
+      internalID: 2001326495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_40
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 123
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e98bc32003d6724cacc3a2a5fb9916a
+      internalID: -1459479767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_41
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 123
+        width: 21
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dbe6e7f93bc565b418444428670d8102
+      internalID: 403657777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_42
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 124
+        width: 16
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5af0bc22184dc7f469a37d9eca1e6bc8
+      internalID: 924254034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_43
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 124
+        width: 12
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a97899ba4bfc3c94fa4672d973cbc7fd
+      internalID: 987270202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_44
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 124
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa825d1d9528e7647b3c0b6b330f5055
+      internalID: -714444750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_45
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 125
+        width: 18
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42009d34f747c614ab04e630c37966c2
+      internalID: 1882079277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_46
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 124
+        width: 19
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad85a06ad68a3144a80f0c76a8b2e694
+      internalID: -2144888273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_47
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 124
+        width: 14
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f4e1ff00e0329b458948e75f390690b
+      internalID: 1695290845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_48
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 124
+        width: 11
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4433006b3d5b75f4681786b82f9fc612
+      internalID: -1811750357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_49
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 124
+        width: 19
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a738f2b82768a444abfbb4172094f3d6
+      internalID: 958772400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_50
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 123
+        width: 15
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c841b8d64978324c892c5109baa1a97
+      internalID: 360601106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_51
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 124
+        width: 18
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e465e73564959f438ff53ddfd397924
+      internalID: 210751956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_52
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 124
+        width: 17
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55f17d23b7e8aaa42b457b8703382e82
+      internalID: -674724640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_53
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 132
+        width: 16
+        height: 7
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c932cc35c1ec8cc4cb8c13413e0724df
+      internalID: -1588282369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_54
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 132
+        width: 17
+        height: 7
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bd60edb74403404db46355e91c7b3ea
+      internalID: -757742782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_55
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 132
+        width: 17
+        height: 7
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9cb37c6982cfb240816eb044a93d3ad
+      internalID: -193646455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_56
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 124
+        width: 17
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6e2008c34267ad45b5b1b13c3b5dd79
+      internalID: 751904183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_57
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 124
+        width: 18
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ac4e712b7c765c439e852f90565a046
+      internalID: -83854447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_58
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 126
+        width: 18
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd99b395d66a9f343adef3998bd3dd4c
+      internalID: 1676090926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_59
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 125
+        width: 17
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 104376895dce92145a81553ad0b469dc
+      internalID: 82934964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_60
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 124
+        width: 17
+        height: 7
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 229b52e0a3e839645bae3c2a4745ba08
+      internalID: 1640981829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_61
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 124
+        width: 17
+        height: 7
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae45e0ea4ae3aba43a1e8c256bf09b24
+      internalID: -893423233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_62
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 124
+        width: 17
+        height: 7
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00f8e04a47352394f88064a3970b81fc
+      internalID: 922223766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_63
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 93
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4db5eb88b1d419844867211886a5cc0e
+      internalID: -19008125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_64
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 93
+        width: 11
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a93fa68d52c848544b62fb9eadf6f526
+      internalID: -632619543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_65
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 93
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50237c72792345546ad1dcdb88fe3c3e
+      internalID: -1959726576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_66
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 93
+        width: 16
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57be3b078d21bb24394102afcc28a433
+      internalID: -931865342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_67
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 95
+        width: 17
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29524f2822c26d243851cff7bde8894f
+      internalID: 1992364916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_68
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 95
+        width: 18
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 18291a0db1369454c8f9bcbaed2f88df
+      internalID: 1466921140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_69
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 94
+        width: 16
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8e6efc7325066b848a436aed83a237ef
+      internalID: -184908278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_70
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 93
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 553d629b79496d64db193d744ca5f783
+      internalID: -1484432173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_71
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 94
+        width: 11
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a9eedd051fd11674680818b70a67f5da
+      internalID: 1422630125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_72
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 94
+        width: 18
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 904aff0b7347c0a448d1611237f9ba6e
+      internalID: -765514059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_73
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 94
+        width: 17
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6bd1d01ee8a8b274aa687af885394773
+      internalID: -2085334582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_74
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 94
+        width: 12
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0c133ced21518d34593e6740f4d02dbc
+      internalID: 1414044156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_75
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 95
+        width: 8
+        height: 12
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24634c409d9d24e4bbea1e5ecee060ff
+      internalID: -1228997376
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_76
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 95
+        width: 11
+        height: 11
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27822775bc3361243bd6a09de3775ed9
+      internalID: -644428264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_77
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 94
+        width: 17
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c711b9975e5be64398c1f8ee4a25138
+      internalID: 523612170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_78
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 94
+        width: 18
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f297371142b6f742838d4ac72fdd59d
+      internalID: -578931381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_79
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 95
+        width: 11
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0fda523810fd3bb4384f1efc2968f5f3
+      internalID: 1868351220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_80
+      rect:
+        serializedVersion: 2
+        x: 525
+        y: 96
+        width: 14
+        height: 12
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83b699dcb81200742b7c7f8cbd427d20
+      internalID: 537827866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_81
+      rect:
+        serializedVersion: 2
+        x: 556
+        y: 93
+        width: 10
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c24e4f40e9104f947a19af896287c5d6
+      internalID: -211605409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_82
+      rect:
+        serializedVersion: 2
+        x: 588
+        y: 93
+        width: 11
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49b48102ef77fe540ac5762de82425d0
+      internalID: -1473234716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_83
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 63
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a330f2609681ff4b9db61fa419ca3b9
+      internalID: -1165858042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_84
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 63
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cba36e08a623d6248b3c543a3a037e0c
+      internalID: -1865892163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_85
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 62
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: daaf67af400a69648b4374ebba94ee79
+      internalID: 1078440118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_86
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 62
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 273c597b187ef8649b4cc2caa29d5342
+      internalID: 75531348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_87
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 63
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e1b445fb68224b4fad0cc95238eece6
+      internalID: -1335411653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_88
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 63
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 31e95fbb061c20649a454da915f5592c
+      internalID: 1806755659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_89
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 61
+        width: 19
+        height: 19
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 02d301a010034554bb91ae88073107ba
+      internalID: 11550574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_90
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 63
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89e19cdb323bf2646a75b65a717ec029
+      internalID: 622009394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_91
+      rect:
+        serializedVersion: 2
+        x: 246
+        y: 63
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1678648f7e56ef6458aaaa7c56f8f556
+      internalID: 579178046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_92
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 63
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 545b1d0ea3d53814da1a9696da519b5d
+      internalID: 1819389703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_93
+      rect:
+        serializedVersion: 2
+        x: 309
+        y: 64
+        width: 15
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 925ea594518aa864d9114c690a807b78
+      internalID: -1146906791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_94
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 64
+        width: 14
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c858062eeb14a74bb7ddab14db1e04a
+      internalID: -1738197915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_95
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 64
+        width: 13
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 827cbb15498fe70478d86cc338ef8676
+      internalID: 980116076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_96
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 63
+        width: 13
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efc57c2a44e817e479b6736a88ed4cb8
+      internalID: 1422669761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_97
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 65
+        width: 17
+        height: 13
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55bf47b16ee1b1f4394f0d37ee89bfaf
+      internalID: 21112598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_98
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 62
+        width: 9
+        height: 9
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7549ca6646802144481b0c6488890c3b
+      internalID: 21193875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_99
+      rect:
+        serializedVersion: 2
+        x: 469
+        y: 70
+        width: 9
+        height: 9
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b62217bc4b9520345909ffedf79c7702
+      internalID: 91548797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_100
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 62
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f4c7354aef62a4a429ff0fdd2f7890e7
+      internalID: -1844429379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_101
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 63
+        width: 15
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22e1fc7f4fa91e249a2c269c06082caf
+      internalID: 212870451
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_102
+      rect:
+        serializedVersion: 2
+        x: 555
+        y: 68
+        width: 15
+        height: 5
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8ad7f15302f8df14b83c451912929d64
+      internalID: -1623022458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_103
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 63
+        width: 14
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2dd34fa5f3dc8784090b9030bc7db5d6
+      internalID: 1546521030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_104
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 31
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0e979e4b3ce2b04e9b58b112521484f
+      internalID: 1638928288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_105
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 31
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 575f8deddcacee44bb97286f41c0c63d
+      internalID: 2005995359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_106
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 32
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d92afda15c1dfe49b70e72e17470c94
+      internalID: 1668116473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_107
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 31
+        width: 15
+        height: 19
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0884e9cff3d315845968d3cf988d913e
+      internalID: 2009194215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_108
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 34
+        width: 21
+        height: 12
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 124d1c3b28fd18b4f82a73d553795921
+      internalID: 1416333769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_109
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 32
+        width: 21
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee23f86347a4de8488b43ae9f8e8ede5
+      internalID: 1329499461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_110
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 32
+        width: 20
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 259ae9650da40eb4c9cc9d0c39da1060
+      internalID: 891659717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_111
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 32
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a88c887056a7d3345811085fb6f72867
+      internalID: -2056731315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_112
+      rect:
+        serializedVersion: 2
+        x: 246
+        y: 31
+        width: 16
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0566cdf0928ff5e48bbbdee6ee4e3dde
+      internalID: 484532055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_113
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 33
+        width: 20
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c04109a4e40cc4438386a636ee2257b
+      internalID: -1466631502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_114
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 31
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3aa2e74828ff39049be48f1bd5a908a5
+      internalID: 259498245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_115
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 31
+        width: 15
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b225462212867744b6869f869866556
+      internalID: 307091133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_116
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 35
+        width: 16
+        height: 10
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7ede1ffced5254468efc20540a7d8a0
+      internalID: -1161548694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_117
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 35
+        width: 16
+        height: 11
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9e8ffb6fa2964f4780c1b1f288d6450
+      internalID: -1973726110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_118
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 33
+        width: 22
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42c7ef866a2e9374fb471086ec8586f2
+      internalID: 205181631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_119
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 32
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78b767e7bc4852d47a7cdd91edc43fcb
+      internalID: 893919189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_120
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 32
+        width: 19
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d1f2f8e62f039747bb3748e807ad53a
+      internalID: 1852865505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_121
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 31
+        width: 20
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfaed3a6f5eef864e8599eda3860732f
+      internalID: 1166882627
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_122
+      rect:
+        serializedVersion: 2
+        x: 557
+        y: 31
+        width: 10
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df714ad99de811a4e873ccec791fbe67
+      internalID: -1694553055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_123
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 36
+        width: 18
+        height: 10
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7106a9c36e57e9409ae56ea9fd33de0
+      internalID: 502688825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_124
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 3
+        width: 17
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 680f504c1641b8c4f903d1b15a0b0e5a
+      internalID: 433114217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_125
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 3
+        width: 18
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b5d627d502d5204685d81ed9dfba6c1
+      internalID: -709546756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_126
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 2
+        width: 16
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec785cb1e7d062d488232e455c82d648
+      internalID: 1484993701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_127
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 3
+        width: 15
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 931703c5556f147409d8bc3a1f0cdfd7
+      internalID: 1860814737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_128
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 3
+        width: 17
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80331322f982ad045a806444ce2960a2
+      internalID: 575162682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_129
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 1
+        width: 17
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b56dac69e471d74e9a46045324744a4
+      internalID: -1106079196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_130
+      rect:
+        serializedVersion: 2
+        x: 185
+        y: 3
+        width: 18
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc2aebf4bf374c044a2adf6e60fb77f4
+      internalID: 787914762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_131
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 3
+        width: 18
+        height: 14
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1f796993f48a0c46a2f8f1112ff006d
+      internalID: -1162119121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_132
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 1
+        width: 14
+        height: 19
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 30d3b94ab3f26fe4e947d893715c2a8d
+      internalID: 1062647517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_133
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 0
+        width: 14
+        height: 19
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c1b99e8c49cca34db11f13adf2e11cc
+      internalID: -262588999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_134
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 1
+        width: 18
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5eed739968ab2bd40a77c7642d0e4bdb
+      internalID: 1289921485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_135
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 1
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c3201edb5c283e46a039b07e4c96ce4
+      internalID: -1032877802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_136
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 1
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5abb2d51ac90a2f4ea4626981344f31c
+      internalID: 1694356156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_137
+      rect:
+        serializedVersion: 2
+        x: 399
+        y: 1
+        width: 18
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57696a47ee49edf4da3fd9db6b557a98
+      internalID: -918286448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_138
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 1
+        width: 16
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 660b01fced146cb4a9d5ab1930706512
+      internalID: -783602015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_139
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 1
+        width: 17
+        height: 17
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3065a25b0dbeff439ebb4a7124715fb
+      internalID: -1005760018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_140
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 1
+        width: 17
+        height: 16
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5aea6d658cd6fa54abf0ecd6f32c74a1
+      internalID: -1117142308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_141
+      rect:
+        serializedVersion: 2
+        x: 524
+        y: 1
+        width: 14
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50e6a8260a80ed043a46970a349d2043
+      internalID: -799703243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_142
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 3
+        width: 17
+        height: 15
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 724dc60a60d25cc42b1b80ad70b7c812
+      internalID: 786325480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: glyphicons-halflings-sprite-sheet_143
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 1
+        width: 17
+        height: 18
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3e7b5af01600d8441893da671efdd21c
+      internalID: 1439837314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      glyphicons-halflings-sprite-sheet_0: 807217744
+      glyphicons-halflings-sprite-sheet_1: 1150394261
+      glyphicons-halflings-sprite-sheet_10: 498789134
+      glyphicons-halflings-sprite-sheet_100: -1844429379
+      glyphicons-halflings-sprite-sheet_101: 212870451
+      glyphicons-halflings-sprite-sheet_102: -1623022458
+      glyphicons-halflings-sprite-sheet_103: 1546521030
+      glyphicons-halflings-sprite-sheet_104: 1638928288
+      glyphicons-halflings-sprite-sheet_105: 2005995359
+      glyphicons-halflings-sprite-sheet_106: 1668116473
+      glyphicons-halflings-sprite-sheet_107: 2009194215
+      glyphicons-halflings-sprite-sheet_108: 1416333769
+      glyphicons-halflings-sprite-sheet_109: 1329499461
+      glyphicons-halflings-sprite-sheet_11: 1004301913
+      glyphicons-halflings-sprite-sheet_110: 891659717
+      glyphicons-halflings-sprite-sheet_111: -2056731315
+      glyphicons-halflings-sprite-sheet_112: 484532055
+      glyphicons-halflings-sprite-sheet_113: -1466631502
+      glyphicons-halflings-sprite-sheet_114: 259498245
+      glyphicons-halflings-sprite-sheet_115: 307091133
+      glyphicons-halflings-sprite-sheet_116: -1161548694
+      glyphicons-halflings-sprite-sheet_117: -1973726110
+      glyphicons-halflings-sprite-sheet_118: 205181631
+      glyphicons-halflings-sprite-sheet_119: 893919189
+      glyphicons-halflings-sprite-sheet_12: -1619253253
+      glyphicons-halflings-sprite-sheet_120: 1852865505
+      glyphicons-halflings-sprite-sheet_121: 1166882627
+      glyphicons-halflings-sprite-sheet_122: -1694553055
+      glyphicons-halflings-sprite-sheet_123: 502688825
+      glyphicons-halflings-sprite-sheet_124: 433114217
+      glyphicons-halflings-sprite-sheet_125: -709546756
+      glyphicons-halflings-sprite-sheet_126: 1484993701
+      glyphicons-halflings-sprite-sheet_127: 1860814737
+      glyphicons-halflings-sprite-sheet_128: 575162682
+      glyphicons-halflings-sprite-sheet_129: -1106079196
+      glyphicons-halflings-sprite-sheet_13: -1856006206
+      glyphicons-halflings-sprite-sheet_130: 787914762
+      glyphicons-halflings-sprite-sheet_131: -1162119121
+      glyphicons-halflings-sprite-sheet_132: 1062647517
+      glyphicons-halflings-sprite-sheet_133: -262588999
+      glyphicons-halflings-sprite-sheet_134: 1289921485
+      glyphicons-halflings-sprite-sheet_135: -1032877802
+      glyphicons-halflings-sprite-sheet_136: 1694356156
+      glyphicons-halflings-sprite-sheet_137: -918286448
+      glyphicons-halflings-sprite-sheet_138: -783602015
+      glyphicons-halflings-sprite-sheet_139: -1005760018
+      glyphicons-halflings-sprite-sheet_14: 249781873
+      glyphicons-halflings-sprite-sheet_140: -1117142308
+      glyphicons-halflings-sprite-sheet_141: -799703243
+      glyphicons-halflings-sprite-sheet_142: 786325480
+      glyphicons-halflings-sprite-sheet_143: 1439837314
+      glyphicons-halflings-sprite-sheet_15: -1100378954
+      glyphicons-halflings-sprite-sheet_16: -1496825712
+      glyphicons-halflings-sprite-sheet_17: 768945707
+      glyphicons-halflings-sprite-sheet_18: 1039753463
+      glyphicons-halflings-sprite-sheet_19: -858067090
+      glyphicons-halflings-sprite-sheet_2: 264433421
+      glyphicons-halflings-sprite-sheet_20: -22100450
+      glyphicons-halflings-sprite-sheet_21: -213433227
+      glyphicons-halflings-sprite-sheet_22: 527692405
+      glyphicons-halflings-sprite-sheet_23: 1041092363
+      glyphicons-halflings-sprite-sheet_24: -870686279
+      glyphicons-halflings-sprite-sheet_25: -1486190001
+      glyphicons-halflings-sprite-sheet_26: 1327676236
+      glyphicons-halflings-sprite-sheet_27: 952563703
+      glyphicons-halflings-sprite-sheet_28: 2059088490
+      glyphicons-halflings-sprite-sheet_29: -1971830714
+      glyphicons-halflings-sprite-sheet_3: 935406999
+      glyphicons-halflings-sprite-sheet_30: -505303187
+      glyphicons-halflings-sprite-sheet_31: 1771146253
+      glyphicons-halflings-sprite-sheet_32: -1402574282
+      glyphicons-halflings-sprite-sheet_33: 1608507074
+      glyphicons-halflings-sprite-sheet_34: -624074519
+      glyphicons-halflings-sprite-sheet_35: -1938501103
+      glyphicons-halflings-sprite-sheet_36: -301824706
+      glyphicons-halflings-sprite-sheet_37: 1868806223
+      glyphicons-halflings-sprite-sheet_38: -568902101
+      glyphicons-halflings-sprite-sheet_39: 2001326495
+      glyphicons-halflings-sprite-sheet_4: -1353510658
+      glyphicons-halflings-sprite-sheet_40: -1459479767
+      glyphicons-halflings-sprite-sheet_41: 403657777
+      glyphicons-halflings-sprite-sheet_42: 924254034
+      glyphicons-halflings-sprite-sheet_43: 987270202
+      glyphicons-halflings-sprite-sheet_44: -714444750
+      glyphicons-halflings-sprite-sheet_45: 1882079277
+      glyphicons-halflings-sprite-sheet_46: -2144888273
+      glyphicons-halflings-sprite-sheet_47: 1695290845
+      glyphicons-halflings-sprite-sheet_48: -1811750357
+      glyphicons-halflings-sprite-sheet_49: 958772400
+      glyphicons-halflings-sprite-sheet_5: -2133684947
+      glyphicons-halflings-sprite-sheet_50: 360601106
+      glyphicons-halflings-sprite-sheet_51: 210751956
+      glyphicons-halflings-sprite-sheet_52: -674724640
+      glyphicons-halflings-sprite-sheet_53: -1588282369
+      glyphicons-halflings-sprite-sheet_54: -757742782
+      glyphicons-halflings-sprite-sheet_55: -193646455
+      glyphicons-halflings-sprite-sheet_56: 751904183
+      glyphicons-halflings-sprite-sheet_57: -83854447
+      glyphicons-halflings-sprite-sheet_58: 1676090926
+      glyphicons-halflings-sprite-sheet_59: 82934964
+      glyphicons-halflings-sprite-sheet_6: -170363260
+      glyphicons-halflings-sprite-sheet_60: 1640981829
+      glyphicons-halflings-sprite-sheet_61: -893423233
+      glyphicons-halflings-sprite-sheet_62: 922223766
+      glyphicons-halflings-sprite-sheet_63: -19008125
+      glyphicons-halflings-sprite-sheet_64: -632619543
+      glyphicons-halflings-sprite-sheet_65: -1959726576
+      glyphicons-halflings-sprite-sheet_66: -931865342
+      glyphicons-halflings-sprite-sheet_67: 1992364916
+      glyphicons-halflings-sprite-sheet_68: 1466921140
+      glyphicons-halflings-sprite-sheet_69: -184908278
+      glyphicons-halflings-sprite-sheet_7: -1546694249
+      glyphicons-halflings-sprite-sheet_70: -1484432173
+      glyphicons-halflings-sprite-sheet_71: 1422630125
+      glyphicons-halflings-sprite-sheet_72: -765514059
+      glyphicons-halflings-sprite-sheet_73: -2085334582
+      glyphicons-halflings-sprite-sheet_74: 1414044156
+      glyphicons-halflings-sprite-sheet_75: -1228997376
+      glyphicons-halflings-sprite-sheet_76: -644428264
+      glyphicons-halflings-sprite-sheet_77: 523612170
+      glyphicons-halflings-sprite-sheet_78: -578931381
+      glyphicons-halflings-sprite-sheet_79: 1868351220
+      glyphicons-halflings-sprite-sheet_8: -870873781
+      glyphicons-halflings-sprite-sheet_80: 537827866
+      glyphicons-halflings-sprite-sheet_81: -211605409
+      glyphicons-halflings-sprite-sheet_82: -1473234716
+      glyphicons-halflings-sprite-sheet_83: -1165858042
+      glyphicons-halflings-sprite-sheet_84: -1865892163
+      glyphicons-halflings-sprite-sheet_85: 1078440118
+      glyphicons-halflings-sprite-sheet_86: 75531348
+      glyphicons-halflings-sprite-sheet_87: -1335411653
+      glyphicons-halflings-sprite-sheet_88: 1806755659
+      glyphicons-halflings-sprite-sheet_89: 11550574
+      glyphicons-halflings-sprite-sheet_9: -724071671
+      glyphicons-halflings-sprite-sheet_90: 622009394
+      glyphicons-halflings-sprite-sheet_91: 579178046
+      glyphicons-halflings-sprite-sheet_92: 1819389703
+      glyphicons-halflings-sprite-sheet_93: -1146906791
+      glyphicons-halflings-sprite-sheet_94: -1738197915
+      glyphicons-halflings-sprite-sheet_95: 980116076
+      glyphicons-halflings-sprite-sheet_96: 1422669761
+      glyphicons-halflings-sprite-sheet_97: 21112598
+      glyphicons-halflings-sprite-sheet_98: 21193875
+      glyphicons-halflings-sprite-sheet_99: 91548797
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

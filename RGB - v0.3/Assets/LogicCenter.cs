@@ -29,33 +29,26 @@ public class LogicCenter : MonoBehaviour
     public Text redPixelText;
     public Text greenPixelText;
     public Text bluePixelText;
+    public Text selectedColorText;
 
     public GameObject SelectMenu;
     public GameObject StakingMenu;
     public GameObject UIbackground;
     public GameObject CanvasGO;
 
-    //v0.2   && v0.3
-    public GameObject[] panels = new GameObject[8];
-    public GameObject[] group = new GameObject[8];
-    public UnityEngine.UI.Text[] timestamps = new Text[8];
-    //.v0.2
+
+
 
     public Machine[] machines = new Machine[10];
     public Employee[] employees = new Employee[10];
     public Pixel[] inventory = new Pixel[20];
-    public TimelineEvent[] timelineEvents = new TimelineEvent[8];
+    public int[] history = new int[8];
 
-    public int timelineIndex = 0;
-    public UnityEngine.UI.Image panelImage;
 
-    public GameObject[] box = new GameObject[8];
-    public GameObject[] eventTextGO = new GameObject[8];
-
+    public GameObject[] events = new GameObject[8];
+    public UnityEngine.UI.Text[] timestamps = new Text[8];
     public UnityEngine.UI.Image[] eventImg = new UnityEngine.UI.Image[8];
     public UnityEngine.UI.Text[] eventText = new UnityEngine.UI.Text[8];
-    public RectTransform[] rectTransform = new RectTransform[8];
-    public RectTransform[] rectTransformText = new RectTransform[8];
 
     int invIndex = 4;
     public FlavorText ft = new FlavorText();
@@ -63,6 +56,8 @@ public class LogicCenter : MonoBehaviour
     public DateTime currentTime;
     String timeString;
 
+    public GameObject machineObject;
+    public GameObject machineryPage;
 
     /// <summary>
     /// </summary>
@@ -71,55 +66,126 @@ public class LogicCenter : MonoBehaviour
     {
         r = new System.Random();
 
-       // SelectMenu.SetActive(true);
+        SelectMenu.SetActive(true);
         StakingMenu.SetActive(false);
         UIbackground.SetActive(true);
-        // eventGroup.SetActive(false);
+        //eventGroup.SetActive(false);
 
+        setupInventory();
+        setupMenu();
+        
+    }
+
+    void Update()
+    {
+        if (timer < spawnRate)
+        {
+            timer += Time.deltaTime;
+        }
+        else
+        {
+            distributeTokens();
+            timer = 0;
+        }
+        setText();
+    }
+    /// <summary>
+    /// ////////////////////////////////////////////////
+    /// </summary>
+    /// 
+    public void setupInventory()
+    {
+        inventory[0] = new Pixel(0, 0, 0, 0, 0);  // ore value
+        inventory[1] = new Pixel(0, 1, 1, 0, 0);  // red value
+        inventory[2] = new Pixel(0, 1, 0, 1, 0);  // green value
+        inventory[3] = new Pixel(0, 1, 0, 0, 1);  // blue value
+
+        Console.WriteLine("Setup run");
+
+        for (int i = 0; i < 10; i++)  //setup both things
+        {
+            employees[i] = new Employee(rollDice(1, 10), rollDice(1, 10), rollDice(1, 10), 16 + rollDice(1, 45), rollDice(1, 10), rollDice(1, 10));
+            machines[i] = new Machine(generateMachineName(), 1, rollDice(3, 6), 60 * rollDice(1, 6), 1 + rollDice(3, 3), 103 - rollDice(3, 6)); ;
+        }
+
+        Debug.Log(machines[0]);
+    }
+    public void setupMenu()
+    {
         GameObject eventslayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
+        
         if (eventslayout == null)
         {
             Debug.LogError("Could not find GameObject named 'eventslayout'");
             return;
         }
+        
 
-        GameObject bg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
-        if (eventslayout == null)
+        if(machineryPage == null)
         {
-            Debug.LogError("Could not find GameObject named 'eventslayout'");
+            Debug.LogError("Could not find GameObject named 'machineryPage'");
             return;
         }
 
+        GameObject eve = Resources.Load<GameObject>("Prefabs/event");  //creates an object of a prefab to be instantiated for each panel.
+        GameObject machineObjectGO = Resources.Load<GameObject>("Resources/Prefab/Machine info");
+
+        /*
+         * if(machineObjectGO == null)
+        {
+            Debug.LogError("Could not find GameObject named 'machineryPage'");
+            return;
+        }
+        */
+        machineObject = Instantiate(Resources.Load<GameObject>("Prefabs/Machine info"),new Vector3(0f,0f,0f),Quaternion.identity);
+        machineObject.transform.SetParent(machineryPage.transform,false);
+        Text[] machineAttributes = new Text[10];
+        //This pulls the specific parent and sets it as the parent without having to create an object for it.
+
+        machineAttributes[0] = machineObject.transform.Find("MACHINE").GetComponent<Text>();
+        machineAttributes[1] = machineObject.transform.Find("Top Body/STATUS/STATUS info").GetComponent<Text>();  // IN PRODUCTION
+        machineAttributes[5] = machineObject.transform.Find("Bottom Body/DURABILITY/durabilityValue").GetComponent<Text>();
+        machineAttributes[6] = machineObject.transform.Find("Bottom Body/DURABILITY/maxDurabilityValue").GetComponent<Text>();
+        machineAttributes[7] = machineObject.transform.Find("Bottom Body/DURABILITY/cycleTimeValue").GetComponent<Text>();
+        machineAttributes[8] = machineObject.transform.Find("Bottom Body/DURABILITY/batchSizeValue").GetComponent<Text>();
+        machineAttributes[9] = machineObject.transform.Find("Bottom Body/DURABILITY/yieldValue").GetComponent<Text>();
+
+        machineAttributes[0].text = machines[0].name.ToUpper();
+        machineAttributes[5].text = machines[0].durability.ToString() + " / " + machines[0].maxDurability.ToString()+" CYCLES";
+        machineAttributes[6].text = machines[0].maxDurability.ToString()+ " CYCLES";
+        machineAttributes[7].text = machines[0].cycleTime.ToString() +" MINUTES";
+        machineAttributes[8].text = machines[0].batchSize.ToString() + " PIXELS".ToUpper();
+        machineAttributes[9].text = machines[0].Yield.ToString()+"%";
+
+
+        for (int i = 7; i >= 0; i--)  //INITALIZE THE OBJECTS TO INTERACT WITH
+        {
+            events[i] = Instantiate(eve, new Vector3(0f, 0f, 0f), Quaternion.identity);  //instanties each element of the panel array.
+            events[i].transform.SetParent(eventslayout.transform, false);   //sets the parent to fit into the eventslayout place
+
+        }
 
         for (int i = 0; i < 8; i++)
         {
-            GameObject e = Resources.Load<GameObject>("Prefabs/event");
-            panels[i] = Instantiate(e,new Vector3(0f,0f,0f), Quaternion.identity);
-
-            panels[i].transform.SetParent(eventslayout.transform, false);
-            Debug.Log("Is this assigning?");
-            timestamps[i] = panels[i].transform.Find("time").GetComponent<Text>();
-            group[i] = panels[i].transform.Find("bg/message").gameObject;
-            //timelineEvents[i].eventType = panels[i].transform.Find("bg/message").GetComponent<Text>().text;
-
+            timestamps[i] = events[i].transform.Find("time").GetComponent<Text>(); //set the timestamp from panels
+            eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>(); //set the text from panels
+            eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>(); //set the
         }
-       
-
     }
 
     public void updateMenu()
     {
 
-        for (int i = 0; i < timelineEvents.Length; i++)
+        for (int i = 0; i < history.Length; i++)
         {
+            eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>();
+            eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>();
 
-            
-            eventText[i] = group[i].GetComponent<Text>();
-            eventImg[i] = panels[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>();
+            //update the sprite for each event type.
+ 
+            eventText[i].text = " " + ft.eventStatuses[history[i]].ToUpper() + " ";  // Assuming ft is an array or list
 
-            eventText[i].text = ft.eventStatuses[timelineEvents[i].eventType].ToUpper();  // Assuming ft is an array or list
-
-            switch (timelineEvents[i].eventType)
+            switch (history[i])
             {
                 case 1:
 
@@ -181,19 +247,17 @@ public class LogicCenter : MonoBehaviour
 
     public void updateEvents(int status)
     {
-        //Debug.Log(DateTime.Now.ToString("hh:MM:ss tt"));
-
         
-        for (int i = timelineEvents.Length-1; i > 0; i--)
+        for (int i = history.Length-1; i > 0; i--)
         {
-            timelineEvents[i] = timelineEvents[i-1];
+            history[i] = history[i-1];
         }
         for (int i = timestamps.Length - 1; i > 0; i--)
         {
             timestamps[i].text = timestamps[i - 1].text;
         }
         
-        timelineEvents[0].eventType = status;
+        history[0] = status;
 
         currentTime = DateTime.Now;
         timeString = currentTime.ToString("hh:MM:sstt");
@@ -201,19 +265,7 @@ public class LogicCenter : MonoBehaviour
         
         updateMenu();
     }
-    void Update()
-    {
-        if (timer < spawnRate)
-        {
-            timer += Time.deltaTime;
-        }
-        else
-        {
-            distributeTokens();
-            timer = 0;
-        }
-        setText();
-    }
+
     public void distributeTokens() 
     {
         if (inventory[0].quantity < harvestCapacity && chosenColor != 0)
@@ -247,7 +299,6 @@ public class LogicCenter : MonoBehaviour
         SelectMenu.SetActive(false);
         StakingMenu.SetActive(true);
         UIbackground.SetActive(true);
-      //  eventGroup.SetActive(true);
 
 
         if (chosenColor == 1)
@@ -357,21 +408,7 @@ public class LogicCenter : MonoBehaviour
         }
         
     }
-public void setupInventory()
-    {
-        inventory[0] = new Pixel(0,0,0,0,0);  // ore value
-        inventory[1] = new Pixel(0,1,1,0,0);  // red value
-        inventory[2] = new Pixel(0,1,0,1,0);  // green value
-        inventory[3] = new Pixel(0,1,0,0,1);  // blue value
 
-        Console.WriteLine("Setup run");
-
-        for (int i = 0; i < 10; i++)  //setup both things
-        {
-            employees[i] = new Employee(rollDice(1, 10), rollDice(1, 10), rollDice(1, 10), 16 + rollDice(1, 45), rollDice(1, 10), rollDice(1, 10));
-            machines[i] = new Machine(1, rollDice(3, 6), 60 * rollDice(1, 6), 1 + rollDice(3, 3), 103 - rollDice(3, 6));
-        }
-    }
 
     public void addToInventory(Pixel p)
     {
@@ -412,5 +449,45 @@ public void setupInventory()
         }
 
         return roll;
+    }
+    string generateMachineName()
+    {
+        // Define the characters and numbers to be used in each segment
+        string segment1Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        string segment2Numbers = "0123456789";
+        string segment3Chars = "abcdefghijklmnopqrstuvwxyz";
+
+        // Initialize the machine machineName as an empty string
+        String machineName = "";
+
+        // Generate the first segment (e.g., "TJZ")
+        for (int i = 0; i < 3; i++)
+        {
+            char randomChar = segment1Chars[UnityEngine.Random.Range(0, segment1Chars.Length)];
+            machineName += randomChar;
+        }
+
+        // Add a dash
+        machineName += "-";
+
+        // Generate the second segment (e.g., "523")
+        for (int i = 0; i < 3; i++)
+        {
+            char randomNum = segment2Numbers[UnityEngine.Random.Range(0, segment2Numbers.Length)];
+            machineName += randomNum;
+        }
+
+        // Add another dash
+        machineName += "-";
+
+        // Generate the third segment (e.g., "j42")
+        char randomChar3 = segment3Chars[UnityEngine.Random.Range(0, segment3Chars.Length)];
+        machineName += randomChar3;
+        for (int i = 0; i < 2; i++)
+        {
+            char randomNum = segment2Numbers[UnityEngine.Random.Range(0, segment2Numbers.Length)];
+            machineName += randomNum;
+        }
+        return machineName;
     }
 }

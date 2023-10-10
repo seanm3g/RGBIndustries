@@ -7,22 +7,48 @@ using Unity.VisualScripting;
 public struct Machine
 {
 
-    public int type, durability, batchSize, cycleTime, Yield, status;
+    public int type, durability, maxDurability, batchSize, cycleTime, Yield;
+    public int status; //0 = working, 1 = needs maintenance, broken
+    public String name;
 
-    public Machine(int type, int durability, int batchSize, int cycleTime, int Yield)
+    public Machine(String name,int type, int maxDurability, int batchSize, int cycleTime, int Yield)
     {
+
+        this.name = name;
         this.type = type;
-        this.durability = durability;
+        
+        this.maxDurability = maxDurability;
+        durability = maxDurability;
+        
         this.batchSize = batchSize;
         this.cycleTime = cycleTime;
         this.Yield = Yield;
         this.status = 0;
-
+        
     }
-
+    
     public override string ToString()
     {
-        String strng = $"Type: {type}\n Durability: {durability}\n Batch Size: {batchSize}\n Cycle Time: {cycleTime}\n Yield: {Yield}";
+        String strng = $"Machine Name: {name}\n Type: {type}\n Durability: {durability}\n Batch Size: {batchSize}\n Cycle Time: {cycleTime}\n Yield: {Yield}";
         return strng;
+    }
+
+    void runMachine()
+    {
+        durability--;
+        if (durability <= 0) 
+        {
+            status = 1;
+        }
+    }
+    
+    void repair()
+    {
+        maxDurability -= 1;
+        if (maxDurability <= 0)
+        {
+            status = 3;
+        }
+        else durability = maxDurability;
     }
 }

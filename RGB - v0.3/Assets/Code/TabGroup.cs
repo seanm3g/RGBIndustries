@@ -64,7 +64,6 @@ public class TabGroup : MonoBehaviour
         }
 
     }
-
     public void resetTabs()
     {
         foreach(TabButton button in tabButtons)
