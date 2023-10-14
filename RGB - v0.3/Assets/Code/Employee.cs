@@ -33,6 +33,6 @@ public struct Employee
 
     public override string ToString()
     {
-        return $"Person [First Name: {f.firstNames[firstName]}\nLast Name: {f.lastNames[lastName]}\nAge: {age}\nHobby: {f.hobbies[this.hobby]}\nStatus: {f.workStatuses[this.status]}";
+        return $"Person [First Name: {f.firstNames[firstName]}\nLast Name: {f.lastNames[lastName]}\nAge: {age}\nHobby: {f.hobbies[this.hobby]}\nStatus: {f.employeeStatuses[this.status]}";
     }
 }

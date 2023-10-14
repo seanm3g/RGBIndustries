@@ -35,7 +35,7 @@ public class TabGroup : MonoBehaviour
     {
         resetTabs();
 
-        if(selectedTab == null || button!= selectedTab)
+        if(selectedTab == null || button != selectedTab)
             button.bg.color = Color.gray;
 
     }
@@ -51,7 +51,7 @@ public class TabGroup : MonoBehaviour
         button.bg.color = Color.red;
 
         index = button.transform.GetSiblingIndex();
-        for(int i =0; i<objectsToSwap.Count; i++)
+        for(int i = 0; i<objectsToSwap.Count; i++)
         {
             if(i==index)
             {
