@@ -9,12 +9,14 @@ public struct Machine
 {
 
     public int type, durability, maxDurability, batchSize, cycleTime, Yield;
-    public int status; //0 = working, 1 = needs maintenance, broken
+    public int status; //0 = idle, 1 = running, 2 = unloading, 3 = completed, 4 = broken, 5 = in maintenance 
     public String name;
     public int c1,c2,c3,c1q,c2q,c3q;  //color 1, color 2, color 1 quantity, color 2 quantity.
     public int result;
-    public bool isRunning,outputReady,completed;
+    public bool isLoading,isRunning,unloading,completed;
     public float elapsedTime;
+    public int orderIndex;
+
 
     public Machine(String name,int type, int maxDurability, int batchSize, int cycleTime, int Yield)
     {
@@ -31,10 +33,13 @@ public struct Machine
         this.Yield = Yield;
         this.status = 7;
 
+        isLoading = false;
         isRunning = false;
-        outputReady = false;
+        unloading = false;
         completed = false;
         elapsedTime = 0f;
+        orderIndex = 0;
+
 
         c1 = -1;
         c2 = -1;
@@ -53,42 +58,44 @@ public struct Machine
 
     public void assignOrder(workOrder wo)
     {
-        c1=wo.c1index; //set the first ingredient index
-        c2=wo.c2index; //set the second ingredient index
-        c3=wo.c3index; //set the desired result index
-        c3q=wo.quantity; //set the desired quantity
+        c1 = wo.c1index; //set the first ingredient index
+        c2 = wo.c2index; //set the second ingredient index
+        c3 = wo.c3index; //set the desired result index
+        c3q = wo.quantity; //set the desired quantity
     }
 
-    public void loadMachine(int c1q, int c2q,int quantity)
+    public void loadMachine(int c1q, int c2q)
     {
         
         this.c1q= c1q;
         this.c2q = c2q;
-        this.c3q = quantity;
+        this.c3q = c2q;
+
+        isLoading = true;
     }
 
     public void startMachine()
     {
-        Debug.Log($"c1q: {c1q} c2q:{c2q}");
         
         status = 1;
         if (c1q>0 && c2q>0)
         {
+            isLoading = false;
             isRunning = true;
         }
     }
     public void runMachine()
     {
-        Debug.Log("Do we to the inside of Machine?");
+
         durability--;
         if (durability <= 0)
         {
             status = 1;
         }
+
         isRunning = false;
 
-
-        result = c1q;  //add yield in, and recognize an order with still quanity
+        result = c2q;  //add yield in, and recognize an order with still quanity
         
     }
 
@@ -98,8 +105,8 @@ public struct Machine
         
         result = 0;
         status = 7;
-        completed = true;
-        Debug.Log($"result: {sendOff}");
+        //completed = true;
+
         return sendOff;
 
     }

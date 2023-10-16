@@ -12,6 +12,7 @@ public struct workOrder
     public int quantity;
     ColorLibrary colorLib;
     public bool isActive;
+    public int machineIndex;
 
     public workOrder(int q, ColorRGB p1, ColorRGB p2, ColorRGB p3)
     {
@@ -19,6 +20,8 @@ public struct workOrder
 
         isActive = false;
         quantity = q;
+
+        machineIndex = -1;
 
         c1index = colorLib.getIndex(p1);
         c2index = colorLib.getIndex(p2);
@@ -31,4 +34,24 @@ public struct workOrder
     {
         isActive = true;
     }
+    public void makeInactive()
+    {
+        isActive = false;
+    }
+    public void adjustQuantity(int q)
+    {
+        quantity += q;
+    }
+
+    public void setQuantity(int q)
+    {
+        //Debug.Log("inmachine Quantity: (before)"+quantity);
+        quantity = q;
+        //Debug.Log("inmachine Quantity: (after)" +quantity);
+    }
+    public void updateIndex(int i)
+    {
+        machineIndex= i;
+    }
+
 }
