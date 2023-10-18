@@ -13,11 +13,15 @@ public struct workOrder
     ColorLibrary colorLib;
     public bool isActive;
     public int machineIndex;
+    public string name;
+    FlavorText fl;
 
     public workOrder(int q, ColorRGB p1, ColorRGB p2, ColorRGB p3)
     {
         colorLib = new ColorLibrary();
-
+        fl = new FlavorText();
+        
+        name = fl.orderName();
         isActive = false;
         quantity = q;
 
@@ -25,33 +29,48 @@ public struct workOrder
 
         c1index = colorLib.getIndex(p1);
         c2index = colorLib.getIndex(p2);
-        c3index = colorLib.getIndex(p3);   //gets the index for the color value, but saves the level
-        
-        
+        c3index = colorLib.getIndex(p3);   //gets the index for the color value, but saves the level 
     }
-
-    public void makeActive()
+    public workOrder(int q, int p1, int p2, int p3)
     {
-        isActive = true;
+        colorLib = new ColorLibrary();
+
+        fl = new FlavorText();
+        name = fl.orderName();
+        isActive = false;
+        quantity = q;
+
+        machineIndex = -1;
+
+        c1index = p1;
+        c2index = p2;
+        c3index = p3;   //gets the index for the color value, but saves the level
+
+
     }
-    public void makeInactive()
+    public workOrder(workOrder w)
+    {
+        colorLib = new ColorLibrary();
+
+        fl = new FlavorText();
+        name = fl.orderName();
+
+        isActive = false;
+        quantity = w.quantity;
+
+        machineIndex = -1;
+
+        c1index = w.c1index;
+        c2index = w.c2index;
+        c3index = w.c3index;
+
+    }
+    public void reset()
     {
         isActive = false;
+        machineIndex= -1;
+        c1index= 0;
+        c2index= 0;
+        c3index= 0;
     }
-    public void adjustQuantity(int q)
-    {
-        quantity += q;
-    }
-
-    public void setQuantity(int q)
-    {
-        //Debug.Log("inmachine Quantity: (before)"+quantity);
-        quantity = q;
-        //Debug.Log("inmachine Quantity: (after)" +quantity);
-    }
-    public void updateIndex(int i)
-    {
-        machineIndex= i;
-    }
-
 }

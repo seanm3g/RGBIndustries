@@ -9,36 +9,39 @@ public struct Machine
 {
 
     public int type, durability, maxDurability, batchSize, cycleTime, Yield;
-    public int status; //0 = idle, 1 = running, 2 = unloading, 3 = completed, 4 = broken, 5 = in maintenance 
+    public int status; //0 = idle, 1 = loading, 2 = running, 3 = unloading, 4 = completed, 5 = broken, 6 = in maintenance, 7 = choked 8= TOTALED;
     public String name;
-    public int c1,c2,c3,c1q,c2q,c3q;  //color 1, color 2, color 1 quantity, color 2 quantity.
+    public int c1, c2, c3, c1q, c2q, c3q;  //color 1, color 2, color 1 quantity, color 2 quantity.
     public int result;
-    public bool isLoading,isRunning,unloading,completed;
     public float elapsedTime;
     public int orderIndex;
 
+    private const int MACHINE_IDLE = 0;
+    private const int MACHINE_LOADING = 1;
+    private const int MACHINE_RUNNING = 2;
+    private const int MACHINE_UNLOADING = 3;
+    private const int MACHINE_COMPLETED = 4;
+    private const int MACHINE_BROKEN = 5;
+    private const int MACHINE_IN_MAINTENANCE = 6;
+    private const int MACHINE_CHOKED = 7;
 
-    public Machine(String name,int type, int maxDurability, int batchSize, int cycleTime, int Yield)
+    public Machine(String name, int type, int maxDurability, int batchSize, int cycleTime, int Yield)
     {
 
         result = 0;
         this.name = name;
         this.type = type;
-        
+
         this.maxDurability = maxDurability;
         durability = maxDurability;
-        
+
         this.batchSize = batchSize;
         this.cycleTime = cycleTime;
         this.Yield = Yield;
-        this.status = 7;
+        this.status = 0;
 
-        isLoading = false;
-        isRunning = false;
-        unloading = false;
-        completed = false;
         elapsedTime = 0f;
-        orderIndex = 0;
+        orderIndex = -1;
 
 
         c1 = -1;
@@ -49,7 +52,7 @@ public struct Machine
         c3q = 0;
 
     }
-    
+
     public override string ToString()
     {
         String strng = $"Machine Name: {name}\n Type: {type}\n Durability: {durability}\n Batch Size: {batchSize}\n Cycle Time: {cycleTime}\n Yield: {Yield}";
@@ -66,58 +69,45 @@ public struct Machine
 
     public void loadMachine(int c1q, int c2q)
     {
-        
-        this.c1q= c1q;
+
+        this.c1q = c1q;
         this.c2q = c2q;
         this.c3q = c2q;
-
-        isLoading = true;
-    }
-
-    public void startMachine()
-    {
-        
-        status = 1;
-        if (c1q>0 && c2q>0)
-        {
-            isLoading = false;
-            isRunning = true;
-        }
+        status = MACHINE_LOADING;
     }
     public void runMachine()
     {
-
-        durability--;
-        if (durability <= 0)
+        if (durability > 0)
         {
-            status = 1;
+            durability--;
+            result = c1q;  //add yield in, and recognize an order with still quanity        
         }
+        else status = 5;  //broken
 
-        isRunning = false;
-
-        result = c2q;  //add yield in, and recognize an order with still quanity
-        
     }
 
     public int unloadMachine()
     {
         int sendOff = result;
-        
         result = 0;
-        status = 7;
-        //completed = true;
 
         return sendOff;
 
     }
-    
+
     void repair()
     {
         maxDurability -= 1;
-        if (maxDurability <= 0)
+        if (maxDurability < 1)
         {
-            status = 3;
+            status = 8; //totaled machine
         }
         else durability = maxDurability;
+    }
+    public void reset()
+    {
+        elapsedTime = 0;
+        status = 0;
+        orderIndex = -1;
     }
 }

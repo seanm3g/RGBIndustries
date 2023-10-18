@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using TMPro;
 using Unity.VisualScripting;
 using Unity.VisualScripting.ReorderableList;
 using Unity.VisualScripting.ReorderableList.Element_Adder_Menu;
@@ -38,15 +39,19 @@ public class LogicCenter : MonoBehaviour
     public Text cyanPixelText;
     public Text whitePixelText;
 
+    public Text newWorkOrderButton;
+    public Text newWorkOrderQuantityBigText;
+    
+    public Text availableMachinesText;
     public Text chosenColorText;
 
     public GameObject SelectMenu;
     public GameObject UIbackground;
     public GameObject CanvasGO;
     public GameObject ProductionPage;
-    
+    public GameObject newWorkOrderWindow;
 
-    public Machine[] machines = new Machine[10];
+    public Machine[] machines = new Machine[8];
     public Employee[] employees = new Employee[10];
     public int[] inventory = new int[8];
     public int[] history = new int[8];
@@ -63,6 +68,7 @@ public class LogicCenter : MonoBehaviour
     public UnityEngine.UI.Image[] productionPixelImg = new UnityEngine.UI.Image[8];
     public UnityEngine.UI.Image[] productionIngredientAImg = new UnityEngine.UI.Image[8];
     public UnityEngine.UI.Image[] productionIngredientBImg = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Text[] productionNameText = new UnityEngine.UI.Text[8];
     public UnityEngine.UI.Text[] productionQuantityText = new UnityEngine.UI.Text[8];
     public UnityEngine.UI.Text[] productionStatusText = new UnityEngine.UI.Text[8];
     public UnityEngine.UI.Text[] productionMachineText = new UnityEngine.UI.Text[8];
@@ -81,7 +87,23 @@ public class LogicCenter : MonoBehaviour
 
     public List<workOrder> ProcessingQueue = new List<workOrder>();  //this is the production queue
 
-    /// </summary>
+
+    private const int MACHINE_IDLE = 0;
+    private const int MACHINE_LOADING = 1;
+    private const int MACHINE_RUNNING = 2;
+    private const int MACHINE_UNLOADING = 3;
+    private const int MACHINE_COMPLETED = 4;
+    private const int MACHINE_BROKEN = 5;
+    private const int MACHINE_IN_MAINTENANCE = 6;
+    private const int MACHINE_CHOKED = 7;
+
+
+    public int newWorkOrderColor;
+    public int newWorkOrderQuantity=1;
+
+    public TextMeshProUGUI NewWorkOrderoutput;
+    public TMP_InputField NewWorkOrderQuantityText;
+    public UnityEngine.UI.Image newWorkOrderPixelImg;
 
     void Start()
     {
@@ -90,6 +112,7 @@ public class LogicCenter : MonoBehaviour
         SelectMenu.SetActive(true);
         UIbackground.SetActive(true);
         ProductionPage.SetActive(false);
+        newWorkOrderWindow.SetActive(false);
 
         setupInventory();
         setupMenu();
@@ -115,54 +138,50 @@ public class LogicCenter : MonoBehaviour
         
         updateMenu();
         runMachines();
-        //updateQueue();
+
     }
+    /// <summary>
+    /// machine function begin
+    /// 
+    /// </summary>
 
     private void runMachines()  //could add an idle condition
     {
 
         for (int i = 0; i < machines.Length; i++)
         {
-            if (machines[i].isLoading)
-                isLoading(i);
-            if (machines[i].isRunning)
-                isRunning(i);
-            if (machines[i].unloading)  //unload the pixels to inventory
-                isUnloading(i);
-            if (machines[i].completed)
-                isComplete(i);
+            if (machines[i].status == 1)
+                machineIsLoading(i);
+            if (machines[i].status == 2)
+                machineIsRunning(i);
+            if (machines[i].status == 3)  //unload the pixels to inventory
+                machineIsUnloading(i);
+            if (machines[i].status == 4)
+                machineIsComplete(i);
         }
         updateProductionUI();
 
     }
 
-    public void isLoading(int i)
+    public void machineIsLoading(int i)
     {
-        //productionStatusText[i].text = ft.woStatuses[2];
-        productionMachineText[i].text = machines[i].name;
+
         machines[i].elapsedTime += Time.deltaTime;
 
         if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
         {
             // Reset the elapsed time and stop processing
-            machines[i].startMachine();
             machines[i].elapsedTime = 0f;
 
            // Debug.Log("but are we getting here?");
             // Signal that the output is ready
-            machines[i].isLoading = false;
-            machines[i].isRunning = true;
+            machines[i].status = MACHINE_RUNNING;
         }
     }
 
-    public void isRunning(int i)
+    public void machineIsRunning(int i)
     {
-
-       // productionStatusText[i].text = ft.woStatuses[3];  //sets to in production
-      //  productionMachineText[i].text = machines[i].name;
-        //Debug.Log($"machine {i} is {machines[i].isRunning}");
         machines[i].elapsedTime += Time.deltaTime;
-        //Debug.Log($"machine {i} time is {machines[i].elapsedTime}");
 
         if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
         {
@@ -172,124 +191,237 @@ public class LogicCenter : MonoBehaviour
             machines[i].elapsedTime = 0f;
 
             // Signal that the output is ready
-            machines[i].unloading = true;
+            updateEvents(5);
+            machines[i].status = MACHINE_UNLOADING;
         }
 
     }
 
-    public void isUnloading(int i)
+    public void machineIsUnloading(int i)
     {
-        //productionStatusText[i].text = ft.woStatuses[4];  //sets to in production
-
-        Debug.Log("i: " + i);
-        Debug.Log("ProcessingQueue.Count: " + ProcessingQueue.Count);
-        Debug.Log("machines.Length: " + machines.Length);
-
-        
-
         machines[i].elapsedTime += Time.deltaTime;
 
         if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
         {
             workOrder wo = ProcessingQueue[machines[i].orderIndex];
+            int inventoryIndex = ProcessingQueue[machines[i].orderIndex].c3index;
             int product = machines[i].unloadMachine();
-            
-            inventory[ProcessingQueue[machines[i].orderIndex].c3index] += product; //unloads the production quantity to inventory. Could be added to have randomness.
-            wo.quantity -= product;
 
-            machines[i].unloading = false;
-            machines[i].completed = true;
+            //Debug.Log($"product: {product}\ninventory Color Quantity: {inventory[ProcessingQueue[machines[i].orderIndex].c3index]}\nWork Order quantity: {wo.quantity}");
+            inventory[inventoryIndex] += product; //unloads the production quantity to inventory. Could be added to have randomness.
+            //wo.quantity -= product;
+            //Debug.Log($"product: {product}\ninventory Color Quantity: {inventory[ProcessingQueue[machines[i].orderIndex].c3index]}\nWork Order quantity: {wo.quantity}");
+            machines[i].status = MACHINE_COMPLETED;
             machines[i].elapsedTime = 0f;
+
             updateEvents(4);  //says job is processed
             ProcessingQueue[machines[i].orderIndex] = wo;  //check it back into the data
-
         }
-        
     }
 
-    public void isComplete(int i)
+    public void machineIsComplete(int i)
     {
         machines[i].elapsedTime += Time.deltaTime;
 
+
+
         if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
         {
-            //productionStatusText[i].text = ft.woStatuses[5];
-            machines[i].elapsedTime = 0f;
+            //check out
+            Machine m = machines[i];
+            int orderIndex = machines[i].orderIndex;
+            workOrder wo = ProcessingQueue[orderIndex];
 
-            machines[i].isRunning = false;
-            machines[i].isLoading = false;
-            machines[i].unloading = false;
-            machines[i].completed = false;
+            Debug.Log("The order:" + orderIndex + " is being completed");
 
-            //if (ProcessingQueue[i].quantity > 0)
+            //the work
+            wo.quantity -= m.c3q;
+            wo.isActive = false;
 
-            if(ProcessingQueue[machines[i].orderIndex].quantity == 0)  //removes the order if it's been fully completed.
-                ProcessingQueue.RemoveAt(machines[i].orderIndex);
+            if (wo.quantity > 0)
+                ProcessingQueue.Add(new workOrder(wo));
 
-               
-        }
-    }
+            m.elapsedTime = 0;
+            m.status = 0;
+            m.orderIndex = -1;
+            //m.reset();  //resets the machine
 
-    public void updateProductionUI()
-    {
-        for (int i = 0; i < ProcessingQueue.Count; i++)  //set status based on the current machine status
-        {
-            int index = ProcessingQueue[i].machineIndex;
+            //check in
+            ProcessingQueue[orderIndex] = wo;
+            machines[i] = m;
+            Debug.Log(machines[i].status);
+            Debug.Log(ProcessingQueue[orderIndex].name);
 
-            //Debug.Log("INDEX: " + index);
-            //Debug.Log("machine "+i+": "+ machines[i].isLoading);
-            //Debug.Log("are we getting to the UI update?");
-            if (index > -1)
+            //readyToRemove[i] = orderIndex;
+            // Update orderIndex for all machines that are affected by the removal
+            
+
+            // Remove the work order from the queue
+            ProcessingQueue.RemoveAt(orderIndex);
+            for (int j = 0; j < machines.Length; j++)
             {
-                if (machines[index].isLoading)
+                if (machines[j].orderIndex > orderIndex)
                 {
-                    productionBarImg[i].color = Color.yellow;
-                    productionStatusText[i].color = Color.blue;
-                    productionStatusText[i].text = ft.woStatuses[2];
-                    productionMachineText[i].text = machines[i].name;
-                }
-                else if (machines[index].isRunning)
-                {
-                    productionBarImg[i].color = Color.green;
-                    productionStatusText[i].color = Color.white;
-                    productionStatusText[i].text = ft.woStatuses[3];
-                    productionMachineText[i].text = machines[i].name;
-                }
-                else if (machines[index].unloading)
-                {
-                    productionBarImg[i].color = Color.gray;
-                    productionStatusText[i].color = Color.yellow;
-                    productionStatusText[i].text = ft.woStatuses[4];
-
-                }
-                else if (machines[index].completed)
-                {
-
-                    if (ProcessingQueue[machines[index].orderIndex].quantity < 1)
-                    {
-                        productionStatusText[i].text = ft.woStatuses[5];
-                        productionBarImg[i].color = Color.yellow;
-                        productionStatusText[i].color = Color.green;
-                    }
-                    else
-                    {
-                        productionStatusText[i].text = ft.woStatuses[1];
-                        productionBarImg[i].color = Color.gray;
-                        productionStatusText[i].color = Color.red;
-                    }
-
+                    machines[j].orderIndex -= 1;
                 }
             }
-            else  //unassigned
+        }
+    }
+    
+    public void updateProductionUI()
+    {
+        int index =-1;
+
+        for (int i = 0; i < productionEntry.Count; i++)  //set status based on the current machine status
+        {
+            if(i < ProcessingQueue.Count)  //if the orders count is less
+            { 
+                index = ProcessingQueue[i].machineIndex;
+
+                //Debug.Log("INDEX: " + index);
+                //Debug.Log("machine "+i+": "+ machines[i].isLoading);
+                //Debug.Log("are we getting to the UI update?");
+                if (index >= 0 && index < machines.Length)
+                {
+                    if (machines[index].status == MACHINE_LOADING) 
+                    {
+                        productionBarImg[i].color = Color.yellow;
+                        productionStatusText[i].color = Color.green;
+                        productionStatusText[i].text = ft.woStatuses[2];
+                        productionMachineText[i].text = machines[i].name;
+                    }
+                    else if (machines[index].status == MACHINE_RUNNING)
+                    {
+                        productionBarImg[i].color = Color.green;
+                        productionStatusText[i].color = Color.white;
+                        productionStatusText[i].text = ft.woStatuses[3];
+                    }
+                    else if (machines[index].status == MACHINE_UNLOADING)
+                    {
+                        productionBarImg[i].color = Color.white;
+                        productionStatusText[i].color = Color.red;
+                        productionStatusText[i].text = ft.woStatuses[4];
+
+                    }
+                    else if (machines[index].status == MACHINE_COMPLETED)
+                    {
+
+                            productionStatusText[i].text = ft.woStatuses[5];
+                            productionBarImg[i].color = Color.white;
+                            productionStatusText[i].color = Color.green;
+                            productionMachineText[i].text = "";
+                    }
+                }
+                else  //unassigned
+                {
+                    productionBarImg[i].color = Color.white;
+                    productionStatusText[i].color = Color.black;
+                    productionStatusText[i].text = ft.woStatuses[1];
+                    //productionMachineText[i].text = "Not Assigned";
+                    productionMachineText[i].text = "";
+                }
+            }
+            else
             {
                 productionBarImg[i].color = Color.white;
                 productionStatusText[i].color = Color.black;
-                productionStatusText[i].text = ft.woStatuses[1];
-                productionMachineText[i].text = "Not Assigned";
+                productionStatusText[i].text = ft.woStatuses[7];
+                //productionMachineText[i].text = "Not Assigned";
+                productionMachineText[i].text = "";
+            }
+        }
+    }
+
+    /// <summary>
+    /// / machine functions end
+    /// </summary>
+    /// 
+
+    public void assignNewWorkOrderColor(int val)  //sets the new color
+    {
+        if (val == 0)
+        {
+            newWorkOrderPixelImg.color = Color.yellow;
+            newWorkOrderColor = 4;
+        }
+        else if (val == 1)
+        {
+            newWorkOrderPixelImg.color = Color.magenta;
+            newWorkOrderColor = 5;
+        }
+        else if (val == 2)
+        {
+            newWorkOrderPixelImg.color = Color.cyan;
+            newWorkOrderColor = 6;
+        }
+        else if (val == 3) 
+        {
+            newWorkOrderPixelImg.color = Color.white;
+            newWorkOrderColor = 7; 
+        }
+    }
+
+    public void assignNewWorkOrderQuantity(String val)
+    {
+        bool isNum = int.TryParse(val,out newWorkOrderQuantity);
+        if(isNum)
+            newWorkOrderQuantity = int.Parse(val);
+
+        if(val !=null)
+            newWorkOrderQuantityBigText.text = val + "x";
+       // NewWorkOrderQuantity.text = int.Parse(val);
+    }
+
+    public void makeNewWorkOrder()  //updates the button to be used in two ways.
+    {
+
+        if (newWorkOrderWindow.activeSelf)
+        {
+            newWorkOrderWindow.SetActive(false);
+
+            newWorkOrderButton.text = "+";
+            newWorkOrderButton.color = Color.black;
+            newWorkOrderButton.transform.Rotate(0, 0, -45);
+        }
+
+        else
+        {
+            newWorkOrderButton.transform.Rotate(0,0,45);
+            newWorkOrderButton.color = Color.red;
+            newWorkOrderWindow.SetActive(true);
+        }
+    }
+    public void cancelNewWorkOrder()
+    {
+        newWorkOrderWindow.SetActive(false);
+    }
+    public void addNewWorkOrder()
+    {
+        if(newWorkOrderColor == 4) //yellow
+            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1,2,newWorkOrderColor));
+        if (newWorkOrderColor == 5) //magenta
+            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 2, 3, newWorkOrderColor));
+        if (newWorkOrderColor == 6) //cyan
+            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1, 3, newWorkOrderColor));
+        if (newWorkOrderColor == 7) //white
+        {
+
+            switch(rollDice(1,3))  //randomly chooses which one you have to make
+            {
+                case 1:
+                    ProcessingQueue.Add(new workOrder(5, 3, 4, newWorkOrderColor));
+                    break;
+                case 2:
+                    ProcessingQueue.Add(new workOrder(5, 2, 5, newWorkOrderColor));
+                    break;
+                case 3:
+                    ProcessingQueue.Add(new workOrder(5, 1, 6, newWorkOrderColor));
+                    break;
             }
             
         }
     }
+    
     public void setupQueue()
     {
         ColorRGB[] level1 = new ColorRGB[8];
@@ -302,138 +434,115 @@ public class LogicCenter : MonoBehaviour
         level1[6] = new ColorRGB(0,1,1);
         level1[7] = new ColorRGB(1,1,1);
 
-        for(int i = 0; i < 8; i++)
+        for(int i = 0; i < 4; i++)
         {      
             int r = rollDice(1, 4);
 
-            if (i < 5)
+            if (i < 6)
                 r = rollDice(1, 3);
 
-            int q = rollDice(4, 2);
+            int q = rollDice(2, 4);
 
             switch (r)
             {
                 case 1:
-                    ProcessingQueue.Add(new workOrder(q, level1[1], level1[2], level1[4]));  //make yellow
+                    ProcessingQueue.Add(new workOrder(q,1,2,4));  //make yellow
                     break;
                 case 2: 
-                    ProcessingQueue.Add(new workOrder(q, level1[1], level1[3], level1[5]));  //makes magenta
+                    ProcessingQueue.Add(new workOrder(q,1, 3, 5));  //makes magenta
                     break;
                 case 3:
-                    ProcessingQueue.Add(new workOrder(q, level1[2], level1[3], level1[6])); //cyan
+                    ProcessingQueue.Add(new workOrder(q,2, 3, 6)); //makes cyan
                     break;
                 case 4:
                     switch (rollDice(1, 3))
                     {
-                        case 1: ProcessingQueue.Add(new workOrder(q, level1[3], level1[4], level1[7])); //white
+                        case 1: ProcessingQueue.Add(new workOrder(q, 3, 4, 7)); //white
                             break;
-                        case 2: ProcessingQueue.Add(new workOrder(q, level1[2], level1[5], level1[7])); //white
+                        case 2: ProcessingQueue.Add(new workOrder(q, 2, 5, 7)); //white
                             break;
-                        case 3: ProcessingQueue.Add(new workOrder(q, level1[1], level1[6], level1[7])); //white
+                        case 3: ProcessingQueue.Add(new workOrder(q, 1, 6, 7)); //white
                             break;
                     }
                     break;
             }
-
-
         }
+    }   //this initliaties the random beginning of the game
 
-        /*
-        ProcessingQueue.Add(new workOrder(3, level1[1], level1[3], level1[5]));  //make magenta
-        ProcessingQueue.Add(new workOrder(5, level1[1], level1[2], level1[4]));  //make yellow
-        ProcessingQueue.Add(new workOrder(2, level1[1], level1[3], level1[5]));  //make magenta
-        ProcessingQueue.Add(new workOrder(8, level1[1], level1[2], level1[4]));  //make yellow
-        ProcessingQueue.Add(new workOrder(5, level1[1], level1[3], level1[5]));  //make magenta
-        ProcessingQueue.Add(new workOrder(5, level1[1], level1[3], level1[5]));  //make magenta
-        ProcessingQueue.Add(new workOrder(2, level1[1], level1[2], level1[4]));  //make yellow
-        ProcessingQueue.Add(new workOrder(10,level1[3], level1[4], level1[7]));  //make white
-        */
+    public void updateQueue()  // Pairs orders to machines // Could use an update if an order is too large.
+    {
+        int firstAvailableMachineIndex = FindFirstAvailableMachine();
+        int firstUnassignedOrderIndex = FindFirstUnassignedOrder();
+
+        if (firstAvailableMachineIndex != -1 && firstUnassignedOrderIndex != -1)
+        {
+            AssignOrderToMachine(firstAvailableMachineIndex, firstUnassignedOrderIndex);
+            updateEvents(4);
+        }
+        
     }
 
-    public void updateQueue()  //pairs orders to Machines
+    private int totalAvailableMachines()
     {
-        // Initialize variables to keep track of the first available machine and the first job that needs assigning.
-        int firstAvailable = -1;
-        int firstNeeded = -1;
+        int total = 0;
 
-        // Search for the first available machine.
+        for(int i=0; i<machines.Length;i++)
+            if (machines[i].status == 0)
+                total++;
+
+        return total;
+    }
+
+    private int FindFirstAvailableMachine()
+    {
         for (int i = 0; i < machines.Length; i++)
         {
-            if (machines[i].status == 7)  // 7 indicates an available machine
+            if (machines[i].status == MACHINE_IDLE)
             {
-                firstAvailable = i;
-                break;  // Exit the loop once the first available machine is found.
+                return i;
             }
         }
+        return -1;
+    }
 
-        // Search for the first job that needs assigning.
+    private int FindFirstUnassignedOrder()
+    {
         for (int i = 0; i < ProcessingQueue.Count; i++)
         {
             if (!ProcessingQueue[i].isActive)
             {
-                firstNeeded = i;
-                
-                break;  // Exit the loop once the first job that needs assigning is found.
+                return i;
             }
         }
-
-        // If the queue is empty or no machines are available, exit the method.
-        if (ProcessingQueue.Count == 0 || firstAvailable == -1)
-        {
-            updateEvents(15);
-            return;
-        }
-
-        workOrder wo = ProcessingQueue[firstNeeded];
-
-
-        updateEvents(5);  // Update events (assuming this method logs or updates some state)
-        
-        wo.isActive = true;  // Mark the job as active.
-        wo.machineIndex = firstAvailable;  //testing this, sets which machine it's assigned to
-        
-        machines[firstAvailable].orderIndex = firstNeeded;        //sets the index the machine is working with in the queue.
-
-        
-        
-        ProcessingQueue[firstNeeded] = wo;
-
-        processOrder(firstAvailable, firstNeeded);  // Process the order.
-
-        
+        return -1;
     }
 
-    private void processOrder(int selectedMachine, int selectedWO)  //selectedMachine of the machine to be used
+    private void AssignOrderToMachine(int machineIndex, int orderIndex)
     {
-        workOrder wo = ProcessingQueue[selectedWO];
+        workOrder wo = ProcessingQueue[orderIndex];
+        Machine m = machines[machineIndex];
 
-        // Assign the order to the machine and update the selectedMachine
-
-        machines[selectedMachine].assignOrder(wo); // sets the machine up for what it wants to produce.
-        wo.machineIndex = selectedMachine;  // sets up the work order to
-
-        // Determine the quantity to move to the machine
-        int c1Quantity = DetermineQuantity(wo.c1index, wo.quantity);
+        int c1Quantity = DetermineQuantity(wo.c1index, wo.quantity); //Determine if there's enough in the inventory to run the order.
         int c2Quantity = DetermineQuantity(wo.c2index, c1Quantity);
         c1Quantity = c2Quantity;
 
-        // If either quantity is zero, set the machine status to 'starved' and return
-        if (c1Quantity <= 0 || c2Quantity <= 0)
+        if(c1Quantity==wo.quantity)  //it's a full order
         {
-            machines[selectedMachine].status = 4;
-            return;
+            wo.machineIndex = machineIndex; //sets the machine being used for the order.
+            m.orderIndex = orderIndex;  //sets the order being run for the machine
+            ProcessingQueue[orderIndex] = wo;
+
+            wo.isActive = true;
+
+            m.assignOrder(wo);
+            inventory[m.c1] -= c1Quantity;
+            inventory[m.c2] -= c2Quantity;
+            m.loadMachine(c1Quantity, c2Quantity);
+            
         }
 
-        // Load the machine and start it
-        machines[selectedMachine].loadMachine(c1Quantity, c2Quantity);
-
-        // Update the order to reflect what has been produced already.
-        
-
-        ProcessingQueue[selectedWO] = wo; //adds the wo back to the collection.
-        // If there's a remaining quantity, update the ProcessingQueue
-
-        // machines[selectedMachine].startMachine();
+        machines[machineIndex] = m;
+        ProcessingQueue[orderIndex] = wo;
     }
 
     private int DetermineQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
@@ -450,8 +559,6 @@ public class LogicCenter : MonoBehaviour
             quantityToUse = availableQuantity;
         }
 
-        // Update the inventory
-        inventory[componentIndex] -= quantityToUse;
         return quantityToUse;
     }
 
@@ -460,18 +567,19 @@ public class LogicCenter : MonoBehaviour
         for(int i = 0; i < inventory.Length;i++)
             inventory[i] = 0;
 
-        inventory[1] = 10;
-        inventory[2] = 10;
-        inventory[3] = 10;
+        inventory[1] = 100;
+        inventory[2] = 100;
+        inventory[3] = 100;
 
         //Console.WriteLine("Setup run");
 
-        for (int i = 0; i < 10; i++)  //setup both things
+        for (int i = 0; i < employees.Length; i++)  //setup both things
         {
             employees[i] = new Employee(rollDice(1, 10), rollDice(1, 10), rollDice(1, 10), 16 + rollDice(1, 45), rollDice(1, 10), rollDice(1, 10));
-            machines[i] = new Machine(ft.generateMachineName(), 1, rollDice(3, 6), 60 * rollDice(1, 6), 1 + rollDice(3, 3), 103 - rollDice(3, 6)); 
+            
         }
-        //Debug.Log(machines[0]);
+        for(int i = 0; i < machines.Length;i++)
+            machines[i] = new Machine(ft.generateMachineName(), 1, rollDice(3, 6), 60 * rollDice(1, 6),rollDice(1,6), 103 - rollDice(3, 6));
 
     }
     
@@ -560,6 +668,7 @@ public class LogicCenter : MonoBehaviour
             productionPixelImg[i] = productionEntry[i].transform.Find("image").GetComponent<UnityEngine.UI.Image>();
             productionIngredientAImg[i] = productionEntry[i].transform.Find("ingredient A").GetComponent<UnityEngine.UI.Image>();
             productionIngredientBImg[i] = productionEntry[i].transform.Find("ingredient B").GetComponent<UnityEngine.UI.Image>();
+            productionNameText[i] = productionEntry[i].transform.Find("NAME").GetComponent<UnityEngine.UI.Text>();
             productionQuantityText[i] = productionEntry[i].transform.Find("QUANTITYNUM").GetComponent<UnityEngine.UI.Text>();
             productionStatusText[i] = productionEntry[i].transform.Find("STATUS").GetComponent<UnityEngine.UI.Text>();
             productionMachineText[i] = productionEntry[i].transform.Find("MACHINE NAME").GetComponent<UnityEngine.UI.Text>();
@@ -636,7 +745,7 @@ public class LogicCenter : MonoBehaviour
             }
         }
 
-        Debug.Log("processing queue length: "+ProcessingQueue.Count);
+       // Debug.Log("processing queue length: "+ProcessingQueue.Count);
         for (int i = 0; i < productionEntry.Count; i++)
         {
             //Debug.Log($"production pixel image: {productionPixelImg[i]}");
@@ -649,13 +758,15 @@ public class LogicCenter : MonoBehaviour
                 Color tempColor = new Color(colorLib.colors[outputIndex].r,colorLib.colors[outputIndex].g,colorLib.colors[outputIndex].b);
                 Color ingredientA = new Color(colorLib.colors[ingredientAindex].r, colorLib.colors[ingredientAindex].g, colorLib.colors[ingredientAindex].b);
                 Color ingredientB = new Color(colorLib.colors[ingredientBindex].r, colorLib.colors[ingredientBindex].g, colorLib.colors[ingredientBindex].b);
+
                 productionPixelImg[i].color = tempColor;
                 productionIngredientAImg[i].color = ingredientA;
                 productionIngredientBImg[i].color = ingredientB;
+                productionNameText[i].text = ProcessingQueue[i].name;
 
-                if (!ProcessingQueue[i].isActive)
+                //if (!ProcessingQueue[i].isActive)
                     productionQuantityText[i].text = ProcessingQueue[i].quantity.ToString();
-                else productionQuantityText[i].text = ProcessingQueue[i].quantity.ToString() + "(-" + machines[ProcessingQueue[i].machineIndex].c2q +")";
+                ///else productionQuantityText[i].text = ProcessingQueue[i].quantity.ToString() + "(-" + machines[ProcessingQueue[i].machineIndex].c2q +")";
 
             }
             else
@@ -664,6 +775,8 @@ public class LogicCenter : MonoBehaviour
                 productionStatusText[i].text = "";
                 productionPixelImg[i].color = Color.white;
                 productionQuantityText[i].text = "";
+                productionIngredientAImg[i].color = Color.white;
+                productionIngredientBImg[i].color = Color.white;
             }
 
         }
@@ -738,7 +851,6 @@ public class LogicCenter : MonoBehaviour
         }
 
     }
-
     public void updateToken()
     {
         chosenColor = selectedColor;
@@ -795,6 +907,8 @@ public class LogicCenter : MonoBehaviour
         magentaPixelText.text = inventory[5].ToString();
         cyanPixelText.text = inventory[6].ToString();
         whitePixelText.text = inventory[7].ToString();
+
+        availableMachinesText.text = "Available Machines:\n" + totalAvailableMachines().ToString() + "/" + machines.Length;
     }
 
     public void harvest()
@@ -854,13 +968,20 @@ public class LogicCenter : MonoBehaviour
         
     }
 
-    public int rollDice(int dice, int max)  //rolls x dice of 1 to max
+    /// <summary>
+    /// //
+    /// </summary>
+    /// <param name="dice"> number of dice</param>
+    /// <param name="max"> sides of dice</param>
+    /// <returns>a random value  </returns>
+    /// 
+    public int rollDice(int dice, int sides)  //rolls x dice of 1 to max
     {
         int roll = 0;
 
         for(int i = 0; i < dice;i++)
         {
-            roll += r.Next(1, max+1);
+            roll += r.Next(1, sides+1);
         }
 
         return roll;

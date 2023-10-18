@@ -13,7 +13,7 @@ public class FlavorText
     public string[] machineStatuses = { "Idle", "Running", "Faulted", "Blocked", "Starved", "Changeover", "Maintenace", "Available", "Ready" };
     public string[] factoryEvents = { "Machine Malfunction", "Safety Inspection", "Inventory Restock", "Employee Training", "Quality Control Audit", "Shift Change", "Power Outage", "Scheduled Maintenance", "Product Launch", "Emergency Drill" };
     public string[] eventStatuses = { "", "Red Chosen!", "Green Chosen!", "Blue Chosen!", "Job is processed", "Machine is Running", "Random Event/Flavor Text", "Machine is Starved", "harvesting...", "Upgrade Harvest Capacity", "Harvester at capacity", "Maintenance", "Refinery Started", "Seasonal", "System","Production Idle"};
-    public string[] woStatuses = {"N/A","In Queue","Loading","In Production","Unloading","Completed","Incomplete"};
+    public string[] woStatuses = {"N/A","In Queue","Loading","In Production","Unloading","Completed","Incomplete",""};
     //public string[][] int = { [3,3,] };
     // A way of storing a bunch of arrays.
 
@@ -55,6 +55,22 @@ public class FlavorText
             char randomNum = segment2Numbers[UnityEngine.Random.Range(0, segment2Numbers.Length)];
             machineName += randomNum;
         }
+        return machineName;
+    }
+
+    public string orderName()
+    {
+        string segment1Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        String machineName = "";
+
+        // Generate the first segment (e.g., "TJZ")
+        for (int i = 0; i < 3; i++)
+        {
+            char randomChar = segment1Chars[UnityEngine.Random.Range(0, segment1Chars.Length)];
+            machineName += randomChar;
+        }
+
         return machineName;
     }
 }
