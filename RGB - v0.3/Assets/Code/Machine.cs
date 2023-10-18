@@ -55,7 +55,7 @@ public struct Machine
 
     public override string ToString()
     {
-        String strng = $"Machine Name: {name}\n Type: {type}\n Durability: {durability}\n Batch Size: {batchSize}\n Cycle Time: {cycleTime}\n Yield: {Yield}";
+        String strng = $"Machine Name: {name}\n status: {status}\n Order Index: {orderIndex}\n Durability: {durability}\n Batch Size: {batchSize}\n Cycle Time: {cycleTime}\n Yield: {Yield}";
         return strng;
     }
 

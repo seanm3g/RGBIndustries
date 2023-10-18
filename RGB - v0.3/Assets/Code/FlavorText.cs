@@ -10,7 +10,7 @@ public class FlavorText
     public string[] hobbies = { "Reading", "Swimming", "Cycling", "Hiking", "Gaming", "Cooking", "Painting", "Fishing", "Photography", "Music" };
     public string[] factoryJobs = { "Assembler", "Machine Operator", "Quality Inspector", "Forklift Driver", "Maintenance Technician", "Welder", "Packager", "Material Handler", "Production Supervisor", "Safety Manager" };
     public string[] employeeStatuses = { "Full-Time", "Part-Time", "Temporary", "Contract", "Intern", "Freelance", "Remote", "On Leave", "Unemployed", "Retired" };
-    public string[] machineStatuses = { "Idle", "Running", "Faulted", "Blocked", "Starved", "Changeover", "Maintenace", "Available", "Ready" };
+    public string[] machineStatuses = { "IDLE", "RUNNING", "Faulted", "Blocked", "Starved", "Changeover", "Maintenace", "Available", "Ready" };
     public string[] factoryEvents = { "Machine Malfunction", "Safety Inspection", "Inventory Restock", "Employee Training", "Quality Control Audit", "Shift Change", "Power Outage", "Scheduled Maintenance", "Product Launch", "Emergency Drill" };
     public string[] eventStatuses = { "", "Red Chosen!", "Green Chosen!", "Blue Chosen!", "Job is processed", "Machine is Running", "Random Event/Flavor Text", "Machine is Starved", "harvesting...", "Upgrade Harvest Capacity", "Harvester at capacity", "Maintenance", "Refinery Started", "Seasonal", "System","Production Idle"};
     public string[] woStatuses = {"N/A","In Queue","Loading","In Production","Unloading","Completed","Incomplete",""};
