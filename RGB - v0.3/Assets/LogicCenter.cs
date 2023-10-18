@@ -138,12 +138,10 @@ public class LogicCenter : MonoBehaviour
         
         updateMenu();
         runMachines();
+        
 
     }
-    /// <summary>
-    /// machine function begin
-    /// 
-    /// </summary>
+
 
     private void runMachines()  //could add an idle condition
     {
@@ -152,13 +150,14 @@ public class LogicCenter : MonoBehaviour
         {
             if (machines[i].status == 1)
                 machineIsLoading(i);
-            if (machines[i].status == 2)
+            else if (machines[i].status == 2)
                 machineIsRunning(i);
-            if (machines[i].status == 3)  //unload the pixels to inventory
+            else if (machines[i].status == 3)  //unload the pixels to inventory
                 machineIsUnloading(i);
-            if (machines[i].status == 4)
+            else if (machines[i].status == 4)
                 machineIsComplete(i);
         }
+
         updateProductionUI();
 
     }
@@ -575,7 +574,7 @@ public class LogicCenter : MonoBehaviour
 
         for (int i = 0; i < employees.Length; i++)  //setup both things
         {
-            employees[i] = new Employee(rollDice(1, 10), rollDice(1, 10), rollDice(1, 10), 16 + rollDice(1, 45), rollDice(1, 10), rollDice(1, 10));
+            employees[i] = new Employee(0);
             
         }
         for(int i = 0; i < machines.Length;i++)

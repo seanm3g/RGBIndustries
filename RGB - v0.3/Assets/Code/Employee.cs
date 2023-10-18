@@ -2,37 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using System;
 
 public struct Employee
 {
-    public int firstName,lastName;
-    public int job;
+    public int firstName, lastName;
+    public int job;   //
+    public int employmentStatus;
     public int age;
-    public int status;
+    public int status;  //1 = fulltime.
     public int hobby; //values like this will all be index's in the master library of names, hobbies, flavortext, etc.
-    FlavorText f;
-    public Employee(int fn,int ln,int job,int age,int hobby, int status)
+    FlavorText ft;
+
+    public System.Random r;
+
+    public int[] skills;   // 0 = SPEED, RELIABILITY, INTELLIGENCE
+
+    public Employee(int job)
     {
+        r = new System.Random();
+        ft = new FlavorText();
 
-        f = new FlavorText();
-        firstName = fn;
-        lastName = ln;
+
+        firstName = ft.rollDice(1,ft.firstNames.Length); //random name
+        lastName = ft.rollDice(1, ft.firstNames.Length);
+        this.hobby = r.Next(0, ft.hobbies.Length); //random hobby
+
+        employmentStatus = 0;
         this.job = job;
-        this.age = age;
-        this.hobby = hobby;
-        this.status = status; 
-        //hobby[0] = "Doesn't find anything particularly interesting";
-        //hobby[1] = "loves dogs";
-        //hobby[2] = "can't stop talking about the weather;
-        //hobby[3] = "loves cats";
-        //hobby[4] = "enjoys going to the movies";
-        //hobby[5] = "loves cats";
-        //Debug.Log($"First Name:{f.firstNames[fn]}/n Last Name:{f.lastNames[ln]}/n Job:{job}/n age:{age}/n Status:{status}");
+        
+        this.status = 0;
 
+        skills = new int[]{0,0,0};
+        for (int i = 0; i < skills.Length; i++)
+        {
+            skills[i] = ft.rollDice(1,20); 
+        }
+        age = 0;
+        age = 14 + ft.rollDice(4, 8);
+        
     }
+
 
     public override string ToString()
     {
-        return $"Person [First Name: {f.firstNames[firstName]}\nLast Name: {f.lastNames[lastName]}\nAge: {age}\nHobby: {f.hobbies[this.hobby]}\nStatus: {f.employeeStatuses[this.status]}";
+        return $"Person [First Name: {ft.firstNames[firstName]}\nLast Name: {ft.lastNames[lastName]}\nAge: {age}\nHobby: {ft.hobbies[this.hobby]}\nStatus: {ft.employeeStatuses[this.status]}";
+    }
+
+    public void happybirthday()
+    {
+        age++;
+    }
+
+    public void retire()
+    {
+        status = 9;
     }
 }
