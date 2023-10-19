@@ -708,19 +708,18 @@ public class LogicCenter : MonoBehaviour
             if (i == 0) machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY");
             else machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY (" + i + ")");
 
-            if (machineEntry[i] == null) { Debug.Log("This crashes!" + i); }
-            else Debug.Log("This one worked!" + i);
-
-
-
-        
-            machineMenuNameText[i] = machineEntry[i].transform.Find("MACHINE NAME").GetComponent<Text>();
-            machineMenuStatusText[i] = machineEntry[i].transform.Find("STATUS").GetComponent<Text>();
-            machineMenuAssignementText[i] = machineEntry[i].transform.Find("ASSIGNMENT").GetComponent<Text>();
-            machineMenuDMDText[i] = machineEntry[i].transform.Find("DURABILITY").GetComponent<Text>();
-            machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
-            machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
-            machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
+            if (machineEntry[i] == null)
+                Debug.Log("This crashes!" + i);
+            else 
+            { 
+                machineMenuNameText[i] = machineEntry[i].transform.Find("MACHINE NAME").GetComponent<Text>();
+                machineMenuStatusText[i] = machineEntry[i].transform.Find("STATUS").GetComponent<Text>();
+                machineMenuAssignementText[i] = machineEntry[i].transform.Find("ASSIGNMENT").GetComponent<Text>();
+                machineMenuDMDText[i] = machineEntry[i].transform.Find("DURABILITY").GetComponent<Text>();
+                machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
+                machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
+                machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
+            }
         }
 
     }
@@ -833,7 +832,6 @@ public class LogicCenter : MonoBehaviour
 
         for (int i = 0; i < machineEntry.Length; i++)  //UPDATE MACHINES
         {
-            Debug.Log(i);
             if (i < machines.Length)
             {
                 Machine m = machines[i];
