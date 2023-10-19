@@ -588,6 +588,7 @@ public class LogicCenter : MonoBehaviour
     public void setupMenu()
     {
         GameObject eventslayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
+        
         if (eventslayout == null)
         {
             Debug.LogError("Could not find GameObject named 'eventslayout'");
@@ -620,7 +621,7 @@ public class LogicCenter : MonoBehaviour
 
         }
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)  //SETUP EVENTLIST
         {
            // Debug.Log(productionEntry[i]);
            // Debug.Log($"work order entry: {workOrderEntry}");
@@ -631,7 +632,28 @@ public class LogicCenter : MonoBehaviour
             eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>(); //set the text from panels
             eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>(); //set the
         }
-        
+        /*
+        for(int i = 0;i<machineEntry.Length; i++)  //SETS UP MACHINE ENTRY
+        {
+            Debug.Log("Do we get here?");
+            if(i==0) machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY");
+            else machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY (" + i+")");
+            Debug.Log("But do we get here?");
+
+            if (machineEntry[i] == null) { Debug.Log("This crashes!" + i); }
+            else Debug.Log("This one worked!" + i);
+            /*
+            else
+            {
+                machineMenuNameText[i] = machineEntry[i].transform.Find("MACHINE ENTRY/MACHINE NAME").GetComponent<Text>();
+                machineMenuStatusText[i] = machineEntry[i].transform.Find("STATUS").GetComponent<Text>();
+                machineMenuAssignementText[i] = machineEntry[i].transform.Find("ASSIGNMENT").GetComponent<Text>();
+                machineMenuDMDText[i] = machineEntry[i].transform.Find("DURABILITY").GetComponent<Text>();
+                machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
+                machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
+                machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
+            }
+        }*/
 
     }
 
@@ -680,8 +702,18 @@ public class LogicCenter : MonoBehaviour
 
     public void setupMachineMenu()
     {
-        for(int i = 0;i<machines.Length;i++)
+
+        for (int i = 0; i < machineEntry.Length; i++)  //SETS UP MACHINE ENTRY
         {
+            if (i == 0) machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY");
+            else machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY (" + i + ")");
+
+            if (machineEntry[i] == null) { Debug.Log("This crashes!" + i); }
+            else Debug.Log("This one worked!" + i);
+
+
+
+        
             machineMenuNameText[i] = machineEntry[i].transform.Find("MACHINE NAME").GetComponent<Text>();
             machineMenuStatusText[i] = machineEntry[i].transform.Find("STATUS").GetComponent<Text>();
             machineMenuAssignementText[i] = machineEntry[i].transform.Find("ASSIGNMENT").GetComponent<Text>();
@@ -689,7 +721,7 @@ public class LogicCenter : MonoBehaviour
             machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
             machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
             machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
-            }
+        }
 
     }
     public void updateMenu()
