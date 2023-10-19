@@ -56,6 +56,16 @@ public class LogicCenter : MonoBehaviour
     public Text[] machineMenuYText = new UnityEngine.UI.Text[12];
     //machines page
 
+    //Employee Page
+    public GameObject[] employeeEntry = new GameObject[12];
+    public Text[] employeeEntryNameText = new UnityEngine.UI.Text[12];
+    public Text[] employeeJobText = new UnityEngine.UI.Text[12];
+    public Text[] employeeStatusText = new UnityEngine.UI.Text[12];
+    public Text[] employeeHobbyText = new Text[12];
+    public Text[] employeeAgeText = new Text[12];
+
+
+
 
     public GameObject SelectMenu;
     public GameObject UIbackground;
@@ -132,6 +142,7 @@ public class LogicCenter : MonoBehaviour
         setupProcessingMenu();
         setupMachineMenu();
         setupQueue();
+        setupEmployeeMenu();
 
         
     }
@@ -577,7 +588,7 @@ public class LogicCenter : MonoBehaviour
 
         for (int i = 0; i < employees.Length; i++)  //setup both things
         {
-            employees[i] = new Employee(rollDice(1, 10), rollDice(1, 10), rollDice(1, 10), 16 + rollDice(1, 45), rollDice(1, 10), rollDice(1, 10));
+            employees[i] = new Employee(0);
             
         }
         for(int i = 0; i < machines.Length;i++)
@@ -723,6 +734,27 @@ public class LogicCenter : MonoBehaviour
         }
 
     }
+
+    public void setupEmployeeMenu()
+    {
+        for (int i = 0; i < employeeEntry.Length; i++)  //SETS UP MACHINE ENTRY
+        {
+            if (i == 0) employeeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE LIST/Employee Entry");
+            else employeeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE LIST/Employee Entry (" + i + ")");
+
+            if (employeeEntry[i] == null)
+                Debug.Log("This crashes!" + i);
+            else
+            {
+
+                employeeEntryNameText[i] = employeeEntry[i].transform.Find("NAME").GetComponent<Text>();
+                employeeJobText[i] = employeeEntry[i].transform.Find("JOB").GetComponent<Text>();
+                employeeStatusText[i] = employeeEntry[i].transform.Find("STATUS").GetComponent<Text>();
+                employeeHobbyText[i] = employeeEntry[i].transform.Find("HOBBY").GetComponent<Text>();
+                employeeAgeText[i] = employeeEntry[i].transform.Find("AGE").GetComponent<Text>();
+            }
+        }
+    }
     public void updateMenu()
     {
 
@@ -863,6 +895,28 @@ public class LogicCenter : MonoBehaviour
 
             }
 
+        }
+
+        for(int i  = 0;i < employeeEntry.Length;i++)   //update employees
+        {
+            if(i<employees.Length)
+            {
+                String fullname = ft.lastNames[employees[i].lastName] +", " + ft.firstNames[employees[i].firstName];
+                employeeEntryNameText[i].text = fullname;
+                employeeJobText[i].text = ft.factoryJobs[employees[i].job];
+                employeeStatusText[i].text = ft.employeeStatus[employees[i].status];
+                employeeHobbyText[i].text = ft.hobbies[employees[i].hobby];
+                employeeAgeText[i].text = " "+employees[i].age.ToString();
+            }
+            else //unassigned
+            {
+                employeeEntryNameText[i].text = "";
+                employeeJobText[i].text = "";
+                employeeStatusText[i].text = "";
+                employeeHobbyText[i].text = "";
+                employeeAgeText[i].text = "";
+
+            }
         }
     }
     public void updateEvents(int status)

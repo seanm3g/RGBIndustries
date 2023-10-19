@@ -11,16 +11,16 @@ public struct Employee
     public int status;
     public int hobby; //values like this will all be index's in the master library of names, hobbies, flavortext, etc.
     FlavorText f;
-    public Employee(int fn,int ln,int job,int age,int hobby, int status)
+    public Employee(int job)
     {
 
         f = new FlavorText();
-        firstName = fn;
-        lastName = ln;
-        this.job = job;
-        this.age = age;
-        this.hobby = hobby;
-        this.status = status; 
+        firstName = f.rollDice(1,f.firstNames.Length)-1;
+        lastName = f.rollDice(1, f.lastNames.Length)-1;
+        this.job = f.rollDice(1, f.factoryJobs.Length)-1;
+        this.age = 14+f.rollDice(2,25);
+        this.hobby = f.rollDice(1,f.hobbies.Length)-1;
+        this.status = 0; 
         //hobby[0] = "Doesn't find anything particularly interesting";
         //hobby[1] = "loves dogs";
         //hobby[2] = "can't stop talking about the weather;
@@ -33,6 +33,8 @@ public struct Employee
 
     public override string ToString()
     {
-        return $"Person [First Name: {f.firstNames[firstName]}\nLast Name: {f.lastNames[lastName]}\nAge: {age}\nHobby: {f.hobbies[this.hobby]}\nStatus: {f.employeeStatuses[this.status]}";
+        return $"Person [First Name: {f.firstNames[firstName]}\nLast Name: {f.lastNames[lastName]}\nAge: {age}\nHobby: {f.hobbies[this.hobby]}\nStatus: {f.employmentStatuses[this.status]}";
     }
+
+
 }
