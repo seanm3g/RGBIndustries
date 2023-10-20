@@ -14442,6 +14442,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: new order
       objectReference: {fileID: 0}
+    - target: {fileID: 4945306221973016561, guid: e90a164ee6071ea41bc7a849e78b03a3, type: 3}
+      propertyPath: m_Name
+      value: QuantityText
+      objectReference: {fileID: 0}
     - target: {fileID: 5636799874715143452, guid: e90a164ee6071ea41bc7a849e78b03a3, type: 3}
       propertyPath: m_IsActive
       value: 0
