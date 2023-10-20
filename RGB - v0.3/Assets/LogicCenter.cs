@@ -74,8 +74,8 @@ public class LogicCenter : MonoBehaviour
     public GameObject newWorkOrderWindow;
 
 
-    public Machine[] machines = new Machine[12];
-    public Employee[] employees = new Employee[12];
+    public List<Machine> machines = new List<Machine>();
+    public List<Employee> employees = new List<Employee>();
     public int[] inventory = new int[8];
     public int[] history = new int[8];
 
@@ -160,20 +160,125 @@ public class LogicCenter : MonoBehaviour
             
         }
         setText();
-        
         updateMenu();
         runMachines();
-
+        runEmployees();
     }
     /// <summary>
     /// machine function begin
     /// 
     /// </summary>
 
+    private void runEmployees()
+    {
+        for (int i = 0; i < employees.Count; i++)
+        {
+            Employee e = employees[i];
+
+            if (initiative(i))
+            {
+
+                switch (e.job)
+                {
+                    case 0: break;
+                    case 1: employeeHarvest(i); break;
+                    case 2: employeeRunMachine(i); break;
+
+                }
+                employees[i] = e;
+            }
+            else 
+            {
+                e.status = 0;
+            }
+        }
+    }
+
+    private bool initiative(int i)
+    {
+        Employee e = employees[i];
+        e.elapsedTime += Time.deltaTime;
+
+        if (e.elapsedTime >= employees[i].getSpeed())
+        {
+            e.elapsedTime = 0f;
+            employees[i] = e;
+            return true;
+        }
+        employees[i] = e;
+        return false;
+    }
+    private bool competance(int i)
+    {
+        if (employees[i].getReliability() > ft.rollDice(1, 20))
+            return true;
+        return false;
+    }
+
+    private void employeeHarvest(int i)  // this is all of the things an employee can do, if any action is taken, the consume their action.
+    {
+        Employee e = employees[i];
+        int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
+        employeeSelectColor(min);
+
+        if (inventory[0] >= harvestCapacity)
+            if (competance(i))
+            {
+                harvest();    //if they have initiatve
+                return;
+            }
+
+        if (min > harvestCapacity)  //if the minimum value is higher than the capacity. (You have some of each)
+            if (inventory[selectedColor] >= harvestCapacity && harvestCapacity < 10)  //update this until you hit 10.
+            {
+                if (competance(i))
+                {
+                    e.status = 1;
+                    harvestUpgrade();
+
+                    employees[i] = e;
+                    return;
+                }
+            }
+
+    }
+
+
+    private void employeeSelectColor(int min)
+    {
+        if (min == inventory[1])
+        {
+            updateRed();
+        }
+        else if (min == inventory[2])
+        {
+            updateGreen();
+        }
+        else if (min == inventory[3])
+        {
+            updateBlue();
+        }
+
+
+    }
+
+
+    private void employeeRunMachine(int i)
+    {
+        Debug.Log("Does an employee try to run a machine?");
+        if(competance(i))
+            updateQueue();
+    }
+
+    /// <summary>
+    /// EMPLOYEE SECTION ENDED
+    /// 
+    /// BEGIN MACHINE SECTION
+    /// </summary>
     private void runMachines()  //could add an idle condition
     {
 
-        for (int i = 0; i < machines.Length; i++)
+        for (int i = 0; i < machines.Count; i++)
         {
             if (machines[i].status == 1)
                 machineIsLoading(i);
@@ -190,68 +295,77 @@ public class LogicCenter : MonoBehaviour
 
     public void machineIsLoading(int i)
     {
+        Machine m = machines[i];
 
-        machines[i].elapsedTime += Time.deltaTime;
+        m.elapsedTime += Time.deltaTime;
 
-        if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
+        if (m.elapsedTime >= m.cycleTime)  //finishes processing
         {
             // Reset the elapsed time and stop processing
-            machines[i].elapsedTime = 0f;
+            m.elapsedTime = 0f;
 
            // Debug.Log("but are we getting here?");
             // Signal that the output is ready
-            machines[i].status = MACHINE_RUNNING;
+            m.status = MACHINE_RUNNING;
         }
+        machines[i] = m;
     }
 
     public void machineIsRunning(int i)
     {
-        machines[i].elapsedTime += Time.deltaTime;
+        Machine m = machines[i];
+        m.elapsedTime += Time.deltaTime;
 
         if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
         {
 
             // Reset the elapsed time and stop processing
-            machines[i].runMachine();
-            machines[i].elapsedTime = 0f;
+            m.runMachine();
+            m.elapsedTime = 0f;
 
             // Signal that the output is ready
             updateEvents(5);
-            machines[i].status = MACHINE_UNLOADING;
+            m.status = MACHINE_UNLOADING;
         }
-
+        machines[i] = m;
     }
 
     public void machineIsUnloading(int i)
     {
-        machines[i].elapsedTime += Time.deltaTime;
+        Machine m = machines[i];
 
-        if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
+        m.elapsedTime += Time.deltaTime;
+
+        if (m.elapsedTime >= m.cycleTime)  //finishes processing
         {
-            workOrder wo = ProcessingQueue[machines[i].orderIndex];
-            int inventoryIndex = ProcessingQueue[machines[i].orderIndex].c3index;
-            int product = machines[i].unloadMachine();
+            workOrder wo = ProcessingQueue[m.orderIndex];
+            int inventoryIndex = ProcessingQueue[m.orderIndex].c3index;
+            int product = m.unloadMachine();
 
             inventory[inventoryIndex] += product; //unloads the production quantity to inventory. Could be added to have randomness.
-            machines[i].status = MACHINE_COMPLETED;
-            machines[i].elapsedTime = 0f;
+            m.status = MACHINE_COMPLETED;
+            m.elapsedTime = 0f;
 
             updateEvents(4);  //says job is processed
-            ProcessingQueue[machines[i].orderIndex] = wo;  //check it back into the data
+            ProcessingQueue[m.orderIndex] = wo;  //check it back into the data
         }
+        machines[i] = m;
     }
 
     public void machineIsComplete(int i)
     {
-        machines[i].elapsedTime += Time.deltaTime;
+
+        Machine m = machines[i];
+
+        m.elapsedTime += Time.deltaTime;
 
 
 
-        if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
+        if (m.elapsedTime >= m.cycleTime)  //finishes processing
         {
             //check out
-            Machine m = machines[i];
-            int orderIndex = machines[i].orderIndex;
+            
+            int orderIndex = m.orderIndex;
             workOrder wo = ProcessingQueue[orderIndex];
 
             Debug.Log("The order:" + orderIndex + " is being completed");
@@ -280,14 +394,18 @@ public class LogicCenter : MonoBehaviour
 
             // Remove the work order from the queue
             ProcessingQueue.RemoveAt(orderIndex);
-            for (int j = 0; j < machines.Length; j++)
+            for (int j = 0; j < machines.Count; j++)
             {
+                Machine tempMachine = machines[j];
                 if (machines[j].orderIndex > orderIndex)
                 {
-                    machines[j].orderIndex -= 1;
+                    tempMachine.orderIndex -= 1;
+                    machines[i] = tempMachine;
                 }
             }
         }
+
+        machines[i] = m;
     }
     
     public void updateProductionUI()
@@ -296,11 +414,11 @@ public class LogicCenter : MonoBehaviour
 
         for (int i = 0; i < productionEntry.Count; i++)  //set status based on the current machine status
         {
-            if(i < ProcessingQueue.Count)  //if the orders count is less
+            if(i > -1 && i < ProcessingQueue.Count)  //if the orders count is less
             { 
                 index = ProcessingQueue[i].machineIndex;
 
-                if (index >= 0 && index < machines.Length)
+                if (index >= 0 && index < machines.Count)
                 {
                     if (machines[index].status == MACHINE_LOADING) 
                     {
@@ -499,7 +617,7 @@ public class LogicCenter : MonoBehaviour
     {
         int total = 0;
 
-        for(int i=0; i<machines.Length;i++)
+        for(int i=0; i<machines.Count;i++)
             if (machines[i].status == 0)
                 total++;
 
@@ -508,7 +626,7 @@ public class LogicCenter : MonoBehaviour
 
     private int FindFirstAvailableMachine()
     {
-        for (int i = 0; i < machines.Length; i++)
+        for (int i = 0; i < machines.Count; i++)
         {
             if (machines[i].status == MACHINE_IDLE)
             {
@@ -575,24 +693,24 @@ public class LogicCenter : MonoBehaviour
         return quantityToUse;
     }
 
-    public void setupInventory()
+    public void setupInventory()  //init the inventory
     {
         for(int i = 0; i < inventory.Length;i++)
             inventory[i] = 0;
 
-        inventory[1] = 100;
-        inventory[2] = 100;
-        inventory[3] = 100;
+        inventory[1] = 0;
+        inventory[2] = 0;
+        inventory[3] = 0;
 
-        //Console.WriteLine("Setup run");
+        employees.Add(new Employee(1));
+        employees.Add(new Employee(2));
 
-        for (int i = 0; i < employees.Length; i++)  //setup both things
+        for (int i = 0; i < 2; i++)  //setup both things
         {
-            employees[i] = new Employee(0);
-            
+            //employees.Add(new Employee(ft.rollDice(1,2)));
         }
-        for(int i = 0; i < machines.Length;i++)
-            machines[i] = new Machine(ft.generateMachineName(), 1, rollDice(3, 6), 60 * rollDice(1, 6),rollDice(1,6), 103 - rollDice(3, 6));
+        for (int i = 0; i < 3; i++)
+            machines.Add(new Machine(ft.generateMachineName(), 1, rollDice(3, 6), 60 * rollDice(1, 6), rollDice(1, 6), 103 - rollDice(3, 6)));
 
     }
     
@@ -864,7 +982,7 @@ public class LogicCenter : MonoBehaviour
 
         for (int i = 0; i < machineEntry.Length; i++)  //UPDATE MACHINES
         {
-            if (i < machines.Length)
+            if (i < machines.Count)
             {
                 Machine m = machines[i];
                 //Debug.Log(m);
@@ -899,7 +1017,7 @@ public class LogicCenter : MonoBehaviour
 
         for(int i  = 0;i < employeeEntry.Length;i++)   //update employees
         {
-            if(i<employees.Length)
+            if(i<employees.Count)
             {
                 String fullname = ft.lastNames[employees[i].lastName] +", " + ft.firstNames[employees[i].firstName];
                 employeeEntryNameText[i].text = fullname;
@@ -1046,7 +1164,7 @@ public class LogicCenter : MonoBehaviour
         cyanPixelText.text = inventory[6].ToString();
         whitePixelText.text = inventory[7].ToString();
 
-        availableMachinesText.text = "Available Machines:\n" + totalAvailableMachines().ToString() + "/" + machines.Length;
+        availableMachinesText.text = "Available Machines:\n" + totalAvailableMachines().ToString() + "/" + machines.Count;
     }
 
     public void harvest()
