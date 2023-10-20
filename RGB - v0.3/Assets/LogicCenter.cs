@@ -181,7 +181,7 @@ public class LogicCenter : MonoBehaviour
                 switch (e.job)
                 {
                     case 0: break;
-                    case 1: employeeHarvest(i); break;
+                    case 1: employeeHarvester(i); break;
                     case 2: employeeRunMachine(i); break;
 
                 }
@@ -215,14 +215,14 @@ public class LogicCenter : MonoBehaviour
         return false;
     }
 
-    private void employeeHarvest(int i)  // this is all of the things an employee can do, if any action is taken, the consume their action.
+    private void employeeHarvester(int i)  // this is all of the things an employee can do, if any action is taken, the consume their action.
     {
         Employee e = employees[i];
         int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
         employeeSelectColor(min);
 
         if (inventory[0] >= harvestCapacity)
-            if (competance(i))
+            if(competance(i))
             {
                 harvest();    //if they have initiatve
                 return;
@@ -816,7 +816,12 @@ public class LogicCenter : MonoBehaviour
 
     public void setupProcessingMenu()
     {
-        for(int i = 0;i < ProcessingQueue.Count; i++)
+        newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order");
+        newWorkOrderQuantityBigText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X").GetComponent<Text>();
+        NewWorkOrderoutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X/CHOSEN COLOR").GetComponent<TextMeshProUGUI>();
+        NewWorkOrderQuantityText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/Quantity/QuantityText").GetComponent<TMP_InputField>();
+        newWorkOrderPixelImg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X/CHOSEN COLOR").GetComponent<UnityEngine.UI.Image>();
+        for (int i = 0;i < ProcessingQueue.Count; i++)
         {
             productionPixelImg[i] = productionEntry[i].transform.Find("image").GetComponent<UnityEngine.UI.Image>();
             productionIngredientAImg[i] = productionEntry[i].transform.Find("ingredient A").GetComponent<UnityEngine.UI.Image>();

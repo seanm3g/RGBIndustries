@@ -30,13 +30,6 @@ public struct Employee
         this.status = 0;
 
         createStats();
-        //hobby[0] = "Doesn't find anything particularly interesting";
-        //hobby[1] = "loves dogs";
-        //hobby[2] = "can't stop talking about the weather;
-        //hobby[3] = "loves cats";
-        //hobby[4] = "enjoys going to the movies";
-        //hobby[5] = "loves cats";
-        //Debug.Log($"First Name:{f.firstNames[fn]}/n Last Name:{f.lastNames[ln]}/n Job:{job}/n age:{age}/n Status:{status}");
 
     }
 
