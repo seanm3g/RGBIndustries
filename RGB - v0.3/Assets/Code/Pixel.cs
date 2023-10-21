@@ -9,12 +9,10 @@ public struct Pixel
 
     public int level;
     public ColorRGB c;
-
     public Pixel(int l, ColorRGB c)
     {
         this.level = l;
         this.c = c;
-        
     }
 
     public int[] leveled()  //returns the value of the color by level translated to 8bit.
