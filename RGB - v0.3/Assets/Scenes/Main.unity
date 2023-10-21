@@ -13280,6 +13280,7 @@ MonoBehaviour:
   - {fileID: 300702912}
   - {fileID: 1097340733}
   - {fileID: 972020368}
+  lc: {fileID: 2035661155}
 --- !u!1 &1641702056
 GameObject:
   m_ObjectHideFlags: 0
@@ -15612,6 +15613,8 @@ MonoBehaviour:
   NewWorkOrderoutput: {fileID: 0}
   NewWorkOrderQuantityText: {fileID: 0}
   newWorkOrderPixelImg: {fileID: 0}
+  randomEventElapsedTime: 0
+  randomEventTriggerTime: 0
 --- !u!224 &2035687277 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8686357856402192109, guid: a4097146376a2574b981a0e72de123d8, type: 3}

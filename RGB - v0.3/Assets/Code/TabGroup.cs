@@ -10,14 +10,15 @@ public class TabGroup : MonoBehaviour
     public TabButton selectedTab;
     public List<GameObject> objectsToSwap;
 
-    LogicCenter lc = new LogicCenter();
+    public LogicCenter lc;
 
     int index;
 
     public void Start()
     {
+        lc = FindObjectOfType<LogicCenter>();
 
-        for(int i = 0;i<objectsToSwap.Count;i++)
+        for (int i = 0;i<objectsToSwap.Count;i++)
             objectsToSwap[i].SetActive(false);
 
         index = 2;
@@ -51,15 +52,15 @@ public class TabGroup : MonoBehaviour
     {
         selectedTab = button;
         resetTabs();
-        Debug.Log("Chosen Color:" + lc.chosenColor);
 
-        button.bg.color = Color.green;
+
+        button.bg.color = Color.blue;
 
         switch (lc.chosenColor)
         {
-            case 1: button.bg.color = Color.red; break;
-            case 2: button.bg.color = Color.green; break;
-            case 3: button.bg.color = Color.blue; break;
+            case 1: button.bg.color = new Color(1,.7f,.7f); break;
+            case 2: button.bg.color = new Color(.7f, 1, .7f); break;
+            case 3: button.bg.color = new Color(.7f, .7f, 1); break;
         }
         
 

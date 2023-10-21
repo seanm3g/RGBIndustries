@@ -12,6 +12,7 @@ public struct Employee
     public int hobby; //values like this will all be index's in the master library of names, hobbies, flavortext, etc.
     FlavorText f;
     public int[] stats;
+    public int compensation;
 
     public float elapsedTime;
     public Employee(int job)
@@ -28,6 +29,7 @@ public struct Employee
         this.age = 17 + f.rollDice(1,40);
         this.hobby = f.rollDice(1,f.hobbies.Length)-1;
         this.status = 0;
+        this.compensation = f.rollDice(1,4);
 
         createStats();
 
@@ -40,7 +42,7 @@ public struct Employee
 
     public void createStats()
     {
-        stats[0] = f.rollDice(3, 20);  // SPEED
+        stats[0] = f.rollDice(1, 20);  // SPEED
         stats[0] = 20 - stats[0];
         if (stats[0] < 1)
             stats[0] = 1;

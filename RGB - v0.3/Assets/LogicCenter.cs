@@ -115,15 +115,9 @@ public class LogicCenter : MonoBehaviour
 
     ///
 
-    public FlavorText ft = new FlavorText();
+    public FlavorText ft = new();
 
-
-
-
-
-    public ColorLibrary colorLib = new ColorLibrary();
-
-
+    public ColorLibrary colorLib = new();
 
 
     private const int MACHINE_IDLE = 0;
@@ -136,11 +130,13 @@ public class LogicCenter : MonoBehaviour
     private const int MACHINE_CHOKED = 7;
 
 
-
-
     public TextMeshProUGUI NewWorkOrderoutput;
     public TMP_InputField NewWorkOrderQuantityText;
     public UnityEngine.UI.Image newWorkOrderPixelImg;
+
+
+    public float randomEventElapsedTime;
+    public float randomEventTriggerTime;
 
     void Start()
     {
@@ -155,6 +151,9 @@ public class LogicCenter : MonoBehaviour
         UIbackground.SetActive(true);
         ProductionPage.SetActive(false);
         newWorkOrderWindow.SetActive(false);
+
+        randomEventElapsedTime = 0;
+        randomEventTriggerTime = ft.rollDice(1,5);
 
         setupInventory();
         setupMenu();
@@ -179,14 +178,31 @@ public class LogicCenter : MonoBehaviour
             
         }
 
-        updateMenu();
+        updateUI();
         runMachines();
         runEmployees();
+        runRandomEvents();
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void runRandomEvents()
+    {
+        randomEventElapsedTime += Time.deltaTime;
+
+        if (randomEventElapsedTime >= randomEventTriggerTime)
+        {
+
+
+            randomEventElapsedTime = 0f;
+            updateEvents(6);
+
+        }
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   
     private void runEmployees()
     {
         for (int i = 0; i < employees.Count; i++)
@@ -240,10 +256,10 @@ public class LogicCenter : MonoBehaviour
         Employee e = employees[i];
         int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
         
-
         if (inventory[0] >= harvestCapacity)
             if(competance(i))
             {
+                employeeSelectColor(min);
                 harvest();    //if they have initiatve
                 return;
             }
@@ -253,7 +269,6 @@ public class LogicCenter : MonoBehaviour
             {
                 if (competance(i))
                 {
-                    employeeSelectColor(min);
                     e.status = 1;
                     harvestUpgrade();
 
@@ -261,7 +276,6 @@ public class LogicCenter : MonoBehaviour
                     return;
                 }
             }
-
     }
     private void employeeSelectColor(int min)
     {
@@ -282,7 +296,6 @@ public class LogicCenter : MonoBehaviour
     }
     private void employeeRunMachine(int i)
     {
-        Debug.Log("Does an employee try to run a machine?");
         if(competance(i))
             updateQueue();
     }
@@ -379,34 +392,27 @@ public class LogicCenter : MonoBehaviour
         {
             //check out
             
-            int orderIndex = m.orderIndex;
-            workOrder wo = ProcessingQueue[orderIndex];
+            int orderIndex = m.orderIndex;  //index for the order
+            workOrder wo = ProcessingQueue[orderIndex];  //checks out the work order
 
             Debug.Log("The order:" + orderIndex + " is being completed");
 
             //the work
-            wo.quantity -= m.c3q;
-            wo.isActive = false;
+            wo.quantity -= m.c3q;  //update the quantity
+            wo.isActive = false;  //ends the order
 
-            if (wo.quantity > 0)
+            if (wo.quantity > 0)                            //currently not used, but creates a new order if the old one isn't finished.
                 ProcessingQueue.Add(new workOrder(wo));
 
             m.elapsedTime = 0;
             m.status = 0;
             m.orderIndex = -1;
-            //m.reset();  //resets the machine
 
-            //check in
             ProcessingQueue[orderIndex] = wo;
             machines[i] = m;
             Debug.Log(machines[i].status);
             Debug.Log(ProcessingQueue[orderIndex].name);
 
-            //readyToRemove[i] = orderIndex;
-            // Update orderIndex for all machines that are affected by the removal
-            
-
-            // Remove the work order from the queue
             ProcessingQueue.RemoveAt(orderIndex);
             for (int j = 0; j < machines.Count; j++)
             {
@@ -538,101 +544,10 @@ public class LogicCenter : MonoBehaviour
             newWorkOrderWindow.SetActive(true);
         }
     }
-    public void addNewWorkOrder()  //adds a new order to the queue
-    {
-        if(newWorkOrderColor == 4) //yellow
-            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1,2,newWorkOrderColor));
-        if (newWorkOrderColor == 5) //magenta
-            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 2, 3, newWorkOrderColor));
-        if (newWorkOrderColor == 6) //cyan
-            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1, 3, newWorkOrderColor));
-        if (newWorkOrderColor == 7) //white
-        {
-
-            switch(ft.rollDice(1,3))  //randomly chooses which one you have to make
-            {
-                case 1:
-                    ProcessingQueue.Add(new workOrder(5, 3, 4, newWorkOrderColor));
-                    break;
-                case 2:
-                    ProcessingQueue.Add(new workOrder(5, 2, 5, newWorkOrderColor));
-                    break;
-                case 3:
-                    ProcessingQueue.Add(new workOrder(5, 1, 6, newWorkOrderColor));
-                    break;
-            }
-            
-        }
-    }
-    private int FindFirstAvailableMachine()
-    {
-        for (int i = 0; i < machines.Count; i++)
-        {
-            if (machines[i].status == MACHINE_IDLE)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-    private int FindFirstUnassignedOrder()
-    {
-        for (int i = 0; i < ProcessingQueue.Count; i++)
-        {
-            if (!ProcessingQueue[i].isActive)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-    private void AssignOrderToMachine(int machineIndex, int orderIndex)
-    {
-        workOrder wo = ProcessingQueue[orderIndex];
-        Machine m = machines[machineIndex];
-
-        int c1Quantity = DetermineQuantity(wo.c1index, wo.quantity); //Determine if there's enough in the inventory to run the order.
-        int c2Quantity = DetermineQuantity(wo.c2index, c1Quantity);
-        c1Quantity = c2Quantity;
-
-        if(c1Quantity==wo.quantity)  //it's a full order
-        {
-            wo.machineIndex = machineIndex; //sets the machine being used for the order.
-            m.orderIndex = orderIndex;  //sets the order being run for the machine
-            ProcessingQueue[orderIndex] = wo;
-
-            wo.isActive = true;
-
-            m.assignOrder(wo);
-            inventory[m.c1] -= c1Quantity;
-            inventory[m.c2] -= c2Quantity;
-            m.loadMachine(c1Quantity, c2Quantity);
-            
-        }
-
-        machines[machineIndex] = m;
-        ProcessingQueue[orderIndex] = wo;
-    }
-    private int DetermineQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
-    {
-        int availableQuantity = inventory[componentIndex];
-        int quantityToUse;
-
-        if (availableQuantity >= requiredQuantity)
-        {
-            quantityToUse = requiredQuantity;
-        }
-        else
-        {
-            quantityToUse = availableQuantity;
-        }
-
-        return quantityToUse;
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void setupQueue()
+    public void setupQueue() //production queue
     {
         ColorRGB[] level1 = new ColorRGB[8];
 
@@ -680,7 +595,7 @@ public class LogicCenter : MonoBehaviour
                     break;
             }
         }
-    }   //this initliaties the random beginning of the game
+    } 
     public void setupInventory()  //init the inventory
     {
         for(int i = 0; i < inventory.Length;i++)
@@ -868,7 +783,7 @@ public class LogicCenter : MonoBehaviour
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void updateMenu()  //this could be setup into 1 loop, maybe?
+    public void updateUI()  //this could be setup into 1 loop, maybe?
     {
         displayInventory();
 
@@ -939,10 +854,9 @@ public class LogicCenter : MonoBehaviour
             }
         }
 
-        // Debug.Log("processing queue length: "+ProcessingQueue.Count);
+        
         for (int i = 0; i < productionEntry.Count; i++)
         {
-            //Debug.Log($"production pixel image: {productionPixelImg[i]}");
             if (i < ProcessingQueue.Count)
             {
                 int outputIndex = ProcessingQueue[i].c3index;
@@ -1053,6 +967,8 @@ public class LogicCenter : MonoBehaviour
         
        // updateMenu();
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void updateQueue()  // Pairs orders to machines // Could use an update if an order is too large.
     {
         int firstAvailableMachineIndex = FindFirstAvailableMachine();
@@ -1061,11 +977,101 @@ public class LogicCenter : MonoBehaviour
         if (firstAvailableMachineIndex != -1 && firstUnassignedOrderIndex != -1)
         {
             AssignOrderToMachine(firstAvailableMachineIndex, firstUnassignedOrderIndex);
-            updateEvents(4);
+            
         }
 
     }
+    private int FindFirstAvailableMachine()
+    {
+        for (int i = 0; i < machines.Count; i++)
+        {
+            if (machines[i].status == MACHINE_IDLE)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    private int FindFirstUnassignedOrder()
+    {
+        for (int i = 0; i < ProcessingQueue.Count; i++)
+        {
+            if (!ProcessingQueue[i].isActive)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    private void AssignOrderToMachine(int machineIndex, int orderIndex)
+    {
+        workOrder wo = ProcessingQueue[orderIndex];
+        Machine m = machines[machineIndex];
 
+        int c1Quantity = DetermineQuantity(wo.c1index, wo.quantity); //Determine if there's enough in the inventory to run the order.
+        int c2Quantity = DetermineQuantity(wo.c2index, c1Quantity);
+        c1Quantity = c2Quantity;
+
+        if (c1Quantity == wo.quantity)  //it's a full order
+        {
+            wo.machineIndex = machineIndex; //sets the machine being used for the order.
+            m.orderIndex = orderIndex;  //sets the order being run for the machine
+            ProcessingQueue[orderIndex] = wo;
+
+            wo.isActive = true;
+
+            m.assignOrder(wo);
+            inventory[m.c1] -= c1Quantity;
+            inventory[m.c2] -= c2Quantity;
+            m.loadMachine(c1Quantity, c2Quantity);
+
+        }
+
+        machines[machineIndex] = m;
+        ProcessingQueue[orderIndex] = wo;
+    }
+    public void addNewWorkOrder()  //adds a new order to the queue
+    {
+        if (newWorkOrderColor == 4) //yellow
+            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1, 2, newWorkOrderColor));
+        if (newWorkOrderColor == 5) //magenta
+            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 2, 3, newWorkOrderColor));
+        if (newWorkOrderColor == 6) //cyan
+            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1, 3, newWorkOrderColor));
+        if (newWorkOrderColor == 7) //white
+        {
+
+            switch (ft.rollDice(1, 3))  //randomly chooses which one you have to make
+            {
+                case 1:
+                    ProcessingQueue.Add(new workOrder(5, 3, 4, newWorkOrderColor));
+                    break;
+                case 2:
+                    ProcessingQueue.Add(new workOrder(5, 2, 5, newWorkOrderColor));
+                    break;
+                case 3:
+                    ProcessingQueue.Add(new workOrder(5, 1, 6, newWorkOrderColor));
+                    break;
+            }
+
+        }
+    }
+    private int DetermineQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
+    {
+        int availableQuantity = inventory[componentIndex];
+        int quantityToUse;
+
+        if (availableQuantity >= requiredQuantity)
+        {
+            quantityToUse = requiredQuantity;
+        }
+        else
+        {
+            quantityToUse = availableQuantity;
+        }
+
+        return quantityToUse;
+    }
     public void displayInventory()
     {
         oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
@@ -1161,7 +1167,7 @@ public class LogicCenter : MonoBehaviour
         selectedColor = 1;
         updateToken();
 
-        updateEvents(1);
+       // updateEvents(1);
         
     }
     public void updateGreen()
@@ -1169,7 +1175,7 @@ public class LogicCenter : MonoBehaviour
         selectedColor = 2;
         updateToken();
 
-        updateEvents(2);
+       // updateEvents(2);
         
     }
     public void updateBlue()
@@ -1177,7 +1183,7 @@ public class LogicCenter : MonoBehaviour
         selectedColor = 3;
         updateToken();
 
-        updateEvents(3);    
+       // updateEvents(3);    
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
