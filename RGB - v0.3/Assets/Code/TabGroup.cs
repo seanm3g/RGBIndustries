@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class TabGroup : MonoBehaviour
 {
     public List<TabButton> tabButtons;
     // Start is called before the first frame update
     public TabButton selectedTab;
+    Text childText;
+
     public List<GameObject> objectsToSwap;
 
     public LogicCenter lc;
@@ -17,6 +20,8 @@ public class TabGroup : MonoBehaviour
     public void Start()
     {
         lc = FindObjectOfType<LogicCenter>();
+
+        
 
         for (int i = 0;i<objectsToSwap.Count;i++)
             objectsToSwap[i].SetActive(false);
@@ -56,12 +61,7 @@ public class TabGroup : MonoBehaviour
 
         button.bg.color = Color.blue;
 
-        switch (lc.chosenColor)
-        {
-            case 1: button.bg.color = new Color(1,.7f,.7f); break;
-            case 2: button.bg.color = new Color(.7f, 1, .7f); break;
-            case 3: button.bg.color = new Color(.7f, .7f, 1); break;
-        }
+        updateColor();
         
 
         index = button.transform.GetSiblingIndex();
@@ -78,12 +78,56 @@ public class TabGroup : MonoBehaviour
         }
 
     }
+
+    public void updateColor()
+    {
+        if(selectedTab.GetComponentInChildren<Text>() != null)
+        {
+
+        
+            childText = selectedTab.GetComponentInChildren<Text>();
+
+            switch (lc.chosenColor)
+            {
+                case 1:
+                    selectedTab.bg.color = new Color(1, 0, 0);
+
+                    if (childText != null)
+                    {
+                        childText.color = new Color(1, 1, 1);
+                    }
+                    break;
+                case 2:
+                    selectedTab.bg.color = new Color(0, 1, 0);
+                    if (childText != null)
+                    {
+                        childText.color = new Color(0, 0, 0);
+                    }
+                    break;
+                case 3:
+                    selectedTab.bg.color = new Color(0, 0, 1);
+                
+                    if (childText != null)
+                    {
+                        childText.color = new Color(1, 1, 1);
+                    }
+                    break;
+            }
+        }
+    }
     public void resetTabs()
     {
         foreach(TabButton button in tabButtons)
         {
+            childText = button.GetComponentInChildren<Text>();
+
             if (selectedTab != null && selectedTab == button) continue;
             button.bg.color = Color.white;
+            if(childText != null)
+            {
+                childText.color = Color.black;
+            }
+         
         }
     }
 }

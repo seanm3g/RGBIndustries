@@ -29,7 +29,7 @@ public struct Employee
         this.age = 17 + f.rollDice(1,40);
         this.hobby = f.rollDice(1,f.hobbies.Length)-1;
         this.status = 0;
-        this.compensation = f.rollDice(1,4);
+        this.compensation = f.rollDice(1,2);
 
         createStats();
 
@@ -43,9 +43,6 @@ public struct Employee
     public void createStats()
     {
         stats[0] = f.rollDice(1, 20);  // SPEED
-        stats[0] = 20 - stats[0];
-        if (stats[0] < 1)
-            stats[0] = 1;
         stats[1] = f.rollDice(1, 20);  // RELIABILITY
         stats[2] = f.rollDice(1, 20);  // INTELLIGENCE
     }

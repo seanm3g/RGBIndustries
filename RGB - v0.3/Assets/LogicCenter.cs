@@ -13,9 +13,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-
 public class LogicCenter : MonoBehaviour
 {
+    #region variables
     // Start is called before the first frame update
     public System.Random r;
     public int oreTokens = 10;
@@ -113,10 +113,9 @@ public class LogicCenter : MonoBehaviour
     public int newWorkOrderColor;
     public int newWorkOrderQuantity = 1;
 
-    ///
+    float expenseElapsedTime = 0;
 
     public FlavorText ft = new();
-
     public ColorLibrary colorLib = new();
 
 
@@ -138,6 +137,13 @@ public class LogicCenter : MonoBehaviour
     public float randomEventElapsedTime;
     public float randomEventTriggerTime;
 
+    public Factory factory = new(1);
+
+    public TabGroup tabgroup;
+
+    #endregion
+
+    #region Start
     void Start()
     {
         r = new System.Random();
@@ -147,10 +153,7 @@ public class LogicCenter : MonoBehaviour
 
     public void setupGame()
     {
-        SelectMenu.SetActive(true);
-        UIbackground.SetActive(true);
-        ProductionPage.SetActive(false);
-        newWorkOrderWindow.SetActive(false);
+        
 
         randomEventElapsedTime = 0;
         randomEventTriggerTime = ft.rollDice(1,5);
@@ -161,10 +164,17 @@ public class LogicCenter : MonoBehaviour
         setupMachineMenu();
         setupQueue();
         setupEmployeeMenu();
-    }
 
+        SelectMenu.SetActive(true);
+        UIbackground.SetActive(true);
+        ProductionPage.SetActive(false);
+        newWorkOrderWindow.SetActive(false);
+    }
+    #endregion
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     void Update()
     {
         if (timer < spawnRate)
@@ -176,16 +186,125 @@ public class LogicCenter : MonoBehaviour
             distributeTokens();
             timer = 0;
             
-        }
 
-        updateUI();
+        }
+        
+        
         runMachines();
+        runExpenses();
         runEmployees();
         runRandomEvents();
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        updateUI();
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region costs
+    public void runExpenses()  //break expenses up
+    {
+        employeeCosts();
+        factoryCosts();
+
+    }
+
+    public void employeeCosts()
+    {
+        expenseElapsedTime += Time.deltaTime;
+
+        if (expenseElapsedTime > 10)  //pay employees every 10 seconds
+        {
+            expenseElapsedTime = 0f;
+
+            int employeeExpenses = 0;
+
+            for (int i = 0; i < employees.Count; i++)
+                employeeExpenses += employees[i].compensation;
+            
+            updateEvents(16);
+
+            
+
+            int index = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+
+
+            inventory[index] -= employeeExpenses;
+
+            if (inventory[index] < 0)  //this is wrong but works for now.
+                inventory[index] = 0;
+        }
+    }
+
+    public void factoryCosts()
+    {
+        factory.elapsedTime += Time.deltaTime;
+
+        if (factory.elapsedTime > 60)  //pay rent every minute
+        {
+            int index = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+
+            factory.elapsedTime = 0f;
+
+
+            inventory[index] -= factory.upkeep;
+
+            if (inventory[index] < 0)  //this is wrong but works for now.
+                inventory[index] = 0;
+        }
+    }
+
+    public int calculateExpenses()
+    {
+        int totalExpenses = 0;
+        int employeeExpenses = calculateEmployeeExpenses();
+        updateEvents(16);
+
+        expenseElapsedTime = 0f;
+        int index = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+        totalExpenses += employeeExpenses;
+        totalExpenses += factory.upkeep;
+
+        return totalExpenses;
+
+    }
+
+    public int calculateEmployeeExpenses()
+    {
+        int employeeExpenses = 0;
+
+        for (int i = 0; i < employees.Count; i++)
+            employeeExpenses += employees[i].compensation;
+
+        return employeeExpenses;
+    }
+
+    public int calculateFactoryExpenses()
+    {
+
+
+
+
+
+        return 5;
+    }
+
+    public int maxInventorySlot()
+    {
+        int max = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+        return max;
+    }
+
+    public int minInventorySlot()
+    {
+        int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
+        return min;
+    }
+
+    #endregion
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Random Events
     public void runRandomEvents()
     {
         randomEventElapsedTime += Time.deltaTime;
@@ -199,10 +318,10 @@ public class LogicCenter : MonoBehaviour
 
         }
     }
-
-
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region employee agency
     private void runEmployees()
     {
         for (int i = 0; i < employees.Count; i++)
@@ -232,7 +351,7 @@ public class LogicCenter : MonoBehaviour
         Employee e = employees[i];
         e.elapsedTime += Time.deltaTime;
 
-        if (e.elapsedTime >= employees[i].getSpeed())  //has initative every x seconds
+        if (e.elapsedTime >= 20-e.getSpeed())  //has initative every x seconds
         {
             e.elapsedTime = 0f;
             employees[i] = e;
@@ -244,13 +363,16 @@ public class LogicCenter : MonoBehaviour
     }
     private bool competance(int i)
     {
-        if (employees[i].getReliability() > ft.rollDice(1, 20))
+        int reliability = employees[i].getReliability();
+
+        if (ft.skillCheck(reliability))
             return true;
         return false;
     }
-
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region employee job functions
     private void employeeHarvester(int i)  // this is all of the things an employee can do, if any action is taken, the consume their action.
     {
         Employee e = employees[i];
@@ -299,9 +421,10 @@ public class LogicCenter : MonoBehaviour
         if(competance(i))
             updateQueue();
     }
-
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Machine Functions
     private void runMachines()  //could add an idle condition
     {
 
@@ -488,9 +611,10 @@ public class LogicCenter : MonoBehaviour
         }
     }
 
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    #region New Work Order
     public void assignNewWorkOrderColor(int val)  //sets the new color
     {
         if (val == 0)
@@ -544,9 +668,10 @@ public class LogicCenter : MonoBehaviour
             newWorkOrderWindow.SetActive(true);
         }
     }
-
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Setup Game
     public void setupQueue() //production queue
     {
         ColorRGB[] level1 = new ColorRGB[8];
@@ -613,11 +738,13 @@ public class LogicCenter : MonoBehaviour
             //employees.Add(new Employee(ft.rollDice(1,2)));
         }
         for (int i = 0; i < 3; i++)
-            machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), 60 * ft.rollDice(1, 6), ft.rollDice(1, 6), 103 - ft.rollDice(3, 6)));
+            machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), 60 * ft.rollDice(3, 6), ft.rollDice(3, 3)+1, 103 - ft.rollDice(3, 6)));
 
     }
     public void setupMenu()
     {
+        tabgroup = GameObject.FindObjectOfType<TabGroup>();
+         
         GameObject eventslayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
         
         if (eventslayout == null)
@@ -750,7 +877,7 @@ public class LogicCenter : MonoBehaviour
             }
         }
     }
-
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void makeMachine()
@@ -780,9 +907,9 @@ public class LogicCenter : MonoBehaviour
         machineAttributes[9].text = machines[0].Yield.ToString() + "%";
 
     }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region update UI
     public void updateUI()  //this could be setup into 1 loop, maybe?
     {
         displayInventory();
@@ -967,8 +1094,10 @@ public class LogicCenter : MonoBehaviour
         
        // updateMenu();
     }
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Production
     public void updateQueue()  // Pairs orders to machines // Could use an update if an order is too large.
     {
         int firstAvailableMachineIndex = FindFirstAvailableMachine();
@@ -1088,25 +1217,10 @@ public class LogicCenter : MonoBehaviour
 
     }
 
+    #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void distributeTokens() 
-    {
-        if (inventory[0] < harvestCapacity && chosenColor != 0)
-        {
-            inventory[0]++;
-
-            if (inventory[0] == harvestCapacity)  //warns when it is full.
-            {
-                oreValueText.color = Color.red;
-                updateEvents(10);
-            }
-        }
-
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Token Selection
     public void selectRed()
     {
         selectedColor = 1;
@@ -1166,7 +1280,7 @@ public class LogicCenter : MonoBehaviour
     {
         selectedColor = 1;
         updateToken();
-
+        tabgroup.updateColor();
        // updateEvents(1);
         
     }
@@ -1174,20 +1288,37 @@ public class LogicCenter : MonoBehaviour
     {
         selectedColor = 2;
         updateToken();
+        tabgroup.updateColor();
 
-       // updateEvents(2);
-        
+        // updateEvents(2);
+
     }
     public void updateBlue()
     {
         selectedColor = 3;
         updateToken();
+        tabgroup.updateColor();
 
-       // updateEvents(3);    
+        // updateEvents(3);    
     }
+    #endregion
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Harvesting
+    public void distributeTokens()
+    {
+        if (inventory[0] < harvestCapacity && chosenColor != 0)
+        {
+            inventory[0]++;
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (inventory[0] == harvestCapacity)  //warns when it is full.
+            {
+                oreValueText.color = Color.red;
+                updateEvents(10);
+            }
+        }
+
+    }
     public void harvest()
     {
         if(inventory[0] > 0) 
@@ -1243,5 +1374,5 @@ public class LogicCenter : MonoBehaviour
         }
         
     }
-
+    #endregion
 }
