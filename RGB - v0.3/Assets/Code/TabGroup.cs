@@ -81,7 +81,8 @@ public class TabGroup : MonoBehaviour
 
     public void updateColor()
     {
-        if(selectedTab.GetComponentInChildren<Text>() != null)
+
+        if(selectedTab != null)
         {
 
         
@@ -91,26 +92,16 @@ public class TabGroup : MonoBehaviour
             {
                 case 1:
                     selectedTab.bg.color = new Color(1, 0, 0);
-
-                    if (childText != null)
-                    {
                         childText.color = new Color(1, 1, 1);
-                    }
                     break;
                 case 2:
                     selectedTab.bg.color = new Color(0, 1, 0);
-                    if (childText != null)
-                    {
                         childText.color = new Color(0, 0, 0);
-                    }
                     break;
                 case 3:
                     selectedTab.bg.color = new Color(0, 0, 1);
                 
-                    if (childText != null)
-                    {
                         childText.color = new Color(1, 1, 1);
-                    }
                     break;
             }
         }

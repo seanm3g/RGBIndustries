@@ -386,7 +386,7 @@ public class FlavorText
     "Playwriting",
     "Novel Writing"
 };
-    public string[] factoryJobs = {"N/A","HARVESTER", "Machine Operator", "Quality Inspector", "Forklift Driver", "Maintenance Technician", "Welder", "Packager", "Material Handler", "Production Supervisor", "Safety Manager" };
+    public string[] factoryJobs = {"N/A","Extraction Engineer", "Machine Operator", "Quality Inspector", "Forklift Driver", "Maintenance Technician", "Welder", "Packager", "Material Handler", "Production Supervisor", "Safety Manager" };
     public string[] employmentStatuses = { "Full-Time", "Part-Time", "Temporary", "Contract", "Intern", "Freelance", "Remote", "On Leave", "Unemployed", "Retired" };
     public string[] employeeStatus = {"idle","working"};
     public string[] machineStatuses = { "IDLE", "RUNNING", "Faulted", "Blocked", "Starved", "Changeover", "Maintenace", "Available", "Ready" };

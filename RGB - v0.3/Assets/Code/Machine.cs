@@ -97,11 +97,13 @@ public struct Machine
 
     void repair()
     {
+        status = 6;
         maxDurability -= 1;
         if (maxDurability < 1)
         {
             status = 8; //totaled machine
         }
+        
         else durability = maxDurability;
     }
     public void reset()

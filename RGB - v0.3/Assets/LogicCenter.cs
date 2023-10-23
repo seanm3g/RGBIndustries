@@ -184,9 +184,8 @@ public class LogicCenter : MonoBehaviour
         else
         {
             distributeTokens();
-            timer = 0;
+            timer = 0f;
             
-
         }
         
         
@@ -224,15 +223,8 @@ public class LogicCenter : MonoBehaviour
             
             updateEvents(16);
 
-            
-
-            int index = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
-
-
-            inventory[index] -= employeeExpenses;
-
-            if (inventory[index] < 0)  //this is wrong but works for now.
-                inventory[index] = 0;
+            payBill(employeeExpenses);
+        
         }
     }
 
@@ -242,16 +234,31 @@ public class LogicCenter : MonoBehaviour
 
         if (factory.elapsedTime > 60)  //pay rent every minute
         {
-            int index = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+            int highestValue = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
 
             factory.elapsedTime = 0f;
 
+            payBill(factory.upkeep);
 
-            inventory[index] -= factory.upkeep;
-
-            if (inventory[index] < 0)  //this is wrong but works for now.
-                inventory[index] = 0;
         }
+    }
+
+    public void payBill(int c)
+    {
+        int highestValue = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+
+        int index=1;
+        for (int i = 1; i < 4; i++)  //check the primaries
+        {
+            index = i;
+            if (inventory[i] == highestValue)
+            {
+                inventory[i] -= c;
+                break;
+            }   
+        }
+        if (inventory[index] < 0)  //this is wrong but works for now.
+            inventory[index] = 0;
     }
 
     public int calculateExpenses()
@@ -328,58 +335,60 @@ public class LogicCenter : MonoBehaviour
         {
             Employee e = employees[i];
 
-            if (initiative(i))
-            {
+            e.elapsedTime += Time.deltaTime;
 
-                switch (e.job)
+            //Debug.Log("i:" +i+"\nElapsed Time: " + e.elapsedTime);
+            if (e.elapsedTime >= 5 - e.getSpeed())
+            {
+                e.elapsedTime = 0f;
+
+                if (competance(e))
+                switch (e.job)  //job index
                 {
                     case 0: break;
-                    case 1: employeeHarvester(i); break;
-                    case 2: employeeRunMachine(i); break;
-
+                    case 1: employeeHarvester(e); break;
+                    case 2:employeeRunMachine(e); break;
                 }
-                employees[i] = e;
             }
             else 
             {
                 e.status = 0;
             }
+
+            employees[i] = e;
         }
     }
-    private bool initiative(int i)
+    private bool initiative(Employee e)
     {
-        Employee e = employees[i];
-        e.elapsedTime += Time.deltaTime;
-
-        if (e.elapsedTime >= 20-e.getSpeed())  //has initative every x seconds
+        //Debug.Log("Does init function call?");
+        if (e.elapsedTime >= 5-e.getSpeed())  //has initative every 5-speed seconds
         {
             e.elapsedTime = 0f;
-            employees[i] = e;
             return true;
         }
 
-        employees[i] = e;
         return false;
     }
-    private bool competance(int i)
+    private bool competance(Employee e)
     {
-        int reliability = employees[i].getReliability();
+        int reliability = e.getReliability();
 
         if (ft.skillCheck(reliability))
+        {
             return true;
+        }
         return false;
     }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #region employee job functions
-    private void employeeHarvester(int i)  // this is all of the things an employee can do, if any action is taken, the consume their action.
+    #region employee job
+    private void employeeHarvester(Employee e)  // this is all of the things an employee can do, if any action is taken, the consume their action.
     {
-        Employee e = employees[i];
         int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
         
         if (inventory[0] >= harvestCapacity)
-            if(competance(i))
+            if(competance(e))
             {
                 employeeSelectColor(min);
                 harvest();    //if they have initiatve
@@ -389,12 +398,10 @@ public class LogicCenter : MonoBehaviour
         if (min > harvestCapacity)  //if the minimum value is higher than the capacity. (You have some of each)
             if (inventory[selectedColor] >= harvestCapacity && harvestCapacity < 10)  //update this until you hit 10.
             {
-                if (competance(i))
+                if (competance(e))
                 {
                     e.status = 1;
                     harvestUpgrade();
-
-                    employees[i] = e;
                     return;
                 }
             }
@@ -416,9 +423,9 @@ public class LogicCenter : MonoBehaviour
 
 
     }
-    private void employeeRunMachine(int i)
+    private void employeeRunMachine(Employee e)
     {
-        if(competance(i))
+        if(competance(e))
             updateQueue();
     }
     #endregion
@@ -436,8 +443,12 @@ public class LogicCenter : MonoBehaviour
                 machineIsRunning(i);
             if (machines[i].status == 3)  //unload the pixels to inventory
                 machineIsUnloading(i);
-            if (machines[i].status == 4)
+            if (machines[i].status == 4)  //ideal result
                 machineIsComplete(i);
+            if (machines[i].status == 5)
+                machineIsBroken(i);
+            if (machines[i].status == 6)
+                machineIsRepairing(i);
         }
         updateProductionUI();
 
@@ -490,9 +501,9 @@ public class LogicCenter : MonoBehaviour
         {
             workOrder wo = ProcessingQueue[m.orderIndex];
             int inventoryIndex = ProcessingQueue[m.orderIndex].c3index;
-            int product = m.unloadMachine();
 
-            inventory[inventoryIndex] += product; //unloads the production quantity to inventory. Could be added to have randomness.
+            inventory[inventoryIndex] += m.unloadMachine(); //unloads the production quantity to inventory. Could be added to have randomness.
+            
             m.status = MACHINE_COMPLETED;
             m.elapsedTime = 0f;
 
@@ -504,28 +515,33 @@ public class LogicCenter : MonoBehaviour
 
     public void machineIsComplete(int i)
     {
+        if (i < 0 || i >= machines.Count)
+        {
+            // Log an error or throw an exception
+            return;
+        }
 
         Machine m = machines[i];
-
         m.elapsedTime += Time.deltaTime;
 
-
-
-        if (m.elapsedTime >= m.cycleTime)  //finishes processing
+        if (m.elapsedTime >= m.cycleTime)
         {
-            //check out
-            
-            int orderIndex = m.orderIndex;  //index for the order
-            workOrder wo = ProcessingQueue[orderIndex];  //checks out the work order
+            int orderIndex = m.orderIndex;
 
-            Debug.Log("The order:" + orderIndex + " is being completed");
+            if (orderIndex < 0 || orderIndex >= ProcessingQueue.Count)
+            {
+                // Log an error or throw an exception
+                return;
+            }
 
-            //the work
-            wo.quantity -= m.c3q;  //update the quantity
-            wo.isActive = false;  //ends the order
+            workOrder wo = ProcessingQueue[orderIndex];
+            wo.quantity -= m.c3q;
+            wo.isActive = false;
 
-            if (wo.quantity > 0)                            //currently not used, but creates a new order if the old one isn't finished.
+            if (wo.quantity > 0)
+            {
                 ProcessingQueue.Add(new workOrder(wo));
+            }
 
             m.elapsedTime = 0;
             m.status = 0;
@@ -533,24 +549,37 @@ public class LogicCenter : MonoBehaviour
 
             ProcessingQueue[orderIndex] = wo;
             machines[i] = m;
-            Debug.Log(machines[i].status);
-            Debug.Log(ProcessingQueue[orderIndex].name);
 
             ProcessingQueue.RemoveAt(orderIndex);
+
             for (int j = 0; j < machines.Count; j++)
             {
                 Machine tempMachine = machines[j];
-                if (machines[j].orderIndex > orderIndex)
+                if (tempMachine.orderIndex > orderIndex)
                 {
                     tempMachine.orderIndex -= 1;
-                    machines[i] = tempMachine;
+                    machines[j] = tempMachine; // Note the index change here
                 }
             }
         }
 
         machines[i] = m;
     }
-    
+
+
+    public void machineIsBroken(int i)
+    {
+
+
+
+    }
+
+    public void machineIsRepairing(int i)
+    {
+
+
+
+    }
     public void updateProductionUI()
     {
         int index =-1;
@@ -568,6 +597,10 @@ public class LogicCenter : MonoBehaviour
                         productionBarImg[i].color = Color.yellow;
                         productionStatusText[i].color = Color.green;
                         productionStatusText[i].text = ft.woStatuses[2];
+
+                        Debug.Log("productiont text: "+productionMachineText[i].text);
+                        Debug.Log("machine name: "+machines[i].name);
+
                         productionMachineText[i].text = machines[i].name;
                     }
                     else if (machines[index].status == MACHINE_RUNNING)
@@ -781,8 +814,6 @@ public class LogicCenter : MonoBehaviour
 
         for (int i = 0; i < 8; i++)  //SETUP EVENTLIST
         {
-           // Debug.Log(productionEntry[i]);
-           // Debug.Log($"work order entry: {workOrderEntry}");
             
            
 
@@ -790,33 +821,12 @@ public class LogicCenter : MonoBehaviour
             eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>(); //set the text from panels
             eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>(); //set the
         }
-        /*
-        for(int i = 0;i<machineEntry.Length; i++)  //SETS UP MACHINE ENTRY
-        {
-            Debug.Log("Do we get here?");
-            if(i==0) machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY");
-            else machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY (" + i+")");
-            Debug.Log("But do we get here?");
-
-            if (machineEntry[i] == null) { Debug.Log("This crashes!" + i); }
-            else Debug.Log("This one worked!" + i);
-            /*
-            else
-            {
-                machineMenuNameText[i] = machineEntry[i].transform.Find("MACHINE ENTRY/MACHINE NAME").GetComponent<Text>();
-                machineMenuStatusText[i] = machineEntry[i].transform.Find("STATUS").GetComponent<Text>();
-                machineMenuAssignementText[i] = machineEntry[i].transform.Find("ASSIGNMENT").GetComponent<Text>();
-                machineMenuDMDText[i] = machineEntry[i].transform.Find("DURABILITY").GetComponent<Text>();
-                machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
-                machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
-                machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
-            }
-        }*/
+        newWorkOrderWindow = GameObject.Find("Canvas/");
 
     }
     public void setupProcessingMenu()
     {
-        //newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/New Order Button");
+        newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order");
         newWorkOrderQuantityBigText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X").GetComponent<Text>();
         NewWorkOrderoutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/COLOR/Dropdown").GetComponent<TextMeshProUGUI>();
         NewWorkOrderQuantityText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/Quantity/QuantityText").GetComponent<TMP_InputField>();
@@ -1040,7 +1050,7 @@ public class LogicCenter : MonoBehaviour
             }
             else //unassigned
             {
-                machineMenuNameText[i].text = "test";
+                machineMenuNameText[i].text = "";
                 machineMenuStatusText[i].text = "";
                 machineMenuAssignementText[i].text = "";
                 machineMenuDMDText[i].text = "";
@@ -1077,14 +1087,16 @@ public class LogicCenter : MonoBehaviour
     public void updateEvents(int status)
     {
         
-        for (int i = history.Length-1; i > 0; i--)
+        for (int i = history.Length-1; i > 0; i--)  //moves everything down one
         {
             history[i] = history[i-1];
-        }
-        for (int i = timestamps.Length - 1; i > 0; i--)
-        {
             timestamps[i].text = timestamps[i - 1].text;
         }
+        /*
+        for (int i = timestamps.Length - 1; i > 0; i--) //timestamps
+        {
+            timestamps[i].text = timestamps[i - 1].text;
+        }*/
         
         history[0] = status;
 
@@ -1093,6 +1105,23 @@ public class LogicCenter : MonoBehaviour
         timestamps[0].text = timeString;
         
        // updateMenu();
+    }
+
+    public void oreValueTextColor()
+    {
+        switch (chosenColor)
+        {
+            case 1:
+                oreValueText.color = new Color(1, 0, 0);
+                break;
+            case 2:
+                oreValueText.color = new Color(0, 1, 0);
+                break;
+            case 3:
+                oreValueText.color = new Color(0, 0, 1);
+                break;
+        }
+        
     }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1309,7 +1338,7 @@ public class LogicCenter : MonoBehaviour
     {
         if (inventory[0] < harvestCapacity && chosenColor != 0)
         {
-            inventory[0]++;
+            inventory[0]+=10;
 
             if (inventory[0] == harvestCapacity)  //warns when it is full.
             {

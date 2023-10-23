@@ -42,7 +42,8 @@ public struct Employee
 
     public void createStats()
     {
-        stats[0] = f.rollDice(1, 20);  // SPEED
+        stats[0] = f.rollDice(1, 4);  // SPEED
+        //stats[0] = 1;  // SPEED
         stats[1] = f.rollDice(1, 20);  // RELIABILITY
         stats[2] = f.rollDice(1, 20);  // INTELLIGENCE
     }
