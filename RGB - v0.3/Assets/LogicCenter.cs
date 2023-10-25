@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -30,7 +30,6 @@ public class LogicCenter : MonoBehaviour
     public float timer = 0;
     public float spawnRate = 1;
 
-
     //right panel
     public Text oreValueText;
     public Text redPixelText;
@@ -41,10 +40,6 @@ public class LogicCenter : MonoBehaviour
     public Text cyanPixelText;
     public Text whitePixelText;
     public Text chosenColorText;
-
-
-    
-
 
     public GameObject SelectMenu;           //top bar
     public GameObject UIbackground;         //
@@ -63,6 +58,7 @@ public class LogicCenter : MonoBehaviour
     public Text[] machineMenuBText = new UnityEngine.UI.Text[12];
     public Text[] machineMenuCText = new UnityEngine.UI.Text[12];
     public Text[] machineMenuYText = new UnityEngine.UI.Text[12];
+    public Text[] machineOEEText = new UnityEngine.UI.Text[12];
     //machines page
 
     //Employee Page
@@ -72,19 +68,30 @@ public class LogicCenter : MonoBehaviour
     public Text[] employeeStatusText = new UnityEngine.UI.Text[12];
     public Text[] employeeHobbyText = new Text[12];
     public Text[] employeeAgeText = new Text[12];
+    
+    //selected Employee
+    public int selectedEmployeeIndex = -1;
+    public int employeeOfTheMonthIndex = 0;
+    public List<int> newHires = new List<int>();
+    public Text selectedEmployeeName;
+    public Text selectedEmployeeDetails;
 
+    //trade
+    public Text[] tradeCadenceText = new Text[8];
+    public Text[] tradeLengthText = new Text[8];
+    public Text[] tradeSendText = new Text[8];
+    public UnityEngine.UI.Image[] tradeSendIMG = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Image[] tradeRecieveIMG = new UnityEngine.UI.Image[8];
+    public Text[] tradeRecieveText = new Text[8];
 
-
-
-
-
+    public List<Trade> availableTrades = new List<Trade>();
+    public List<Trade> activeTrades = new List<Trade>();
+    //end trade
 
     public List<Machine> machines = new List<Machine>();
     public List<Employee> employees = new List<Employee>();
     public int[] inventory = new int[8];
     public int[] history = new int[8];
-
-
     
     public GameObject[] events = new GameObject[8];
     public UnityEngine.UI.Text[] timestamps = new Text[8];
@@ -92,7 +99,6 @@ public class LogicCenter : MonoBehaviour
     public UnityEngine.UI.Text[] eventText = new UnityEngine.UI.Text[8];
     public DateTime currentTime;
     public String timeString;
-
 
     /// <summary>
     public List<workOrder> ProcessingQueue = new List<workOrder>();  //this is the production queue
@@ -141,22 +147,27 @@ public class LogicCenter : MonoBehaviour
 
     public TabGroup tabgroup;
 
+    public int distribution = 1;
+    public int lastChosenColor = 0;
     #endregion
 
     #region Start
     void Start()
     {
-        r = new System.Random();
 
         setupGame();
     }
 
     public void setupGame()
     {
-        
+        r = new System.Random();
+
+        //set the first random event timer
 
         randomEventElapsedTime = 0;
-        randomEventTriggerTime = ft.rollDice(1,5);
+        randomEventTriggerTime = ft.rollDice(10,10);
+
+        //setup the systems of the game.
 
         setupInventory();
         setupMenu();
@@ -164,6 +175,7 @@ public class LogicCenter : MonoBehaviour
         setupMachineMenu();
         setupQueue();
         setupEmployeeMenu();
+        
 
         SelectMenu.SetActive(true);
         UIbackground.SetActive(true);
@@ -171,10 +183,198 @@ public class LogicCenter : MonoBehaviour
         newWorkOrderWindow.SetActive(false);
     }
     #endregion
-    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+    #region Setup Game
+    public void setupQueue() //production queue
+    {
+        ColorRGB[] level1 = new ColorRGB[8];
+
+        level1[1] = new ColorRGB(1, 0, 0);
+        level1[2] = new ColorRGB(0, 1, 0);
+        level1[3] = new ColorRGB(0, 0, 1);
+        level1[4] = new ColorRGB(1, 1, 0);
+        level1[5] = new ColorRGB(1, 0, 1);
+        level1[6] = new ColorRGB(0, 1, 1);
+        level1[7] = new ColorRGB(1, 1, 1);
+
+        for (int i = 0; i < 15; i++)
+        {
+            int r = ft.rollDice(1, 4);
+
+            if (i < 6)
+                r = ft.rollDice(1, 3);
+
+            int q = ft.rollDice(2, 4);
+
+            switch (r)
+            {
+                case 1:
+                    ProcessingQueue.Add(new workOrder(q, 1, 2, 4));  //make yellow
+                    break;
+                case 2:
+                    ProcessingQueue.Add(new workOrder(q, 1, 3, 5));  //makes magenta
+                    break;
+                case 3:
+                    ProcessingQueue.Add(new workOrder(q, 2, 3, 6)); //makes cyan
+                    break;
+                case 4:
+                    switch (ft.rollDice(1, 3))
+                    {
+                        case 1:
+                            ProcessingQueue.Add(new workOrder(q, 3, 4, 7)); //white
+                            break;
+                        case 2:
+                            ProcessingQueue.Add(new workOrder(q, 2, 5, 7)); //white
+                            break;
+                        case 3:
+                            ProcessingQueue.Add(new workOrder(q, 1, 6, 7)); //white
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    public void setupInventory()  //init the inventory
+    {
+        for (int i = 0; i < inventory.Length; i++)
+            inventory[i] = 0;
+
+        inventory[1] = 0;
+        inventory[2] = 0;
+        inventory[3] = 0;
+
+        for (int i = 0; i < 5; i++)  //setup both things
+        {
+            employees.Add(new Employee(i));
+            Debug.Log("Random birthday for a " + employees[i].age + "-year-old: " + employees[i].birthdate.ToShortDateString());
+        }
+        for (int i = 0; i < 3; i++)
+            machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), ft.rollDice(3, 6), ft.rollDice(3, 3) + 1, 103 - ft.rollDice(3, 6)));
+
+    }
+    public void setupMenu()
+    {
+        tabgroup = GameObject.FindObjectOfType<TabGroup>();
+
+        GameObject eventslayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
+
+        if (eventslayout == null)
+        {
+            Debug.LogError("Could not find GameObject named 'eventslayout'");
+            return;
+        }
+
+        GameObject productionlayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/Production layout");
+
+        if (productionlayout == null)
+        {
+            Debug.LogError("Could not find GameObject named 'productionlayout'");
+            return;
+        }
+
+        if (machineryPage == null)
+        {
+            Debug.LogError("Could not find GameObject named 'machineryPage'");
+            return;
+        }
+
+        GameObject eve = Resources.Load<GameObject>("Prefabs/event");  //creates an object of a prefab to be instantiated for each panel.
+
+
+        //makeMachine();
+
+        for (int i = 7; i >= 0; i--)  //INITALIZE THE OBJECTS TO INTERACT WITH FOR THE EVENTLIST
+        {
+            events[i] = Instantiate(eve, new Vector3(0f, 0f, 0f), Quaternion.identity);  //instanties each element of the panel array.
+            events[i].transform.SetParent(eventslayout.transform, false);   //sets the parent to fit into the eventslayout place
+
+        }
+
+        for (int i = 0; i < 8; i++)  //SETUP EVENTLIST
+        {
+
+
+
+            timestamps[i] = events[i].transform.Find("time").GetComponent<Text>(); //set the timestamp from panels
+            eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>(); //set the text from panels
+            eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>(); //set the
+        }
+
+        newWorkOrderWindow = GameObject.Find("Canvas/");
+
+    }
+    public void setupProcessingMenu()
+    {
+        newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order");
+        newWorkOrderQuantityBigText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X").GetComponent<Text>();
+        NewWorkOrderoutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/COLOR/Dropdown").GetComponent<TextMeshProUGUI>();
+        NewWorkOrderQuantityText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/Quantity/QuantityText").GetComponent<TMP_InputField>();
+        newWorkOrderPixelImg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X/CHOSEN COLOR").GetComponent<UnityEngine.UI.Image>();
+
+        for (int i = 0; i < productionEntry.Count; i++)
+        {
+            productionPixelImg[i] = productionEntry[i].transform.Find("image").GetComponent<UnityEngine.UI.Image>();
+            productionIngredientAImg[i] = productionEntry[i].transform.Find("image/ingredient A").GetComponent<UnityEngine.UI.Image>();
+            productionIngredientBImg[i] = productionEntry[i].transform.Find("image/ingredient B").GetComponent<UnityEngine.UI.Image>();
+            productionNameText[i] = productionEntry[i].transform.Find("NAME").GetComponent<UnityEngine.UI.Text>();
+            productionQuantityText[i] = productionEntry[i].transform.Find("QUANTITYNUM").GetComponent<UnityEngine.UI.Text>();
+            productionStatusText[i] = productionEntry[i].transform.Find("STATUS").GetComponent<UnityEngine.UI.Text>();
+            productionMachineText[i] = productionEntry[i].transform.Find("MACHINE NAME").GetComponent<UnityEngine.UI.Text>();
+            productionBarImg[i] = productionEntry[i].transform.GetComponent<UnityEngine.UI.Image>();
+        }
+    }
+    public void setupMachineMenu()
+    {
+
+        for (int i = 0; i < machineEntry.Length; i++)  //SETS UP MACHINE ENTRY
+        {
+            if (i == 0) machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY");
+            else machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY (" + i + ")");
+
+            if (machineEntry[i] == null)
+                Debug.Log("This crashes!" + i);
+            else
+            {
+                machineMenuNameText[i] = machineEntry[i].transform.Find("MACHINE NAME").GetComponent<Text>();
+                machineMenuStatusText[i] = machineEntry[i].transform.Find("STATUS").GetComponent<Text>();
+                machineMenuAssignementText[i] = machineEntry[i].transform.Find("ASSIGNMENT").GetComponent<Text>();
+                machineMenuDMDText[i] = machineEntry[i].transform.Find("DURABILITY").GetComponent<Text>();
+                machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
+                machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
+                machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
+                machineOEEText[i] = machineEntry[i].transform.Find("OEE").GetComponent<Text>();
+            }
+        }
+
+    }
+    public void setupEmployeeMenu()
+    {
+        for (int i = 0; i < employeeEntry.Length; i++)  //SETS UP MACHINE ENTRY
+        {
+            if (i == 0) employeeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/EMPLOYEE LIST/Employee Entry");
+            else employeeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/EMPLOYEE LIST/Employee Entry (" + i + ")");
+
+
+
+            if (employeeEntry[i] == null)
+                Debug.Log("This crashes!" + i);
+            else
+            {
+                employeeEntryNameText[i] = employeeEntry[i].transform.Find("NAME").GetComponent<Text>();
+                employeeJobText[i] = employeeEntry[i].transform.Find("JOB").GetComponent<Text>();
+                employeeStatusText[i] = employeeEntry[i].transform.Find("STATUS").GetComponent<Text>();
+                employeeHobbyText[i] = employeeEntry[i].transform.Find("HOBBY").GetComponent<Text>();
+                employeeAgeText[i] = employeeEntry[i].transform.Find("AGE").GetComponent<Text>();
+            }
+        }
+
+        selectedEmployeeName = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/Employees Feature/Employees Body/EMPLOYEE HEADER/Employee Name Banner").GetComponent<Text>();
+        selectedEmployeeDetails = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/Employees Feature/Employees Body/Employee Details").GetComponent<Text>();
+    }
+    #endregion
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void Update()
     {
         if (timer < spawnRate)
@@ -196,8 +396,7 @@ public class LogicCenter : MonoBehaviour
 
         updateUI();
 
-    }
-
+    }  
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region costs
@@ -212,7 +411,7 @@ public class LogicCenter : MonoBehaviour
     {
         expenseElapsedTime += Time.deltaTime;
 
-        if (expenseElapsedTime > 10)  //pay employees every 10 seconds
+        if (expenseElapsedTime > 60)  //pay employees every 10 seconds
         {
             expenseElapsedTime = 0f;
 
@@ -284,16 +483,6 @@ public class LogicCenter : MonoBehaviour
             employeeExpenses += employees[i].compensation;
 
         return employeeExpenses;
-    }
-
-    public int calculateFactoryExpenses()
-    {
-
-
-
-
-
-        return 5;
     }
 
     public int maxInventorySlot()
@@ -375,6 +564,7 @@ public class LogicCenter : MonoBehaviour
 
         if (ft.skillCheck(reliability))
         {
+            //Debug.Log(e.firstName+"did the thing!");
             return true;
         }
         return false;
@@ -382,11 +572,25 @@ public class LogicCenter : MonoBehaviour
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #region employee job
+    #region employees
     private void employeeHarvester(Employee e)  // this is all of the things an employee can do, if any action is taken, the consume their action.
     {
         int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
-        
+
+
+        /*
+        if (min > harvestCapacity)  //if the minimum value is higher than the capacity. (You have some of each)
+            if (inventory[selectedColor] >= harvestCapacity && harvestCapacity < 10)  //update this until you hit 10.
+            {
+                if (competance(e))
+                {
+                    e.status = 1;
+                    harvestUpgrade();
+                    return; 
+                }
+            }
+        */
+
         if (inventory[0] >= harvestCapacity)
             if(competance(e))
             {
@@ -395,16 +599,7 @@ public class LogicCenter : MonoBehaviour
                 return;
             }
 
-        if (min > harvestCapacity)  //if the minimum value is higher than the capacity. (You have some of each)
-            if (inventory[selectedColor] >= harvestCapacity && harvestCapacity < 10)  //update this until you hit 10.
-            {
-                if (competance(e))
-                {
-                    e.status = 1;
-                    harvestUpgrade();
-                    return;
-                }
-            }
+
     }
     private void employeeSelectColor(int min)
     {
@@ -427,6 +622,12 @@ public class LogicCenter : MonoBehaviour
     {
         if(competance(e))
             updateQueue();
+    }
+
+    public void fireEmployee()
+    {
+        employees.RemoveAt(selectedEmployeeIndex);
+
     }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -598,8 +799,8 @@ public class LogicCenter : MonoBehaviour
                         productionStatusText[i].color = Color.green;
                         productionStatusText[i].text = ft.woStatuses[2];
 
-                        Debug.Log("productiont text: "+productionMachineText[i].text);
-                        Debug.Log("machine name: "+machines[i].name);
+                        //Debug.Log("productiont text: "+productionMachineText[i].text);
+                        //Debug.Log("machine name: "+machines[i].name);
 
                         productionMachineText[i].text = machines[i].name;
                     }
@@ -658,12 +859,12 @@ public class LogicCenter : MonoBehaviour
         else if (val == 1)
         {
             newWorkOrderPixelImg.color = Color.magenta;
-            newWorkOrderColor = 5;
+            newWorkOrderColor = 6;
         }
         else if (val == 2)
         {
             newWorkOrderPixelImg.color = Color.cyan;
-            newWorkOrderColor = 6;
+            newWorkOrderColor = 5;
         }
         else if (val == 3) 
         {
@@ -704,189 +905,58 @@ public class LogicCenter : MonoBehaviour
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #region Setup Game
-    public void setupQueue() //production queue
+    #region trade
+
+    public void runTrades()
     {
-        ColorRGB[] level1 = new ColorRGB[8];
 
-        level1[1] = new ColorRGB(1, 0, 0);
-        level1[2] = new ColorRGB(0, 1, 0);
-        level1[3] = new ColorRGB(0, 0, 1);
-        level1[4] = new ColorRGB(1, 1, 0);
-        level1[5] = new ColorRGB(1, 0, 1);
-        level1[6] = new ColorRGB(0, 1, 1);
-        level1[7] = new ColorRGB(1, 1, 1);
-
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < activeTrades.Count; i++)
         {
-            int r = ft.rollDice(1, 4);
+            Trade t = activeTrades[i];  //check out 
 
-            if (i < 6)
-                r = ft.rollDice(1, 3);
-
-            int q = ft.rollDice(2, 4);
-
-            switch (r)
+            if (t.isActive)
             {
-                case 1:
-                    ProcessingQueue.Add(new workOrder(q, 1, 2, 4));  //make yellow
-                    break;
-                case 2:
-                    ProcessingQueue.Add(new workOrder(q, 1, 3, 5));  //makes magenta
-                    break;
-                case 3:
-                    ProcessingQueue.Add(new workOrder(q, 2, 3, 6)); //makes cyan
-                    break;
-                case 4:
-                    switch (ft.rollDice(1, 3))
-                    {
-                        case 1:
-                            ProcessingQueue.Add(new workOrder(q, 3, 4, 7)); //white
-                            break;
-                        case 2:
-                            ProcessingQueue.Add(new workOrder(q, 2, 5, 7)); //white
-                            break;
-                        case 3:
-                            ProcessingQueue.Add(new workOrder(q, 1, 6, 7)); //white
-                            break;
-                    }
-                    break;
-            }
-        }
-    } 
-    public void setupInventory()  //init the inventory
-    {
-        for(int i = 0; i < inventory.Length;i++)
-            inventory[i] = 0;
+                t.elapsedTime += Time.deltaTime;
 
-        inventory[1] = 0;
-        inventory[2] = 0;
-        inventory[3] = 0;
+                if (t.elapsedTime > t.cadence)
+                {
+                    t.elapsedTime = 0;
+                    activeTrades[i] = t;  //checks back in
 
-        employees.Add(new Employee(1));
-        employees.Add(new Employee(2));
-
-        for (int i = 0; i < 2; i++)  //setup both things
-        {
-            //employees.Add(new Employee(ft.rollDice(1,2)));
-        }
-        for (int i = 0; i < 3; i++)
-            machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), 60 * ft.rollDice(3, 6), ft.rollDice(3, 3)+1, 103 - ft.rollDice(3, 6)));
-
-    }
-    public void setupMenu()
-    {
-        tabgroup = GameObject.FindObjectOfType<TabGroup>();
-         
-        GameObject eventslayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/events page/eventslayout");
-        
-        if (eventslayout == null)
-        {
-            Debug.LogError("Could not find GameObject named 'eventslayout'");
-            return;
-        }
-
-        GameObject productionlayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/Production layout");
-
-        if(productionlayout == null)
-        {
-            Debug.LogError("Could not find GameObject named 'productionlayout'");
-            return;
-        }
-
-        if (machineryPage == null)
-        {
-            Debug.LogError("Could not find GameObject named 'machineryPage'");
-            return;
-        }
-
-        GameObject eve = Resources.Load<GameObject>("Prefabs/event");  //creates an object of a prefab to be instantiated for each panel.
-
-
-        //makeMachine();
-
-        for (int i = 7; i >= 0; i--)  //INITALIZE THE OBJECTS TO INTERACT WITH FOR THE EVENTLIST
-        {
-            events[i] = Instantiate(eve, new Vector3(0f, 0f, 0f), Quaternion.identity);  //instanties each element of the panel array.
-            events[i].transform.SetParent(eventslayout.transform, false);   //sets the parent to fit into the eventslayout place
-
-        }
-
-        for (int i = 0; i < 8; i++)  //SETUP EVENTLIST
-        {
-            
-           
-
-            timestamps[i] = events[i].transform.Find("time").GetComponent<Text>(); //set the timestamp from panels
-            eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>(); //set the text from panels
-            eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>(); //set the
-        }
-        newWorkOrderWindow = GameObject.Find("Canvas/");
-
-    }
-    public void setupProcessingMenu()
-    {
-        newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order");
-        newWorkOrderQuantityBigText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X").GetComponent<Text>();
-        NewWorkOrderoutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/COLOR/Dropdown").GetComponent<TextMeshProUGUI>();
-        NewWorkOrderQuantityText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/Quantity/QuantityText").GetComponent<TMP_InputField>();
-        newWorkOrderPixelImg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X/CHOSEN COLOR").GetComponent<UnityEngine.UI.Image>();
-
-        for (int i = 0; i < ProcessingQueue.Count; i++)
-        {
-            productionPixelImg[i] = productionEntry[i].transform.Find("image").GetComponent<UnityEngine.UI.Image>();
-            productionIngredientAImg[i] = productionEntry[i].transform.Find("ingredient A").GetComponent<UnityEngine.UI.Image>();
-            productionIngredientBImg[i] = productionEntry[i].transform.Find("ingredient B").GetComponent<UnityEngine.UI.Image>();
-            productionNameText[i] = productionEntry[i].transform.Find("NAME").GetComponent<UnityEngine.UI.Text>();
-            productionQuantityText[i] = productionEntry[i].transform.Find("QUANTITYNUM").GetComponent<UnityEngine.UI.Text>();
-            productionStatusText[i] = productionEntry[i].transform.Find("STATUS").GetComponent<UnityEngine.UI.Text>();
-            productionMachineText[i] = productionEntry[i].transform.Find("MACHINE NAME").GetComponent<UnityEngine.UI.Text>();
-            productionBarImg[i] = productionEntry[i].transform.GetComponent<UnityEngine.UI.Image>();
-        }
-    }
-    public void setupMachineMenu()
-    {
-
-        for (int i = 0; i < machineEntry.Length; i++)  //SETS UP MACHINE ENTRY
-        {
-            if (i == 0) machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY");
-            else machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY (" + i + ")");
-
-            if (machineEntry[i] == null)
-                Debug.Log("This crashes!" + i);
-            else
-            {
-                machineMenuNameText[i] = machineEntry[i].transform.Find("MACHINE NAME").GetComponent<Text>();
-                machineMenuStatusText[i] = machineEntry[i].transform.Find("STATUS").GetComponent<Text>();
-                machineMenuAssignementText[i] = machineEntry[i].transform.Find("ASSIGNMENT").GetComponent<Text>();
-                machineMenuDMDText[i] = machineEntry[i].transform.Find("DURABILITY").GetComponent<Text>();
-                machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
-                machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
-                machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
-            }
-        }
-
-    }
-    public void setupEmployeeMenu()
-    {
-        for (int i = 0; i < employeeEntry.Length; i++)  //SETS UP MACHINE ENTRY
-        {
-            if (i == 0) employeeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE LIST/Employee Entry");
-            else employeeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE LIST/Employee Entry (" + i + ")");
-
-            if (employeeEntry[i] == null)
-                Debug.Log("This crashes!" + i);
-            else
-            {
-
-                employeeEntryNameText[i] = employeeEntry[i].transform.Find("NAME").GetComponent<Text>();
-                employeeJobText[i] = employeeEntry[i].transform.Find("JOB").GetComponent<Text>();
-                employeeStatusText[i] = employeeEntry[i].transform.Find("STATUS").GetComponent<Text>();
-                employeeHobbyText[i] = employeeEntry[i].transform.Find("HOBBY").GetComponent<Text>();
-                employeeAgeText[i] = employeeEntry[i].transform.Find("AGE").GetComponent<Text>();
+                    executeTrade(i);
+                }
             }
         }
     }
+
+    public void selectTrade(int i)
+    {
+        activeTrades.Add(availableTrades[i]);
+        availableTrades.RemoveAt(i);
+    }
+
+    public void executeTrade(int i)  //i is the index of the trade being executed
+    {
+        Trade t = activeTrades[i];  //check trade out
+
+        inventory[t.sendColor] -= t.sendQuantity;  //swap send
+        inventory[t.recieveColor] -= t.recieveQuantity; //swap recieve
+
+        t.length -= 1;  //reduce the iterations by 1.
+        activeTrades[i] = t;    //check back in
+
+        if (activeTrades[i].length < 1)  //if it's run the length of it's trade, remove it from the queue
+            activeTrades.RemoveAt(i);
+    }
+
+
+    public void setupTrade()
+    {
+        for(int i=0;i<8;i++)
+            availableTrades.Add(new Trade());
+    }
+
+
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -991,7 +1061,7 @@ public class LogicCenter : MonoBehaviour
             }
         }
 
-        
+
         for (int i = 0; i < productionEntry.Count; i++)
         {
             if (i < ProcessingQueue.Count)
@@ -1039,13 +1109,14 @@ public class LogicCenter : MonoBehaviour
 
                 if (m.orderIndex == -1)
                     machineMenuAssignementText[i].text = "not assigned";
-                else 
+                else
                     machineMenuAssignementText[i].text = ProcessingQueue[m.orderIndex].name;
-                
+
                 machineMenuDMDText[i].text = m.durability + "/" + m.maxDurability;
                 machineMenuBText[i].text = m.batchSize.ToString();
                 machineMenuCText[i].text = m.cycleTime.ToString();
-                machineMenuYText[i].text = m.Yield.ToString();
+                machineMenuYText[i].text = m.Yield.ToString() + "%";
+                machineOEEText[i].text = m.OEE.ToString("F0");
 
             }
             else //unassigned
@@ -1057,21 +1128,22 @@ public class LogicCenter : MonoBehaviour
                 machineMenuBText[i].text = "";
                 machineMenuCText[i].text = "";
                 machineMenuYText[i].text = "";
+                machineOEEText[i].text = "";
 
             }
 
         }
 
-        for(int i  = 0;i < employeeEntry.Length;i++)   //update employees
+        for (int i = 0; i < employeeEntry.Length; i++)   //update employees
         {
-            if(i<employees.Count)
+            if (i < employees.Count)
             {
-                String fullname = ft.lastNames[employees[i].lastName] +", " + ft.firstNames[employees[i].firstName];
+                String fullname = ft.lastNames[employees[i].lastName] + ", " + ft.firstNames[employees[i].firstName];
                 employeeEntryNameText[i].text = fullname;
                 employeeJobText[i].text = ft.factoryJobs[employees[i].job];
                 employeeStatusText[i].text = ft.employeeStatus[employees[i].status];
                 employeeHobbyText[i].text = ft.hobbies[employees[i].hobby];
-                employeeAgeText[i].text = " "+employees[i].age.ToString();
+                employeeAgeText[i].text = " " + employees[i].age.ToString();
             }
             else //unassigned
             {
@@ -1082,6 +1154,22 @@ public class LogicCenter : MonoBehaviour
                 employeeAgeText[i].text = "";
 
             }
+        }
+
+        
+        if (selectedEmployeeIndex < employees.Count)    
+        {
+            Employee e = employees[selectedEmployeeIndex];
+            selectedEmployeeName.text = ft.firstNames[e.firstName] + " " + ft.lastNames[e.lastName];
+            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() +
+                "\nHobby: " + ft.hobbies[e.hobby] + "\n\nSKILLS: \nSPEED: " + e.getSpeed().ToString() + "\nRELIABILITY: " + e.getReliability().ToString() + "\nINTELLIGENCE: " + e.getIntelligence().ToString();
+        
+            selectedEmployeeDetails.text = details;
+        }
+        else
+        {
+            selectedEmployeeName.text = "";
+            selectedEmployeeDetails.text = "";
         }
     }
     public void updateEvents(int status)
@@ -1106,7 +1194,7 @@ public class LogicCenter : MonoBehaviour
         
        // updateMenu();
     }
-
+    
     public void oreValueTextColor()
     {
         switch (chosenColor)
@@ -1122,6 +1210,23 @@ public class LogicCenter : MonoBehaviour
                 break;
         }
         
+    }
+
+    public void selectEmployee(int index)
+    {
+        selectedEmployeeIndex = index;
+
+        for(int i = 0;i<employeeEntry.Length;i++)
+        {
+            if (i == index  && index < employees.Count)
+            {
+                employeeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+            }
+            else
+            {
+                employeeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white; 
+            }          
+        }
     }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1336,9 +1441,22 @@ public class LogicCenter : MonoBehaviour
     #region Harvesting
     public void distributeTokens()
     {
+        if(lastChosenColor != chosenColor)//checks to see if it's changed since last time and if it has then reset the momentum;
+        {
+            distribution = 1;  //reset the distribution
+            lastChosenColor=chosenColor;  //reset the color
+            inventory[0] = 0;  //no carryover.
+            oreValueText.text = inventory[0].ToString();
+        }
+
         if (inventory[0] < harvestCapacity && chosenColor != 0)
         {
-            inventory[0]+=10;
+            inventory[0]+=distribution;
+
+            distribution++;
+
+            if (inventory[0]>10)
+                inventory[0]=10;
 
             if (inventory[0] == harvestCapacity)  //warns when it is full.
             {

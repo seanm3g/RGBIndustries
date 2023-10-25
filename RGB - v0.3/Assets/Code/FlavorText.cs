@@ -386,7 +386,7 @@ public class FlavorText
     "Playwriting",
     "Novel Writing"
 };
-    public string[] factoryJobs = {"N/A","Extraction Engineer", "Machine Operator", "Quality Inspector", "Forklift Driver", "Maintenance Technician", "Welder", "Packager", "Material Handler", "Production Supervisor", "Safety Manager" };
+    public string[] factoryJobs = {"N/A","Harvest Engineer", "Machine Operator", "Quality Inspector", "Forklift Driver", "Maintenance Technician", "Welder", "Packager", "Material Handler", "Production Supervisor", "Safety Manager" };
     public string[] employmentStatuses = { "Full-Time", "Part-Time", "Temporary", "Contract", "Intern", "Freelance", "Remote", "On Leave", "Unemployed", "Retired" };
     public string[] employeeStatus = {"idle","working"};
     public string[] machineStatuses = { "IDLE", "RUNNING", "Faulted", "Blocked", "Starved", "Changeover", "Maintenace", "Available", "Ready" };
@@ -396,6 +396,8 @@ public class FlavorText
     //public string[][] int = { [3,3,] };
     // A way of storing a bunch of arrays.
     System.Random r = new System.Random();
+
+    public int currentYear = DateTime.Now.Year;
     public string generateMachineName()
     {
 
@@ -468,8 +470,37 @@ public class FlavorText
 
     public bool skillCheck(int skill)
     {
-        if (rollDice(1, 20) > skill)
+        if (rollDice(1, 2) > skill)
             return false;
         return true;
+    }
+    public DateTime GenerateRandomDate(int year)
+    {
+        System.Random random = new System.Random();
+        int month = random.Next(1, 13); // Random month
+        int day;
+
+        // Handle February separately because of leap year
+        if (month == 2)
+        {
+            if (DateTime.IsLeapYear(year))
+            {
+                day = random.Next(1, 30); // 1 to 29 for leap year
+            }
+            else
+            {
+                day = random.Next(1, 29); // 1 to 28 for non-leap year
+            }
+        }
+        else if (month == 4 || month == 6 || month == 9 || month == 11)
+        {
+            day = random.Next(1, 31); // 1 to 30 for months with 30 days
+        }
+        else
+        {
+            day = random.Next(1, 32); // 1 to 31 for months with 31 days
+        }
+
+        return new DateTime(year, month, day);
     }
 }

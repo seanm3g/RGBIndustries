@@ -4,6 +4,8 @@ using UnityEngine;
 using System;
 using Unity.VisualScripting;
 using System.Reflection;
+using UnityEditorInternal;
+using UnityEngine.Analytics;
 
 public struct Machine
 {
@@ -15,6 +17,7 @@ public struct Machine
     public int result;
     public float elapsedTime;
     public int orderIndex;
+    public float OEE;
 
     private const int MACHINE_IDLE = 0;
     private const int MACHINE_LOADING = 1;
@@ -24,6 +27,7 @@ public struct Machine
     private const int MACHINE_BROKEN = 5;
     private const int MACHINE_IN_MAINTENANCE = 6;
     private const int MACHINE_CHOKED = 7;
+    
 
     public Machine(String name, int type, int maxDurability, int batchSize, int cycleTime, int Yield)
     {
@@ -51,6 +55,10 @@ public struct Machine
         c2q = 0;
         c3q = 0;
 
+        OEE = 0;
+
+        OEE = calculateOEE();
+        //Debug.Log("OEE: "+OEE);
     }
 
     public override string ToString()
@@ -112,4 +120,22 @@ public struct Machine
         status = 0;
         orderIndex = -1;
     }
+
+    public float calculateOEE()
+    {
+        //Debug.Log("Are we calcuating OEE?");
+
+        // Explicitly cast integers to float before division
+        float availability = (float)maxDurability / 2 * (1 + (float)maxDurability);
+        float performance = (float)batchSize / cycleTime;
+        float tempOEE = availability * performance * ((float)Yield / 100);
+
+        //Debug.Log("availability: " + availability);
+        //Debug.Log("performance: " + performance);
+        //Debug.Log("OEE: " + tempOEE);
+
+        return tempOEE;
+    }
+
+
 }
