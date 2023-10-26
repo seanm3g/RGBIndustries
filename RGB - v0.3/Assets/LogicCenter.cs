@@ -85,8 +85,17 @@ public class LogicCenter : MonoBehaviour
     public Text[] tradeRecieveText = new Text[8];
 
     public List<Trade> availableTrades = new List<Trade>();
+    public GameObject[] tradeEntry = new GameObject[8];
     public List<Trade> activeTrades = new List<Trade>();
     //end trade
+
+    //active trade
+    public Text[] activeTradeSendText = new Text[8];
+    public UnityEngine.UI.Image[] activeTradeSendIMG = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Image[] activeTradeRecieveIMG = new UnityEngine.UI.Image[8];
+    public Text[] activeTradeRecieveText = new Text[8];
+    public GameObject[] activeTradeEntry = new GameObject[8];
+    //active trade end
 
     public List<Machine> machines = new List<Machine>();
     public List<Employee> employees = new List<Employee>();
@@ -147,46 +156,53 @@ public class LogicCenter : MonoBehaviour
 
     public TabGroup tabgroup;
 
-    public int distribution = 1;
-    public int lastChosenColor = 0;
+    public int distribution = 1; //not sure what this is doing
+    public int lastChosenColor = 0; //not sure what this is doing either
     #endregion
 
     #region Start
     void Start()
     {
-
         setupGame();
     }
-
     public void setupGame()
     {
-        r = new System.Random();
-
-        //set the first random event timer
-
-        randomEventElapsedTime = 0;
-        randomEventTriggerTime = ft.rollDice(10,10);
-
-        //setup the systems of the game.
-
         setupInventory();
         setupMenu();
-        setupProcessingMenu();
-        setupMachineMenu();
-        setupQueue();
-        setupEmployeeMenu();
-        
 
+        setupEmployees(8);
+        setupEmployeeMenu();
+
+        setupMachines(5);
+        setupMachineMenu();
+
+        setupTrades(15);
+        setupTradeMenu();
+
+        setupQueue(1);
+        setupProcessingMenu();
+
+        setupRandomEvents();
+
+        startingPage();
+    }
+
+    #endregion
+    ///////////////////////////////////
+    ///////////////////////////////////
+    #region setup Functions
+    public void startingPage()  //sets the window that shows up when the game is run.
+    {
         SelectMenu.SetActive(true);
         UIbackground.SetActive(true);
         ProductionPage.SetActive(false);
         newWorkOrderWindow.SetActive(false);
     }
-    #endregion
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #region Setup Game
-    public void setupQueue() //production queue
+    public void setupSystemFunctions()
+    {
+        r = new System.Random();
+    }  //just sets up random for now.
+    public void setupQueue(int quantity) //production queue
     {
         ColorRGB[] level1 = new ColorRGB[8];
 
@@ -198,7 +214,7 @@ public class LogicCenter : MonoBehaviour
         level1[6] = new ColorRGB(0, 1, 1);
         level1[7] = new ColorRGB(1, 1, 1);
 
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < quantity; i++)
         {
             int r = ft.rollDice(1, 4);
 
@@ -238,18 +254,22 @@ public class LogicCenter : MonoBehaviour
     public void setupInventory()  //init the inventory
     {
         for (int i = 0; i < inventory.Length; i++)
-            inventory[i] = 0;
+            inventory[i] = 0; //set everything to start as zero
 
-        inventory[1] = 0;
-        inventory[2] = 0;
-        inventory[3] = 0;
+    }
 
-        for (int i = 0; i < 5; i++)  //setup both things
+    public void setupEmployees(int quantity)
+    {
+        for (int i = 0; i < quantity; i++)  //setup employees
         {
             employees.Add(new Employee(i));
-            Debug.Log("Random birthday for a " + employees[i].age + "-year-old: " + employees[i].birthdate.ToShortDateString());
+            //Debug.Log("Random birthday for a " + employees[i].age + "-year-old: " + employees[i].birthdate.ToShortDateString());
         }
-        for (int i = 0; i < 3; i++)
+    }
+
+    public void setupMachines(int quantity)
+    {
+        for (int i = 0; i < quantity; i++) //setup machines
             machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), ft.rollDice(3, 6), ft.rollDice(3, 3) + 1, 103 - ft.rollDice(3, 6)));
 
     }
@@ -306,11 +326,7 @@ public class LogicCenter : MonoBehaviour
     }
     public void setupProcessingMenu()
     {
-        newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order");
-        newWorkOrderQuantityBigText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X").GetComponent<Text>();
-        NewWorkOrderoutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/COLOR/Dropdown").GetComponent<TextMeshProUGUI>();
-        NewWorkOrderQuantityText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/Quantity/QuantityText").GetComponent<TMP_InputField>();
-        newWorkOrderPixelImg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X/CHOSEN COLOR").GetComponent<UnityEngine.UI.Image>();
+        setupNewWorkOrderMenu();
 
         for (int i = 0; i < productionEntry.Count; i++)
         {
@@ -323,6 +339,15 @@ public class LogicCenter : MonoBehaviour
             productionMachineText[i] = productionEntry[i].transform.Find("MACHINE NAME").GetComponent<UnityEngine.UI.Text>();
             productionBarImg[i] = productionEntry[i].transform.GetComponent<UnityEngine.UI.Image>();
         }
+    }
+    public void setupNewWorkOrderMenu()
+    {
+        newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order");
+        newWorkOrderQuantityBigText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X").GetComponent<Text>();
+        NewWorkOrderoutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/COLOR/Dropdown").GetComponent<TextMeshProUGUI>();
+        NewWorkOrderQuantityText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/Quantity/QuantityText").GetComponent<TMP_InputField>();
+        newWorkOrderPixelImg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X/CHOSEN COLOR").GetComponent<UnityEngine.UI.Image>();
+
     }
     public void setupMachineMenu()
     {
@@ -372,6 +397,66 @@ public class LogicCenter : MonoBehaviour
         selectedEmployeeName = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/Employees Feature/Employees Body/EMPLOYEE HEADER/Employee Name Banner").GetComponent<Text>();
         selectedEmployeeDetails = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/Employees Feature/Employees Body/Employee Details").GetComponent<Text>();
     }
+
+    public void setupTradeMenu()
+    {
+
+        for (int i = 0; i < tradeEntry.Length; i++)  //SETS UP TRADE ENTRY
+        {
+            if (i == 0) tradeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Trading Page/TRADE OFFERS/TRADE ENTRY");
+            else tradeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Trading Page/TRADE OFFERS/TRADE ENTRY (" + i + ")");
+
+            if (tradeEntry[i] == null)
+            {
+                Debug.Log("This crashes!" + i);
+            }
+            else
+            {
+
+                tradeCadenceText[i] = tradeEntry[i].transform.Find("CADENCE").GetComponent<Text>();
+                tradeLengthText[i] = tradeEntry[i].transform.Find("LENGTH NUM").GetComponent<Text>();
+                tradeSendText[i] = tradeEntry[i].transform.Find("PIXEL 1/QUANTITY A").GetComponent<Text>();
+                tradeSendIMG[i] = tradeEntry[i].transform.Find("PIXEL 1/Image").GetComponent<UnityEngine.UI.Image>();
+                tradeRecieveIMG[i] = tradeEntry[i].transform.Find("PIXEL 2/Image").GetComponent<UnityEngine.UI.Image>();
+                tradeRecieveText[i] = tradeEntry[i].transform.Find("PIXEL 2/QUANTITY A").GetComponent<Text>();
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////active trade
+        
+        for (int i = 0; i < activeTradeEntry.Length; i++)  //SETS UP TRADE ENTRY
+        {
+            if (i == 0) activeTradeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Trading Page/ACTIVE/Active Trade Entry");
+            else activeTradeEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Trading Page/ACTIVE/Active Trade Entry (" + i + ")");
+
+            if (activeTradeEntry[i] == null)
+            {
+                Debug.Log("This crashes!" + i);
+            }
+            else
+            {
+                activeTradeSendText[i] = activeTradeEntry[i].transform.Find("PIXEL 1/QUANTITY A").GetComponent<Text>();
+                activeTradeSendIMG[i] = activeTradeEntry[i].transform.Find("PIXEL 1/Image").GetComponent<UnityEngine.UI.Image>();
+                activeTradeRecieveIMG[i] = activeTradeEntry[i].transform.Find("PIXEL 2/Image").GetComponent<UnityEngine.UI.Image>();
+                activeTradeRecieveText[i] = activeTradeEntry[i].transform.Find("PIXEL 2/QUANTITY A").GetComponent<Text>();
+            }
+        }
+    }
+    void setupTrades(int numberOfTrades)
+    {
+        for (int i = 0; i < numberOfTrades; i++)
+        {
+            Trade newTrade = new Trade(5);
+            availableTrades.Add(newTrade);
+        }
+    }
+
+    public void setupRandomEvents()
+    {
+        randomEventElapsedTime = 0;
+        randomEventTriggerTime = ft.rollDice(10, 10);
+    }
+
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,9 +474,12 @@ public class LogicCenter : MonoBehaviour
         }
         
         
-        runMachines();
-        runExpenses();
+        runMachines();   //these should live inside the above else statement and increment by 1 isntead of by timedelta.
+        
         runEmployees();
+        runExpenses();
+        runTrades();
+
         runRandomEvents();
 
         updateUI();
@@ -624,9 +712,9 @@ public class LogicCenter : MonoBehaviour
             updateQueue();
     }
 
-    public void fireEmployee()
+    public void fireEmployee() 
     {
-        employees.RemoveAt(selectedEmployeeIndex);
+        employees.RemoveAt(selectedEmployeeIndex); //there's probably a better way to do selectedEmployeeIndex with just passing the right value when a thing is selected.
 
     }
     #endregion
@@ -851,25 +939,53 @@ public class LogicCenter : MonoBehaviour
     #region New Work Order
     public void assignNewWorkOrderColor(int val)  //sets the new color
     {
+        val += 4; //This accounts for the list only having some entries.
+        newWorkOrderColor = val;
+
+        updatePixelColor(newWorkOrderPixelImg, val);
+    }
+
+    public void updatePixelColor(UnityEngine.UI.Image i, int val)
+    {
         if (val == 0)
         {
-            newWorkOrderPixelImg.color = Color.yellow;
-            newWorkOrderColor = 4;
+            i.color = Color.black;
+
         }
         else if (val == 1)
         {
-            newWorkOrderPixelImg.color = Color.magenta;
-            newWorkOrderColor = 6;
+            i.color = Color.red;
+
         }
         else if (val == 2)
         {
-            newWorkOrderPixelImg.color = Color.cyan;
-            newWorkOrderColor = 5;
+            i.color = Color.green;
+
         }
-        else if (val == 3) 
+        else if (val == 3)
         {
-            newWorkOrderPixelImg.color = Color.white;
-            newWorkOrderColor = 7; 
+            i.color = Color.blue;
+
+        }
+        else if (val == 4)
+        {
+            i.color = Color.yellow;
+
+        }
+        else if (val == 5)
+        {
+            i.color = Color.magenta;
+
+        }
+        else if (val == 6)
+        {
+            i.color = Color.cyan;
+
+        }
+        else if (val == 7)
+        {
+            i.color = Color.white;
+
         }
     }
     public void assignNewWorkOrderQuantity(String val)
@@ -909,30 +1025,44 @@ public class LogicCenter : MonoBehaviour
 
     public void runTrades()
     {
-
+        Debug.Log("Active Trades"+ activeTrades.Count);
         for (int i = 0; i < activeTrades.Count; i++)
         {
             Trade t = activeTrades[i];  //check out 
 
             if (t.isActive)
             {
+               
                 t.elapsedTime += Time.deltaTime;
-
+                Debug.Log(t.elapsedTime);
                 if (t.elapsedTime > t.cadence)
                 {
                     t.elapsedTime = 0;
-                    activeTrades[i] = t;  //checks back in
 
+                    activeTrades[i] = t;
                     executeTrade(i);
                 }
+                else
+                    activeTrades[i] = t;
             }
         }
     }
 
-    public void selectTrade(int i)
+    public void selectTrade(int i)  ///used for the button
     {
-        activeTrades.Add(availableTrades[i]);
-        availableTrades.RemoveAt(i);
+        
+        if (availableTrades.Count > 0)
+        {
+            Trade t = availableTrades[i];
+
+            t.isActive = true;
+            activeTrades.Add(t);
+            
+            tradeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+
+            availableTrades[i]= t;
+            availableTrades.RemoveAt(i);
+        }
     }
 
     public void executeTrade(int i)  //i is the index of the trade being executed
@@ -940,20 +1070,24 @@ public class LogicCenter : MonoBehaviour
         Trade t = activeTrades[i];  //check trade out
 
         inventory[t.sendColor] -= t.sendQuantity;  //swap send
-        inventory[t.recieveColor] -= t.recieveQuantity; //swap recieve
+        inventory[t.recieveColor] += t.recieveQuantity; //swap recieve
 
         t.length -= 1;  //reduce the iterations by 1.
         activeTrades[i] = t;    //check back in
 
+
+        Debug.Log("execute trade");
         if (activeTrades[i].length < 1)  //if it's run the length of it's trade, remove it from the queue
             activeTrades.RemoveAt(i);
+        
+        
+    
     }
 
-
-    public void setupTrade()
+    public void setActiveTrade(int i)
     {
-        for(int i=0;i<8;i++)
-            availableTrades.Add(new Trade());
+        activeTrades.Add(availableTrades[i]);
+
     }
 
 
@@ -1157,7 +1291,7 @@ public class LogicCenter : MonoBehaviour
         }
 
         
-        if (selectedEmployeeIndex < employees.Count)    
+        if (selectedEmployeeIndex < employees.Count)     //selected employee info
         {
             Employee e = employees[selectedEmployeeIndex];
             selectedEmployeeName.text = ft.firstNames[e.firstName] + " " + ft.lastNames[e.lastName];
@@ -1171,6 +1305,50 @@ public class LogicCenter : MonoBehaviour
             selectedEmployeeName.text = "";
             selectedEmployeeDetails.text = "";
         }
+
+        for(int i = 0;i < tradeEntry.Length; i++)
+        {
+            if(i < availableTrades.Count)
+            {
+                tradeCadenceText[i].text = availableTrades[i].cadence.ToString();
+                tradeLengthText[i].text = availableTrades[i].length.ToString();
+                tradeSendText[i].text = availableTrades[i].sendQuantity.ToString();
+                updatePixelColor(tradeSendIMG[i], availableTrades[i].sendColor);
+                updatePixelColor(tradeRecieveIMG[i], availableTrades[i].recieveColor);
+                tradeRecieveText[i].text = availableTrades[i].recieveQuantity.ToString();
+            }
+            else
+            {
+                tradeCadenceText[i].text = "";
+                tradeLengthText[i].text = "";
+                tradeSendText[i].text = "";
+                updatePixelColor(tradeSendIMG[i], 7);
+                updatePixelColor(tradeRecieveIMG[i], 7);
+                tradeRecieveText[i].text = "";
+            }
+        }
+
+        for (int i = 0; i < activeTradeEntry.Length; i++)
+        {
+            if (i < activeTrades.Count)
+            {
+
+                activeTradeSendText[i].text = activeTrades[i].sendQuantity.ToString();
+                updatePixelColor(activeTradeSendIMG[i], activeTrades[i].sendColor);
+                updatePixelColor(activeTradeRecieveIMG[i], activeTrades[i].recieveColor);
+                activeTradeRecieveText[i].text = activeTrades[i].recieveQuantity.ToString();
+            }
+            else
+            {
+                Debug.Log("i: "+i);
+                Debug.Log(activeTradeSendText[i]);
+                activeTradeSendText[i].text = "";
+                updatePixelColor(activeTradeSendIMG[i], 7);
+                updatePixelColor(activeTradeRecieveIMG[i], 7);
+                activeTradeRecieveText[i].text = "";
+            }
+        }
+
     }
     public void updateEvents(int status)
     {
@@ -1180,11 +1358,6 @@ public class LogicCenter : MonoBehaviour
             history[i] = history[i-1];
             timestamps[i].text = timestamps[i - 1].text;
         }
-        /*
-        for (int i = timestamps.Length - 1; i > 0; i--) //timestamps
-        {
-            timestamps[i].text = timestamps[i - 1].text;
-        }*/
         
         history[0] = status;
 
@@ -1192,7 +1365,6 @@ public class LogicCenter : MonoBehaviour
         timeString = currentTime.ToString("hh:MM:sstt");
         timestamps[0].text = timeString;
         
-       // updateMenu();
     }
     
     public void oreValueTextColor()

@@ -5,27 +5,40 @@ using UnityEngine;
 public struct Trade
 {
     // Start is called before the first frame update
+
+    FlavorText f;
+
     public float cadence;
     public float length;
     public int sendQuantity;
     public int sendColor;
     public int recieveQuantity;
     public int recieveColor;
-    FlavorText f;
+    
     public float elapsedTime;
     public bool isActive;
 
-    void Start()
+    public Trade(int t)
     {
-        elapsedTime = 0;
         f = new();
-        cadence = f.rollDice(1,10);
-        length = f.rollDice(1,10);
+
+        //cadence = 15*f.rollDice(1,4);
+        //length = f.rollDice(1, 10);
+        cadence = 1;
+        length = 1;
+        sendQuantity = 5 * f.rollDice(1, 10);  //sets the initial quantity
         sendColor = f.rollDice(1,7);
         recieveColor = f.rollDice(1,7);
-        sendQuantity = f.rollDice(1, 10);  //sets the initial quantity
+        while (recieveColor == sendColor) //if it's the same, then redo it.
+            recieveColor = f.rollDice(1,7);
 
+        recieveQuantity = 0;
+
+       
+        
+        elapsedTime = 0;
         isActive = false;
+
         setRecieveQuantity();  //sets the quantity so that there somewhat balanced
     }
 
@@ -57,8 +70,13 @@ public struct Trade
         // Cast sendQuantity to float for the calculation, then cast the result back to int
         recieveQuantity = (int)((float)sendQuantity * sendModifier / recieveModifier);  //compares the amount of each color to adjust
 
+        if(recieveQuantity<0)
+        {
+            recieveQuantity = recieveQuantity * -1;
+            sendQuantity += recieveQuantity;
+        }
         // Assuming f is an object with a rollDice method
-        if (f.rollDice(1, 2) > 1)
+        if (f.rollDice(1, 2) > 1)  //randomly do one or the other.
             recieveQuantity += f.rollDice(1, 5);
         else
             recieveQuantity -= f.rollDice(1, 5);

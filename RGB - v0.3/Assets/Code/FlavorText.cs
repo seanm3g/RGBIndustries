@@ -503,4 +503,15 @@ public class FlavorText
 
         return new DateTime(year, month, day);
     }
+
+    public int highestDice(int dice, int sides)
+    {
+        int highest=0;
+
+        for(int i = 0;i<dice;i++)
+            if(sides > highest)
+                highest = sides;
+
+        return highest;
+    }
 }
