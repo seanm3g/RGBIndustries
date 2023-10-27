@@ -75,7 +75,7 @@ public class LogicCenter : MonoBehaviour
     public List<int> newHires = new List<int>();
     public Text selectedEmployeeName;
     public Text selectedEmployeeDetails;
-
+    public int newEmployeeJob=1;
     //trade
     public Text[] tradeCadenceText = new Text[8];
     public Text[] tradeLengthText = new Text[8];
@@ -170,7 +170,7 @@ public class LogicCenter : MonoBehaviour
         setupInventory();
         setupMenu();
 
-        setupEmployees(8);
+        setupEmployees(0);
         setupEmployeeMenu();
 
         setupMachines(5);
@@ -179,7 +179,7 @@ public class LogicCenter : MonoBehaviour
         setupTrades(15);
         setupTradeMenu();
 
-        setupQueue(1);
+        setupQueue(25);
         setupProcessingMenu();
 
         setupRandomEvents();
@@ -257,7 +257,6 @@ public class LogicCenter : MonoBehaviour
             inventory[i] = 0; //set everything to start as zero
 
     }
-
     public void setupEmployees(int quantity)
     {
         for (int i = 0; i < quantity; i++)  //setup employees
@@ -266,7 +265,6 @@ public class LogicCenter : MonoBehaviour
             //Debug.Log("Random birthday for a " + employees[i].age + "-year-old: " + employees[i].birthdate.ToShortDateString());
         }
     }
-
     public void setupMachines(int quantity)
     {
         for (int i = 0; i < quantity; i++) //setup machines
@@ -717,6 +715,24 @@ public class LogicCenter : MonoBehaviour
         employees.RemoveAt(selectedEmployeeIndex); //there's probably a better way to do selectedEmployeeIndex with just passing the right value when a thing is selected.
 
     }
+
+    public void performanceReview()  //doesn't do anything yet.
+    {
+
+
+    }
+    
+    public void pickEmployeeJob(int i)
+    {
+        Debug.Log("JOB:"+i);
+        newEmployeeJob = 1+i;
+        Debug.Log("new Employee Job:" + newEmployeeJob);
+    }
+
+    public void hireEmployee()
+    {
+        employees.Add(new(newEmployeeJob));
+    }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -856,14 +872,14 @@ public class LogicCenter : MonoBehaviour
     }
 
 
-    public void machineIsBroken(int i)
+    public void machineIsBroken(int i) //not setup yet
     {
 
 
 
     }
 
-    public void machineIsRepairing(int i)
+    public void machineIsRepairing(int i)  //not setup yet.
     {
 
 
@@ -1025,7 +1041,6 @@ public class LogicCenter : MonoBehaviour
 
     public void runTrades()
     {
-        Debug.Log("Active Trades"+ activeTrades.Count);
         for (int i = 0; i < activeTrades.Count; i++)
         {
             Trade t = activeTrades[i];  //check out 
@@ -1076,7 +1091,6 @@ public class LogicCenter : MonoBehaviour
         activeTrades[i] = t;    //check back in
 
 
-        Debug.Log("execute trade");
         if (activeTrades[i].length < 1)  //if it's run the length of it's trade, remove it from the queue
             activeTrades.RemoveAt(i);
         
@@ -1201,8 +1215,11 @@ public class LogicCenter : MonoBehaviour
             if (i < ProcessingQueue.Count)
             {
                 int outputIndex = ProcessingQueue[i].c3index;
-                int ingredientBindex = ProcessingQueue[i].c2index;
+
                 int ingredientAindex = ProcessingQueue[i].c1index;
+                int ingredientBindex = ProcessingQueue[i].c2index;
+                Debug.Log("ingredient A: "+ ProcessingQueue[i].c1index);
+                Debug.Log("ingredient B: " + ProcessingQueue[i].c2index);
 
                 Color tempColor = new Color(colorLib.colors[outputIndex].r, colorLib.colors[outputIndex].g, colorLib.colors[outputIndex].b);
                 Color ingredientA = new Color(colorLib.colors[ingredientAindex].r, colorLib.colors[ingredientAindex].g, colorLib.colors[ingredientAindex].b);
@@ -1239,7 +1256,11 @@ public class LogicCenter : MonoBehaviour
                 //Debug.Log(m);
 
                 machineMenuNameText[i].text = m.name;
-                machineMenuStatusText[i].text = ft.machineStatuses[m.status];
+
+
+      
+                machineMenuStatusText[i].text = ft.machineStatuses[m.status];    /////////////
+
 
                 if (m.orderIndex == -1)
                     machineMenuAssignementText[i].text = "not assigned";
@@ -1295,8 +1316,8 @@ public class LogicCenter : MonoBehaviour
         {
             Employee e = employees[selectedEmployeeIndex];
             selectedEmployeeName.text = ft.firstNames[e.firstName] + " " + ft.lastNames[e.lastName];
-            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() +
-                "\nHobby: " + ft.hobbies[e.hobby] + "\n\nSKILLS: \nSPEED: " + e.getSpeed().ToString() + "\nRELIABILITY: " + e.getReliability().ToString() + "\nINTELLIGENCE: " + e.getIntelligence().ToString();
+            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() +"\nBIRTHDATE: "+e.birthdate.ToString("MM/dd/yyyy")+
+                "\nSUN SIGN: "+ft.zodiacSigns[e.sunSign]+"\nHOMETOWN: "+ ft.cities[e.hometown] + "\nHOBBY: " + ft.hobbies[e.hobby] + "\n\nSKILLS: \nSPEED: " + e.getSpeed().ToString() + "\nRELIABILITY: " + e.getReliability().ToString() + "\nINTELLIGENCE: " + e.getIntelligence().ToString();
         
             selectedEmployeeDetails.text = details;
         }
@@ -1340,8 +1361,6 @@ public class LogicCenter : MonoBehaviour
             }
             else
             {
-                Debug.Log("i: "+i);
-                Debug.Log(activeTradeSendText[i]);
                 activeTradeSendText[i].text = "";
                 updatePixelColor(activeTradeSendIMG[i], 7);
                 updatePixelColor(activeTradeRecieveIMG[i], 7);
