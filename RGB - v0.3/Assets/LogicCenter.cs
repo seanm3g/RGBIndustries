@@ -158,6 +158,8 @@ public class LogicCenter : MonoBehaviour
 
     public int distribution = 1; //not sure what this is doing
     public int lastChosenColor = 0; //not sure what this is doing either
+
+    public int chosenPaintColor;
     #endregion
 
     #region Start
@@ -1218,8 +1220,8 @@ public class LogicCenter : MonoBehaviour
 
                 int ingredientAindex = ProcessingQueue[i].c1index;
                 int ingredientBindex = ProcessingQueue[i].c2index;
-                Debug.Log("ingredient A: "+ ProcessingQueue[i].c1index);
-                Debug.Log("ingredient B: " + ProcessingQueue[i].c2index);
+                //Debug.Log("ingredient A: "+ ProcessingQueue[i].c1index);           RESUME HERE
+                //Debug.Log("ingredient B: " + ProcessingQueue[i].c2index);
 
                 Color tempColor = new Color(colorLib.colors[outputIndex].r, colorLib.colors[outputIndex].g, colorLib.colors[outputIndex].b);
                 Color ingredientA = new Color(colorLib.colors[ingredientAindex].r, colorLib.colors[ingredientAindex].g, colorLib.colors[ingredientAindex].b);
@@ -1316,7 +1318,7 @@ public class LogicCenter : MonoBehaviour
         {
             Employee e = employees[selectedEmployeeIndex];
             selectedEmployeeName.text = ft.firstNames[e.firstName] + " " + ft.lastNames[e.lastName];
-            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() +"\nBIRTHDATE: "+e.birthdate.ToString("MM/dd/yyyy")+
+            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() +"\nBIRTHDATE: "+e.birthdate.ToString("MM/dd")+
                 "\nSUN SIGN: "+ft.zodiacSigns[e.sunSign]+"\nHOMETOWN: "+ ft.cities[e.hometown] + "\nHOBBY: " + ft.hobbies[e.hobby] + "\n\nSKILLS: \nSPEED: " + e.getSpeed().ToString() + "\nRELIABILITY: " + e.getReliability().ToString() + "\nINTELLIGENCE: " + e.getIntelligence().ToString();
         
             selectedEmployeeDetails.text = details;
@@ -1629,6 +1631,7 @@ public class LogicCenter : MonoBehaviour
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     #region Harvesting
     public void distributeTokens()
     {
@@ -1712,5 +1715,19 @@ public class LogicCenter : MonoBehaviour
         }
         
     }
+    #endregion
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region painting
+
+    public void setPaintColor(int i)
+    {
+        chosenPaintColor = i;
+
+    }
+
+
+
+
     #endregion
 }

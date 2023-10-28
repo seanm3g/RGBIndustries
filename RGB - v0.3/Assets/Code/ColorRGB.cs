@@ -34,4 +34,10 @@ public struct ColorRGB
         
         return c3;
     }
+
+    public Color toColor()
+    {
+        return new Color(r,g,b);
+
+    }
 }

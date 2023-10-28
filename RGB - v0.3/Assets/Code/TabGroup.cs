@@ -62,7 +62,6 @@ public class TabGroup : MonoBehaviour
         button.bg.color = Color.blue;
 
         updateColor();
-        
 
         index = button.transform.GetSiblingIndex();
         for(int i = 0; i<objectsToSwap.Count; i++)
@@ -81,11 +80,8 @@ public class TabGroup : MonoBehaviour
 
     public void updateColor()
     {
-
         if(selectedTab != null)
         {
-
-        
             childText = selectedTab.GetComponentInChildren<Text>();
 
             switch (lc.chosenColor)
