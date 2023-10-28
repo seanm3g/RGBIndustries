@@ -16,8 +16,8 @@ public class ColorLibrary
         colors[2] = new ColorRGB(0, 1, 0);  //green
         colors[3] = new ColorRGB(0, 0, 1);  //blue
         colors[4] = new ColorRGB(1, 1, 0);  //yellow
-        colors[5] = new ColorRGB(0, 1, 1);  //cyan
-        colors[6] = new ColorRGB(1, 0, 1);  //magenta
+        colors[5] = new ColorRGB(1, 0, 1);  //cyan
+        colors[6] = new ColorRGB(0, 1, 1);  //magenta
         colors[7] = new ColorRGB(1, 1, 1);  //white
     }
  

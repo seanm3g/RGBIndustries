@@ -181,7 +181,7 @@ public class LogicCenter : MonoBehaviour
         setupTrades(15);
         setupTradeMenu();
 
-        setupQueue(25);
+        setupQueue(0);
         setupProcessingMenu();
 
         setupRandomEvents();
@@ -1725,7 +1725,6 @@ public class LogicCenter : MonoBehaviour
         chosenPaintColor = i;
 
     }
-
 
 
 

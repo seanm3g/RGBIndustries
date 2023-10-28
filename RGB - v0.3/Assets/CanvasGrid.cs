@@ -9,6 +9,8 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler
     private Color[] pixels;
     private int[,] pixelValues;
 
+    FlavorText ft = new();
+
     public LogicCenter lc = new LogicCenter();
     ColorLibrary ColorLibrary = new ColorLibrary();
 
@@ -51,7 +53,7 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler
         if (clickedRow >= 0 && clickedRow < (canvasHeight / pixelSize) && clickedCol >= 0 && clickedCol < (canvasWidth / pixelSize))
         {
 
-            pixelValues[clickedRow, clickedCol] = lc.chosenColor;
+            pixelValues[clickedRow, clickedCol] = lc.chosenPaintColor;
             Debug.Log("pixel Value:"+ pixelValues[clickedRow,clickedCol]);
 
             // Loop to color the 10x10 area representing the "pixel"
@@ -73,5 +75,79 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler
     {
         canvasTexture.SetPixels(pixels);
         canvasTexture.Apply();
+    }
+
+
+    public void convertToWorkOrder()
+    {
+        Debug.Log("Do we enter this function?");
+        int[] vals = new int[8];
+        
+        for(int i = 0;i<vals.Length;i++)
+        {
+            vals[i] = 0;
+        }
+        for(int x=0; x < pixelValues.GetLength(0);x++)
+            for(int y = 0; y < pixelValues.GetLength(1);y++)
+                switch (pixelValues[x,y])
+                {
+                    case 1:
+                        vals[1]++;
+                        break;
+                    case 2:
+                        vals[2]++;
+                        break;
+                    case 3:
+                        vals[3]++;
+                        break;
+                    case 4:
+                        vals[4]++;
+                        break;
+                    case 5:
+                        vals[5]++;
+                        break;
+                    case 6:
+                        vals[6]++;
+                        break;
+                    case 7:
+                        vals[7]++;
+                        break;
+                }
+        
+        for (int x = 0; x < vals.Length; x++)
+        {
+            Debug.Log("Do we get in this switch"+x);
+            Debug.Log("Quantity of: "+x+"="+vals[x]);
+            if (vals[x] > 3)
+                switch (x)
+                {
+                    
+                    case 4:
+                        lc.ProcessingQueue.Add(new workOrder(vals[x],1,2,4));
+                        break;
+                    case 5:
+                        lc.ProcessingQueue.Add(new workOrder(vals[x],1,3,5));
+                        break;
+                    case 6:
+                        lc.ProcessingQueue.Add(new workOrder(vals[x],2,3,6));
+                        break;
+                    case 7:
+                        switch (ft.rollDice(1, 3))
+                        {
+                            case 1:
+                                lc.ProcessingQueue.Add(new workOrder(vals[x], 3, 4, 7)); //white
+                                break;
+                            case 2:
+                                lc.ProcessingQueue.Add(new workOrder(vals[x], 2, 5, 7)); //white
+                                break;
+                            case 3:
+                                lc.ProcessingQueue.Add(new workOrder(vals[x], 1, 6, 7)); //white
+                                break;
+                        }
+                        break;
+                }
+            
+        }
+
     }
 }
