@@ -17,6 +17,7 @@ public struct Machine
     public float elapsedTime;
     public int orderIndex;
     public float OEE;
+    public int cycles;
 
     private const int MACHINE_IDLE = 0;
     private const int MACHINE_LOADING = 1;
@@ -30,7 +31,7 @@ public struct Machine
 
     public Machine(String name, int type, int maxDurability, int batchSize, int cycleTime, int Yield)
     {
-
+        cycles = 0;
         result = 0;
         this.name = name;
         this.type = type;
@@ -84,12 +85,22 @@ public struct Machine
     }
     public void runMachine()
     {
-        if (durability > 0)
+        if (cycles > 0)
         {
-            durability--;
-            result = c1q;  //add yield in, and recognize an order with still quanity        
-        }
-        else status = 5;  //broken
+            cycles--;
+            status = MACHINE_RUNNING;
+
+            if (durability > 0)
+            {
+                durability--;
+                 
+            }
+            else status = 5;  //broken
+        } 
+        else result = c1q;  //add yield in, and recognize an order with still quanity       
+        
+       
+
 
     }
 

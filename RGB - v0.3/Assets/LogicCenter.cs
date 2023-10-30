@@ -12,8 +12,17 @@ using UnityEngine.UIElements;
 public class LogicCenter : MonoBehaviour
 {
     #region variables
-    // Start is called before the first frame update
+
+    #region libraries
+    public FlavorText ft = new();
+    public ColorLibrary colorLib = new();
     public System.Random r;
+    public CanvasGrid cg;
+    #endregion
+
+    #region basic functions
+
+    /// </summary>
     public int oreTokens = 10;
 
     public int selectedColor = 0;  //color being selected in the menu
@@ -25,8 +34,9 @@ public class LogicCenter : MonoBehaviour
 
     public float timer = 0;
     public float spawnRate = 1;
+    #endregion     //right panel
 
-    //right panel
+    #region basicUI
     public Text oreValueText;
     public Text redPixelText;
     public Text greenPixelText;
@@ -36,7 +46,9 @@ public class LogicCenter : MonoBehaviour
     public Text cyanPixelText;
     public Text whitePixelText;
     public Text chosenColorText;
+    #endregion
 
+    #region UI Game Objects
     public GameObject SelectMenu;           //top bar
     public GameObject UIbackground;         //
     public GameObject CanvasGO;             //
@@ -45,7 +57,13 @@ public class LogicCenter : MonoBehaviour
     public GameObject machineObject;        // machine object?
     public GameObject machineryPage;        //machine page
 
-    //machines page
+    public TabGroup tabgroup;               //used to control the top part
+    #endregion
+
+    #region machines
+
+    public List<Machine> machines = new List<Machine>();
+
     public GameObject[] machineEntry = new GameObject[12];
     public Text[] machineMenuNameText = new UnityEngine.UI.Text[12];
     public Text[] machineMenuStatusText = new UnityEngine.UI.Text[12];
@@ -55,80 +73,7 @@ public class LogicCenter : MonoBehaviour
     public Text[] machineMenuCText = new UnityEngine.UI.Text[12];
     public Text[] machineMenuYText = new UnityEngine.UI.Text[12];
     public Text[] machineOEEText = new UnityEngine.UI.Text[12];
-    //machines page
-
-    //Employee Page
-    public GameObject[] employeeEntry = new GameObject[12];
-    public Text[] employeeEntryNameText = new UnityEngine.UI.Text[12];
-    public Text[] employeeJobText = new UnityEngine.UI.Text[12];
-    public Text[] employeeStatusText = new UnityEngine.UI.Text[12];
-    public Text[] employeeHobbyText = new Text[12];
-    public Text[] employeeAgeText = new Text[12];
-    
-    //selected Employee
-    public int selectedEmployeeIndex = -1;
-    public int employeeOfTheMonthIndex = 0;
-    public List<int> newHires = new List<int>();
-    public Text selectedEmployeeName;
-    public Text selectedEmployeeDetails;
-    public int newEmployeeJob=1;
-    //trade
-    public Text[] tradeCadenceText = new Text[8];
-    public Text[] tradeLengthText = new Text[8];
-    public Text[] tradeSendText = new Text[8];
-    public UnityEngine.UI.Image[] tradeSendIMG = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Image[] tradeRecieveIMG = new UnityEngine.UI.Image[8];
-    public Text[] tradeRecieveText = new Text[8];
-
-    public List<Trade> availableTrades = new List<Trade>();
-    public GameObject[] tradeEntry = new GameObject[8];
-    public List<Trade> activeTrades = new List<Trade>();
-    //end trade
-
-    //active trade
-    public Text[] activeTradeSendText = new Text[8];
-    public UnityEngine.UI.Image[] activeTradeSendIMG = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Image[] activeTradeRecieveIMG = new UnityEngine.UI.Image[8];
-    public Text[] activeTradeRecieveText = new Text[8];
-    public GameObject[] activeTradeEntry = new GameObject[8];
-    //active trade end
-
-    public List<Machine> machines = new List<Machine>();
-    public List<Employee> employees = new List<Employee>();
-    public int[] inventory = new int[8];
-    public int[] history = new int[8];
-    
-    public GameObject[] events = new GameObject[8];
-    public UnityEngine.UI.Text[] timestamps = new Text[8];
-    public UnityEngine.UI.Image[] eventImg = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Text[] eventText = new UnityEngine.UI.Text[8];
-    public DateTime currentTime;
-    public String timeString;
-
-    /// <summary>
-    public List<workOrder> ProcessingQueue = new List<workOrder>();  //this is the production queue
-
-    public List<GameObject> productionEntry = new List<GameObject>();
-    public UnityEngine.UI.Image[] productionBarImg = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Image[] productionPixelImg = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Image[] productionIngredientAImg = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Image[] productionIngredientBImg = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Text[] productionNameText = new UnityEngine.UI.Text[8];
-    public UnityEngine.UI.Text[] productionQuantityText = new UnityEngine.UI.Text[8];
-    public UnityEngine.UI.Text[] productionStatusText = new UnityEngine.UI.Text[8];
-    public UnityEngine.UI.Text[] productionMachineText = new UnityEngine.UI.Text[8];
-    
-    public GameObject workOrderEntry;
-    public Text newWorkOrderButton;
-    public Text newWorkOrderQuantityBigText;
-    public int newWorkOrderColor;
-    public int newWorkOrderQuantity = 1;
-
-    float expenseElapsedTime = 0;
-
-    public FlavorText ft = new();
-    public ColorLibrary colorLib = new();
-
+    public int selectedMachineIndex = -1;
 
     private const int MACHINE_IDLE = 0;
     private const int MACHINE_LOADING = 1;
@@ -138,26 +83,120 @@ public class LogicCenter : MonoBehaviour
     private const int MACHINE_BROKEN = 5;
     private const int MACHINE_IN_MAINTENANCE = 6;
     private const int MACHINE_CHOKED = 7;
+    
+    #endregion
 
+    #region employees
 
+    public List<Employee> employees = new List<Employee>();
+
+    public GameObject[] employeeEntry = new GameObject[12];
+    public Text[] employeeEntryNameText = new UnityEngine.UI.Text[12];
+    public Text[] employeeJobText = new UnityEngine.UI.Text[12];
+    public Text[] employeeStatusText = new UnityEngine.UI.Text[12];
+    public Text[] employeeHobbyText = new Text[12];
+    public Text[] employeeAgeText = new Text[12];
+    #endregion
+
+    #region selected Employee Box
+    public int selectedEmployeeIndex = -1;
+    public int employeeOfTheMonthIndex = 0;
+    public List<int> newHires = new List<int>();
+    public Text selectedEmployeeName;
+    public Text selectedEmployeeDetails;
+    public int newEmployeeJob=1;
+    #endregion
+
+    #region Trade
+    public Text[] tradeCadenceText = new Text[8];
+    public Text[] tradeLengthText = new Text[8];
+    public Text[] tradeSendText = new Text[8];
+    public UnityEngine.UI.Image[] tradeSendIMG = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Image[] tradeRecieveIMG = new UnityEngine.UI.Image[8];
+    public Text[] tradeRecieveText = new Text[8];
+
+    public List<Trade> availableTrades = new List<Trade>();
+    public GameObject[] tradeEntry = new GameObject[8];
+
+    public int selectedTrade;
+    public float MarketElapsedTime;
+    #endregion
+
+    #region active trade
+    public List<Trade> activeTrades = new List<Trade>();
+    public Text[] activeTradeSendText = new Text[8];
+    public UnityEngine.UI.Image[] activeTradeSendIMG = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Image[] activeTradeRecieveIMG = new UnityEngine.UI.Image[8];
+    public Text[] activeTradeRecieveText = new Text[8];
+    public GameObject[] activeTradeEntry = new GameObject[8];
+    #endregion
+
+    #region inventory
+    public int[] inventory = new int[8];
+    #endregion
+
+    #region eventlist
+
+    public int[] history = new int[8]; //the recent 8 events.  // this would get larger if the game scales.
+    public GameObject[] events = new GameObject[8];
+    public UnityEngine.UI.Text[] timestamps = new Text[8];
+    public UnityEngine.UI.Image[] eventImg = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Text[] eventText = new UnityEngine.UI.Text[8];
+    public DateTime currentTime;
+    public String timeString;
+    #endregion
+
+    #region production Queue
+    public List<workOrder> ProcessingQueue = new List<workOrder>();  //this is the production queue
+    public List<GameObject> productionEntry = new List<GameObject>();
+    public UnityEngine.UI.Image[] productionBarImg = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Image[] productionPixelImg = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Image[] productionIngredientAImg = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Image[] productionIngredientBImg = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Text[] productionNameText = new UnityEngine.UI.Text[8];
+    public UnityEngine.UI.Text[] productionQuantityText = new UnityEngine.UI.Text[8];
+    public UnityEngine.UI.Text[] productionStatusText = new UnityEngine.UI.Text[8];
+    public UnityEngine.UI.Text[] productionMachineText = new UnityEngine.UI.Text[8];
+    #endregion
+
+    #region new work order
     public TextMeshProUGUI NewWorkOrderoutput;
     public TMP_InputField NewWorkOrderQuantityText;
     public UnityEngine.UI.Image newWorkOrderPixelImg;
 
+    public GameObject workOrderEntry;
+    public Text newWorkOrderButton;
+    public Text newWorkOrderQuantityBigText;
+    public int newWorkOrderColor;
+    public int newWorkOrderQuantity = 1;
+    #endregion
 
+    #region random events
     public float randomEventElapsedTime;
     public float randomEventTriggerTime;
+    #endregion
 
+    #region factory
     public Factory factory = new(1);
-
-    public TabGroup tabgroup;
+    #endregion
 
     public int distribution = 1; //not sure what this is doing
     public int lastChosenColor = 0; //not sure what this is doing either
 
+    #region paint
     public int chosenPaintColor;
+
+    public Text pictureStats;
+    public Text[] hueQuantitiesText = new UnityEngine.UI.Text[8];
     #endregion
 
+    #region costs
+    float expenseElapsedTime = 0;
+    #endregion
+
+    #endregion
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region Start
     void Start()
     {
@@ -165,6 +204,7 @@ public class LogicCenter : MonoBehaviour
     }
     public void setupGame()
     {
+
         setupInventory();
         setupMenu();
 
@@ -174,7 +214,7 @@ public class LogicCenter : MonoBehaviour
         setupMachines(5);
         setupMachineMenu();
 
-        setupTrades(15);
+        setupTrades(5);
         setupTradeMenu();
 
         setupQueue(0);
@@ -182,13 +222,14 @@ public class LogicCenter : MonoBehaviour
 
         setupRandomEvents();
 
+        setupPainting();
+
         startingPage();
     }
 
     #endregion
-    ///////////////////////////////////
-    ///////////////////////////////////
-    #region setup Functions
+
+    #region Setup Functions
     public void startingPage()  //sets the window that shows up when the game is run.
     {
         SelectMenu.SetActive(true);
@@ -393,7 +434,6 @@ public class LogicCenter : MonoBehaviour
         selectedEmployeeName = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/Employees Feature/Employees Body/EMPLOYEE HEADER/Employee Name Banner").GetComponent<Text>();
         selectedEmployeeDetails = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Mgmt Page/EMPLOYEE FULL MENU/Employees Feature/Employees Body/Employee Details").GetComponent<Text>();
     }
-
     public void setupTradeMenu()
     {
 
@@ -438,7 +478,7 @@ public class LogicCenter : MonoBehaviour
             }
         }
     }
-    void setupTrades(int numberOfTrades)
+    public void setupTrades(int numberOfTrades)
     {
         for (int i = 0; i < numberOfTrades; i++)
         {
@@ -446,11 +486,22 @@ public class LogicCenter : MonoBehaviour
             availableTrades.Add(newTrade);
         }
     }
-
     public void setupRandomEvents()
     {
         randomEventElapsedTime = 0;
         randomEventTriggerTime = ft.rollDice(10, 10);
+    }
+
+    public void setupPainting()
+    {
+        for (int i = 0; i < hueQuantitiesText.Length; i++)
+        {
+            int index = hueQuantitiesText.Length - i - 1;
+            hueQuantitiesText[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/paint canvas/quantity/Text (Legacy) ("+index+")").GetComponent<Text>();
+            hueQuantitiesText[i].text = "0x";
+        }
+
+        pictureStats = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/paint canvas/TOTAL").GetComponent<Text>();
     }
 
     #endregion
@@ -468,13 +519,12 @@ public class LogicCenter : MonoBehaviour
             timer = 0f;
             
         }
-        
-        
         runMachines();   //these should live inside the above else statement and increment by 1 isntead of by timedelta.
         
         runEmployees();
         runExpenses();
         runTrades();
+        runMarket();
 
         runRandomEvents();
 
@@ -528,20 +578,29 @@ public class LogicCenter : MonoBehaviour
 
     public void payBill(int c)
     {
-        int highestValue = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+        int highestValueIndex = highestQuantityColorIndex();
 
-        int index=1;
+
+        inventory[highestValueIndex] -= c;
+        
+        if (inventory[highestValueIndex] < 0)  //this is wrong but works for now.
+            inventory[highestValueIndex] = 0;
+    }
+
+    public int highestQuantityColorIndex()
+    {
+
+        int highestValueQuantity = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+        int highestValueIndex = 0;
+
         for (int i = 1; i < 4; i++)  //check the primaries
         {
-            index = i;
-            if (inventory[i] == highestValue)
-            {
-                inventory[i] -= c;
-                break;
-            }   
+            if (inventory[i] == highestValueQuantity)
+                highestValueIndex = i;
         }
-        if (inventory[index] < 0)  //this is wrong but works for now.
-            inventory[index] = 0;
+
+        return highestValueIndex;
+
     }
 
     public int calculateExpenses()
@@ -627,7 +686,6 @@ public class LogicCenter : MonoBehaviour
             {
                 e.status = 0;
             }
-
             employees[i] = e;
         }
     }
@@ -722,9 +780,9 @@ public class LogicCenter : MonoBehaviour
     
     public void pickEmployeeJob(int i)
     {
-        Debug.Log("JOB:"+i);
+        //Debug.Log("JOB:"+i);
         newEmployeeJob = 1+i;
-        Debug.Log("new Employee Job:" + newEmployeeJob);
+        //Debug.Log("new Employee Job:" + newEmployeeJob);
     }
 
     public void hireEmployee()
@@ -782,14 +840,14 @@ public class LogicCenter : MonoBehaviour
 
         if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
         {
-
+            m.status = MACHINE_UNLOADING;
             // Reset the elapsed time and stop processing
             m.runMachine();
             m.elapsedTime = 0f;
 
             // Signal that the output is ready
             updateEvents(5);
-            m.status = MACHINE_UNLOADING;
+            
         }
         machines[i] = m;
     }
@@ -883,6 +941,8 @@ public class LogicCenter : MonoBehaviour
 
 
     }
+
+
     public void updateProductionUI()
     {
         int index =-1;
@@ -945,6 +1005,85 @@ public class LogicCenter : MonoBehaviour
                 productionMachineText[i].text = "";
             }
         }
+    }
+
+    public void addNewMachine() //add new random machine
+    {
+        if (inventory[highestQuantityColorIndex()] > 25)
+        {
+            machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), ft.rollDice(3, 6), ft.rollDice(3, 3) + 1, 103 - ft.rollDice(3, 6)));
+            payBill(25); //right now machines cost 25 pixels each
+        }
+    }
+
+    public void selectMachine(int index)
+    {
+        // Reset all tradeEntry colors to white
+        for (int i = 0; i < machineEntry.Length; i++)
+        {
+            machineEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+        }
+
+        // If the selected index is within the bounds of availableTrades, proceed
+        if (index >= 0 && index < machines.Count)
+        {
+            // Highlight the selected tradeEntry
+            machineEntry[index].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+
+            // Update the selectedTrade index
+            selectedMachineIndex = index;
+        }
+        else
+        {
+            // Reset the selectedTrade index if the selected index is out of bounds
+            selectedMachineIndex = -1;
+        }
+    }
+
+    public void sellMachine()
+    {
+        // Check if a trade has been selected
+        if (selectedMachineIndex >= 0 && selectedMachineIndex < machines.Count && machines[selectedMachineIndex].status == 0)
+        {
+
+
+            // Remove it from the list of available trades
+            machines.RemoveAt(selectedMachineIndex);
+
+            // Reset the selectedTrade index
+            selectedMachineIndex = -1;
+
+            payBill(-5);
+
+            // Reset all machine colors to white
+            for (int i = 0; i < machineEntry.Length; i++)
+            {
+                machineEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No trade selected or selected index is out of bounds.");
+        }
+
+        
+    }
+
+    public float machineAverage()  //This gives you the average rate of production per pixel based on the machines you have.
+    {
+
+        int runningCycleTotal = 0;
+        int runningBatchTotal = 0;
+        for (int i = 0; i < machines.Count; i++)
+        {
+            runningCycleTotal = machines[i].cycleTime * 3;
+            runningBatchTotal = machines[i].batchSize;
+        }
+
+        float avgCycles = runningCycleTotal/machines.Count;
+        float avgBatch = runningBatchTotal/machines.Count;
+
+        return avgBatch/avgCycles;
     }
 
     #endregion
@@ -1010,7 +1149,6 @@ public class LogicCenter : MonoBehaviour
 
         if(val !=null)
             newWorkOrderQuantityBigText.text = val + "x";
-       // NewWorkOrderQuantity.text = int.Parse(val);
     }
 
     public void makeNewWorkOrder()  //updates the button to be used in two ways.
@@ -1032,6 +1170,33 @@ public class LogicCenter : MonoBehaviour
             newWorkOrderWindow.SetActive(true);
         }
     }
+
+    public void addNewWorkOrder()  //adds a new order to the queue
+    {
+        if (newWorkOrderColor == 4) //yellow
+            ProcessingQueue.Insert(0,new workOrder(newWorkOrderQuantity, 1, 2, newWorkOrderColor));
+        if (newWorkOrderColor == 5) //magenta
+            ProcessingQueue.Insert(0, new workOrder(newWorkOrderQuantity, 2, 3, newWorkOrderColor));
+        if (newWorkOrderColor == 6) //cyan
+            ProcessingQueue.Insert(0, new workOrder(newWorkOrderQuantity, 1, 3, newWorkOrderColor));
+        if (newWorkOrderColor == 7) //white
+        {
+
+            switch (ft.rollDice(1, 3))  //randomly chooses which one you have to make
+            {
+                case 1:
+                    ProcessingQueue.Insert(0, new workOrder(5, 3, 4, newWorkOrderColor));
+                    break;
+                case 2:
+                    ProcessingQueue.Insert(0, new workOrder(5, 2, 5, newWorkOrderColor));
+                    break;
+                case 3:
+                    ProcessingQueue.Insert(0, new workOrder(5, 1, 6, newWorkOrderColor));
+                    break;
+            }
+
+        }
+    }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1047,7 +1212,7 @@ public class LogicCenter : MonoBehaviour
             {
                
                 t.elapsedTime += Time.deltaTime;
-                Debug.Log(t.elapsedTime);
+                //Debug.Log(t.elapsedTime);
                 if (t.elapsedTime > t.cadence)
                 {
                     t.elapsedTime = 0;
@@ -1061,22 +1226,89 @@ public class LogicCenter : MonoBehaviour
         }
     }
 
-    public void selectTrade(int i)  ///used for the button
+    public void runMarket()
     {
-        
-        if (availableTrades.Count > 0)
+        MarketElapsedTime += Time.deltaTime;
+
+        if (MarketElapsedTime > 2)
         {
-            Trade t = availableTrades[i];
+            MarketElapsedTime = 0;
+            int maxSize = availableTrades.Count;
 
-            t.isActive = true;
-            activeTrades.Add(t);
-            
-            tradeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
-
-            availableTrades[i]= t;
-            availableTrades.RemoveAt(i);
+            if (ft.rollDice(1, 2) == 2)
+            {
+                if (maxSize < 8)
+                {
+                    availableTrades.Add(new Trade(5));
+                }
+            }
+            else
+            {
+                if (maxSize > 1)
+                { 
+                    int removeIndex = ft.rollDice(1, maxSize);
+                    availableTrades.RemoveAt(removeIndex - 1);
+                }
+            }
         }
     }
+
+    public void selectTrade(int index)  ///used for the button
+    {
+        // Reset all tradeEntry colors to white
+        for (int i = 0; i < tradeEntry.Length; i++)
+        {
+            tradeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+        }
+
+        // If the selected index is within the bounds of availableTrades, proceed
+        if (index >= 0 && index < availableTrades.Count)
+        {
+            // Highlight the selected tradeEntry
+            tradeEntry[index].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+
+            // Update the selectedTrade index
+            selectedTrade = index;
+        }
+        else
+        {
+            // Reset the selectedTrade index if the selected index is out of bounds
+            selectedTrade = -1;
+        }
+    }
+
+    public void acceptTrade()
+    {
+        // Check if a trade has been selected
+        if (selectedTrade >= 0 && selectedTrade < availableTrades.Count)
+        {
+            // Get the selected trade
+            Trade t = availableTrades[selectedTrade];
+
+            // Mark it as active
+            t.isActive = true;
+
+            // Add it to the list of active trades
+            activeTrades.Add(t);
+
+            // Remove it from the list of available trades
+            availableTrades.RemoveAt(selectedTrade);
+
+            // Reset the selectedTrade index
+            selectedTrade = -1;
+
+            // Reset all tradeEntry colors to white
+            for (int i = 0; i < tradeEntry.Length; i++)
+            {
+                tradeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No trade selected or selected index is out of bounds.");
+        }
+    }
+
 
     public void executeTrade(int i)  //i is the index of the trade being executed
     {
@@ -1101,6 +1333,7 @@ public class LogicCenter : MonoBehaviour
         activeTrades.Add(availableTrades[i]);
 
     }
+
 
 
     #endregion
@@ -1482,32 +1715,7 @@ public class LogicCenter : MonoBehaviour
         machines[machineIndex] = m;
         ProcessingQueue[orderIndex] = wo;
     }
-    public void addNewWorkOrder()  //adds a new order to the queue
-    {
-        if (newWorkOrderColor == 4) //yellow
-            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1, 2, newWorkOrderColor));
-        if (newWorkOrderColor == 5) //magenta
-            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 2, 3, newWorkOrderColor));
-        if (newWorkOrderColor == 6) //cyan
-            ProcessingQueue.Add(new workOrder(newWorkOrderQuantity, 1, 3, newWorkOrderColor));
-        if (newWorkOrderColor == 7) //white
-        {
-
-            switch (ft.rollDice(1, 3))  //randomly chooses which one you have to make
-            {
-                case 1:
-                    ProcessingQueue.Add(new workOrder(5, 3, 4, newWorkOrderColor));
-                    break;
-                case 2:
-                    ProcessingQueue.Add(new workOrder(5, 2, 5, newWorkOrderColor));
-                    break;
-                case 3:
-                    ProcessingQueue.Add(new workOrder(5, 1, 6, newWorkOrderColor));
-                    break;
-            }
-
-        }
-    }
+   
     private int DetermineQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
     {
         int availableQuantity = inventory[componentIndex];
@@ -1627,7 +1835,6 @@ public class LogicCenter : MonoBehaviour
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
     #region Harvesting
     public void distributeTokens()
     {
@@ -1662,7 +1869,8 @@ public class LogicCenter : MonoBehaviour
         {
 
             updateEvents(8);
-
+            cg.available();
+            cg.UpdateTexture();
             oreValueText.color = Color.white;
 
 
@@ -1722,6 +1930,11 @@ public class LogicCenter : MonoBehaviour
 
     }
 
+    public void updateHueQuantities()
+    {
+
+
+    }
 
 
     #endregion
