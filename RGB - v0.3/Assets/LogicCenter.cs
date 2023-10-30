@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TMPro;
 using Unity.VisualScripting;
@@ -885,7 +886,7 @@ public class LogicCenter : MonoBehaviour
         Machine m = machines[i];
         m.elapsedTime += Time.deltaTime;
 
-        if (m.elapsedTime >= m.cycleTime)
+        if (m.elapsedTime >= m.cycleTime)  //the machine should be reset not on complete but on unload
         {
             int orderIndex = m.orderIndex;
 
@@ -1156,46 +1157,108 @@ public class LogicCenter : MonoBehaviour
 
         if (newWorkOrderWindow.activeSelf)
         {
-            newWorkOrderWindow.SetActive(false);
-
-            newWorkOrderButton.text = "+";
-            newWorkOrderButton.color = Color.black;
-            newWorkOrderButton.transform.Rotate(0, 0, -45);
+            closeNewWorkOrderWindow();
         }
 
         else
         {
-            newWorkOrderButton.transform.Rotate(0,0,45);
-            newWorkOrderButton.color = Color.red;
-            newWorkOrderWindow.SetActive(true);
+            openNewWorkOrderWindow();
         }
     }
 
-    public void addNewWorkOrder()  //adds a new order to the queue
+    public void AddNewWorkOrder()
     {
-        if (newWorkOrderColor == 4) //yellow
-            ProcessingQueue.Insert(0,new workOrder(newWorkOrderQuantity, 1, 2, newWorkOrderColor));
-        if (newWorkOrderColor == 5) //magenta
-            ProcessingQueue.Insert(0, new workOrder(newWorkOrderQuantity, 2, 3, newWorkOrderColor));
-        if (newWorkOrderColor == 6) //cyan
-            ProcessingQueue.Insert(0, new workOrder(newWorkOrderQuantity, 1, 3, newWorkOrderColor));
-        if (newWorkOrderColor == 7) //white
+        // Offset the queue if necessary
+        Debug.Log("Beginning of new order ");
+        if (ProcessingQueue.Count > 0 && HasActiveOrder())
         {
-
-            switch (ft.rollDice(1, 3))  //randomly chooses which one you have to make
-            {
-                case 1:
-                    ProcessingQueue.Insert(0, new workOrder(5, 3, 4, newWorkOrderColor));
-                    break;
-                case 2:
-                    ProcessingQueue.Insert(0, new workOrder(5, 2, 5, newWorkOrderColor));
-                    break;
-                case 3:
-                    ProcessingQueue.Insert(0, new workOrder(5, 1, 6, newWorkOrderColor));
-                    break;
-            }
-
+            OffsetQueue();
         }
+
+        // Create a new work order based on the color
+        workOrder? newOrder = CreateWorkOrderBasedOnColor(newWorkOrderColor, newWorkOrderQuantity);
+
+        Debug.Log("MIDDLE of new order ");
+        // Add the new work order to the front of the queue
+        if (newOrder.HasValue)  // Check if newOrder is not null
+        {
+            ProcessingQueue.Insert(0, newOrder.Value);  // Use .Value to get the underlying workOrder
+        }
+
+        Debug.Log("END of new order ");
+
+        closeNewWorkOrderWindow();
+    }
+
+
+    private workOrder? CreateWorkOrderBasedOnColor(int color, int quantity)
+    {
+        switch (color)
+        {
+            case 4:
+                return new workOrder(quantity, 1, 2, color);
+            case 5:
+                return new workOrder(quantity, 2, 3, color);
+            case 6:
+                return new workOrder(quantity, 1, 3, color);
+            case 7:
+                int randomCase = ft.rollDice(1, 3);
+                return new workOrder(5, randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1, randomCase + 3, color);
+            default:
+                return null;
+        }
+    }
+
+    private void OffsetQueue()
+    {
+        for (int i = 0; i < machines.Count; i++)
+        {
+            Machine tempMachine = machines[i];
+
+            if (tempMachine.status > 0)
+            {
+                tempMachine.orderIndex++;
+                machines[i] = tempMachine; // Update the original struct in the collection
+            }
+        }
+    }
+
+
+    private bool HasActiveOrder()
+    {
+        return machines.Any(machine => machine.status > 0);
+    }
+
+    public void openNewWorkOrderWindow()
+    {
+        newWorkOrderButton.transform.Rotate(0, 0, 45);
+        newWorkOrderButton.color = Color.red;
+        newWorkOrderWindow.SetActive(true);
+
+    }
+    public void closeNewWorkOrderWindow()
+    {
+        newWorkOrderWindow.SetActive(false);
+
+        newWorkOrderButton.text = "+";
+        newWorkOrderButton.color = Color.black;
+        newWorkOrderButton.transform.Rotate(0, 0, -45);
+
+    }
+
+
+
+    public bool hasActiveOrder()
+    {
+        bool active = false;
+
+        for (int i = 0; i < ProcessingQueue.Count; i++)
+            if (ProcessingQueue[i].isActive)
+            {
+                active = true;
+                break;
+            }
+        return active;
     }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1650,6 +1713,22 @@ public class LogicCenter : MonoBehaviour
             }          
         }
     }
+
+    public void displayInventory()
+    {
+        oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
+
+
+        redPixelText.text = inventory[1].ToString();
+        greenPixelText.text = inventory[2].ToString();
+        bluePixelText.text = inventory[3].ToString();
+        yellowPixelText.text = inventory[4].ToString();
+        magentaPixelText.text = inventory[5].ToString();
+        cyanPixelText.text = inventory[6].ToString();
+        whitePixelText.text = inventory[7].ToString();
+
+
+    }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1659,12 +1738,11 @@ public class LogicCenter : MonoBehaviour
         int firstAvailableMachineIndex = FindFirstAvailableMachine();
         int firstUnassignedOrderIndex = FindFirstUnassignedOrder();
 
-        if (firstAvailableMachineIndex != -1 && firstUnassignedOrderIndex != -1)
+        if (firstAvailableMachineIndex != -1 && firstUnassignedOrderIndex != -1)  //if there's a match
         {
             AssignOrderToMachine(firstAvailableMachineIndex, firstUnassignedOrderIndex);
             
         }
-
     }
     private int FindFirstAvailableMachine()
     {
@@ -1697,10 +1775,17 @@ public class LogicCenter : MonoBehaviour
         int c2Quantity = DetermineQuantity(wo.c2index, c1Quantity);
         c1Quantity = c2Quantity;
 
+        if(m.batchSize < wo.quantity) //This sets the number of cycles needed to produce the whole amount.
+            while(m.cycles*m.batchSize<wo.quantity)
+            {
+                m.cycles++;
+            }
+
         if (c1Quantity == wo.quantity)  //it's a full order
         {
             wo.machineIndex = machineIndex; //sets the machine being used for the order.
             m.orderIndex = orderIndex;  //sets the order being run for the machine
+
             ProcessingQueue[orderIndex] = wo;
 
             wo.isActive = true;
@@ -1731,21 +1816,6 @@ public class LogicCenter : MonoBehaviour
         }
 
         return quantityToUse;
-    }
-    public void displayInventory()
-    {
-        oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
-
-
-        redPixelText.text = inventory[1].ToString();
-        greenPixelText.text = inventory[2].ToString();
-        bluePixelText.text = inventory[3].ToString();
-        yellowPixelText.text = inventory[4].ToString();
-        magentaPixelText.text = inventory[5].ToString();
-        cyanPixelText.text = inventory[6].ToString();
-        whitePixelText.text = inventory[7].ToString();
-
-
     }
 
     #endregion
