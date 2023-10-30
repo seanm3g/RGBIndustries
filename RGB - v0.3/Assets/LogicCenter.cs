@@ -158,6 +158,7 @@ public class LogicCenter : MonoBehaviour
     public UnityEngine.UI.Text[] productionQuantityText = new UnityEngine.UI.Text[8];
     public UnityEngine.UI.Text[] productionStatusText = new UnityEngine.UI.Text[8];
     public UnityEngine.UI.Text[] productionMachineText = new UnityEngine.UI.Text[8];
+    public int selectedWorkOrderIndex = -1;
     #endregion
 
     #region new work order
@@ -856,21 +857,16 @@ public class LogicCenter : MonoBehaviour
     public void machineIsUnloading(int i)
     {
         Machine m = machines[i];
-
         m.elapsedTime += Time.deltaTime;
 
-        if (m.elapsedTime >= m.cycleTime)  //finishes processing
+        if (m.elapsedTime >= m.cycleTime)
         {
-            workOrder wo = ProcessingQueue[m.orderIndex];
             int inventoryIndex = ProcessingQueue[m.orderIndex].c3index;
+            inventory[inventoryIndex] += m.unloadMachine();
 
-            inventory[inventoryIndex] += m.unloadMachine(); //unloads the production quantity to inventory. Could be added to have randomness.
-            
             m.status = MACHINE_COMPLETED;
             m.elapsedTime = 0f;
-
-            updateEvents(4);  //says job is processed
-            ProcessingQueue[m.orderIndex] = wo;  //check it back into the data
+            m.orderIndex = -1;  // Unlink the machine from the work order
         }
         machines[i] = m;
     }
@@ -879,24 +875,15 @@ public class LogicCenter : MonoBehaviour
     {
         if (i < 0 || i >= machines.Count)
         {
-            // Log an error or throw an exception
             return;
         }
 
         Machine m = machines[i];
         m.elapsedTime += Time.deltaTime;
 
-        if (m.elapsedTime >= m.cycleTime)  //the machine should be reset not on complete but on unload
+        if (m.elapsedTime >= m.cycleTime)
         {
-            int orderIndex = m.orderIndex;
-
-            if (orderIndex < 0 || orderIndex >= ProcessingQueue.Count)
-            {
-                // Log an error or throw an exception
-                return;
-            }
-
-            workOrder wo = ProcessingQueue[orderIndex];
+            workOrder wo = ProcessingQueue[m.orderIndex];
             wo.quantity -= m.c3q;
             wo.isActive = false;
 
@@ -906,27 +893,28 @@ public class LogicCenter : MonoBehaviour
             }
 
             m.elapsedTime = 0;
-            m.status = 0;
-            m.orderIndex = -1;
+            m.status = 0;  // Free the machine
+            m.orderIndex = -1;  // Unlink the machine from the work order
 
-            ProcessingQueue[orderIndex] = wo;
+            ProcessingQueue[m.orderIndex] = wo;
             machines[i] = m;
 
-            ProcessingQueue.RemoveAt(orderIndex);
+            ProcessingQueue.RemoveAt(m.orderIndex);
 
+            // Adjust the orderIndex for all other machines
             for (int j = 0; j < machines.Count; j++)
             {
                 Machine tempMachine = machines[j];
-                if (tempMachine.orderIndex > orderIndex)
+                if (tempMachine.orderIndex > m.orderIndex)
                 {
                     tempMachine.orderIndex -= 1;
-                    machines[j] = tempMachine; // Note the index change here
+                    machines[j] = tempMachine;
                 }
             }
         }
-
         machines[i] = m;
     }
+
 
 
     public void machineIsBroken(int i) //not setup yet
@@ -948,9 +936,9 @@ public class LogicCenter : MonoBehaviour
     {
         int index =-1;
 
-        for (int i = 0; i < productionEntry.Count; i++)  //set status based on the current machine status
+        for (int i = 0; i < productionEntry.Count; i++)  //
         {
-            if(i > -1 && i < ProcessingQueue.Count)  //if the orders count is less
+            if(i < ProcessingQueue.Count)  //if the index we are on is less than the total number of items in the queue
             { 
                 index = ProcessingQueue[i].machineIndex;
 
@@ -965,7 +953,7 @@ public class LogicCenter : MonoBehaviour
                         //Debug.Log("productiont text: "+productionMachineText[i].text);
                         //Debug.Log("machine name: "+machines[i].name);
 
-                        productionMachineText[i].text = machines[i].name;
+                        productionMachineText[i].text = machines[index].name;  //This was set to i and not index meaning it wasn't pulling the correct thing.
                     }
                     else if (machines[index].status == MACHINE_RUNNING)
                     {
@@ -1101,97 +1089,62 @@ public class LogicCenter : MonoBehaviour
 
     public void updatePixelColor(UnityEngine.UI.Image i, int val)
     {
-        if (val == 0)
+        switch (val)
         {
-            i.color = Color.black;
-
-        }
-        else if (val == 1)
-        {
-            i.color = Color.red;
-
-        }
-        else if (val == 2)
-        {
-            i.color = Color.green;
-
-        }
-        else if (val == 3)
-        {
-            i.color = Color.blue;
-
-        }
-        else if (val == 4)
-        {
-            i.color = Color.yellow;
-
-        }
-        else if (val == 5)
-        {
-            i.color = Color.magenta;
-
-        }
-        else if (val == 6)
-        {
-            i.color = Color.cyan;
-
-        }
-        else if (val == 7)
-        {
-            i.color = Color.white;
-
+            case 0: i.color = Color.black; break;
+            case 1: i.color = Color.red; break;
+            case 2: i.color = Color.green; break;
+            case 3: i.color = Color.blue; break;
+            case 4: i.color = Color.yellow; break;
+            case 5: i.color = Color.magenta; break;
+            case 6: i.color = Color.cyan; break;
+            case 7: i.color = Color.white; break;
         }
     }
     public void assignNewWorkOrderQuantity(String val)
     {
         bool isNum = int.TryParse(val,out newWorkOrderQuantity);
+
         if(isNum)
             newWorkOrderQuantity = int.Parse(val);
 
-        if(val !=null)
+        if(val != null)  //This sets what the order is going to get made
             newWorkOrderQuantityBigText.text = val + "x";
     }
 
     public void makeNewWorkOrder()  //updates the button to be used in two ways.
     {
-
         if (newWorkOrderWindow.activeSelf)
-        {
             closeNewWorkOrderWindow();
-        }
-
         else
-        {
             openNewWorkOrderWindow();
-        }
     }
 
-    public void AddNewWorkOrder()
+    public void addNewWorkOrder()
     {
         // Offset the queue if necessary
-        Debug.Log("Beginning of new order ");
+
         if (ProcessingQueue.Count > 0 && HasActiveOrder())
         {
             OffsetQueue();
         }
 
-        // Create a new work order based on the color
+        // Create a new work order based on the color  ? means it might be null
         workOrder? newOrder = CreateWorkOrderBasedOnColor(newWorkOrderColor, newWorkOrderQuantity);
 
-        Debug.Log("MIDDLE of new order ");
+
         // Add the new work order to the front of the queue
         if (newOrder.HasValue)  // Check if newOrder is not null
         {
             ProcessingQueue.Insert(0, newOrder.Value);  // Use .Value to get the underlying workOrder
         }
 
-        Debug.Log("END of new order ");
 
         closeNewWorkOrderWindow();
     }
 
 
-    private workOrder? CreateWorkOrderBasedOnColor(int color, int quantity)
+    public workOrder? CreateWorkOrderBasedOnColor(int color, int quantity)
     {
         switch (color)
         {
@@ -1215,10 +1168,23 @@ public class LogicCenter : MonoBehaviour
         {
             Machine tempMachine = machines[i];
 
-            if (tempMachine.status > 0)
+            // If the machine is actively working on a work order, increment its orderIndex
+            if (tempMachine.status > 0 && tempMachine.orderIndex >= 0)
             {
                 tempMachine.orderIndex++;
                 machines[i] = tempMachine; // Update the original struct in the collection
+            }
+        }
+
+        for (int i = 0; i < ProcessingQueue.Count; i++)
+        {
+            workOrder wo = ProcessingQueue[i];
+
+            // If the machine is actively working on a work order, increment its orderIndex
+            if (wo.isActive && wo.machineIndex >= 2)
+            {
+                wo.machineIndex--;
+                ProcessingQueue[i] = wo; // Update the original struct in the collection
             }
         }
     }
@@ -1818,6 +1784,29 @@ public class LogicCenter : MonoBehaviour
         return quantityToUse;
     }
 
+    public void selectWorkOrder(int index)
+    {
+        // Reset all tradeEntry colors to white
+        for (int i = 0; i < productionEntry.Count; i++)
+        {
+            productionEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+        }
+
+        // If the selected index is within the bounds of availableTrades, proceed
+        if (index >= 0 && index < ProcessingQueue.Count)
+        {
+            // Highlight the selected tradeEntry
+            productionEntry[index].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+
+            // Update the selectedTrade index
+            selectedWorkOrderIndex = index;
+        }
+        else
+        {
+            // Reset the selectedTrade index if the selected index is out of bounds
+            selectedWorkOrderIndex = -1;
+        }
+    }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
