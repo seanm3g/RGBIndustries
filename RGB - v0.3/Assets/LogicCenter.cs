@@ -645,6 +645,26 @@ public class LogicCenter : MonoBehaviour
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Events
+    public void updateEvents(int status)
+    {
+
+        for (int i = history.Length - 1; i > 0; i--)  //moves everything down one
+        {
+            history[i] = history[i - 1];
+            timestamps[i].text = timestamps[i - 1].text;
+        }
+
+        history[0] = status;
+
+        currentTime = DateTime.Now;
+        timeString = currentTime.ToString("hh:MM:sstt");
+        timestamps[0].text = timeString;
+
+    }
+    #endregion
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region Random Events
     public void runRandomEvents()
     {
@@ -791,6 +811,23 @@ public class LogicCenter : MonoBehaviour
     {
         employees.Add(new(newEmployeeJob));
     }
+
+    public void selectEmployee(int index)
+    {
+        selectedEmployeeIndex = index;
+
+        for (int i = 0; i < employeeEntry.Length; i++)
+        {
+            if (i == index && index < employees.Count)
+            {
+                employeeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+            }
+            else
+            {
+                employeeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+            }
+        }
+    }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -798,22 +835,28 @@ public class LogicCenter : MonoBehaviour
     private void runMachines()  //could add an idle condition
     {
 
+        updateProductionUI();
+
         for (int i = 0; i < machines.Count; i++)
         {
-            if (machines[i].status == 1)
-                machineIsLoading(i);
-            if (machines[i].status == 2)
-                machineIsRunning(i);
-            if (machines[i].status == 3)  //unload the pixels to inventory
-                machineIsUnloading(i);
-            if (machines[i].status == 4)  //ideal result
-                machineIsComplete(i);
-            if (machines[i].status == 5)
-                machineIsBroken(i);
-            if (machines[i].status == 6)
-                machineIsRepairing(i);
+            switch (machines[i].status)
+            {
+                case 1:  
+                    machineIsLoading(i);break;
+                case 2:
+                    machineIsRunning(i); break;
+                case 3:
+                    machineIsUnloading(i); break;
+                case 4:
+                    machineIsComplete(i); break;
+                case 5:
+                    machineIsBroken(i); break;
+                case 6:
+                    machineIsRepairing(i); break;
+
+            }
         }
-        updateProductionUI();
+        
 
     }
 
@@ -866,7 +909,7 @@ public class LogicCenter : MonoBehaviour
 
             m.status = MACHINE_COMPLETED;
             m.elapsedTime = 0f;
-            m.orderIndex = -1;  // Unlink the machine from the work order
+            //m.orderIndex = -1;  // Unlink the machine from the work order
         }
         machines[i] = m;
     }
@@ -894,12 +937,14 @@ public class LogicCenter : MonoBehaviour
 
             m.elapsedTime = 0;
             m.status = 0;  // Free the machine
-            m.orderIndex = -1;  // Unlink the machine from the work order
+            
 
             ProcessingQueue[m.orderIndex] = wo;
-            machines[i] = m;
 
             ProcessingQueue.RemoveAt(m.orderIndex);
+
+            m.orderIndex = -1;  // Unlink the machine from the work order
+            machines[i] = m;
 
             // Adjust the orderIndex for all other machines
             for (int j = 0; j < machines.Count; j++)
@@ -934,66 +979,66 @@ public class LogicCenter : MonoBehaviour
 
     public void updateProductionUI()
     {
-        int index =-1;
-
-        for (int i = 0; i < productionEntry.Count; i++)  //
+        for (int i = 0; i < productionEntry.Count; i++)
         {
-            if(i < ProcessingQueue.Count)  //if the index we are on is less than the total number of items in the queue
-            { 
-                index = ProcessingQueue[i].machineIndex;
+            Color barColor = Color.white;
+            Color textColor = Color.black;
+            string statusText = ft.woStatuses[7];
+            string machineName = "";
+
+            if (i < ProcessingQueue.Count)
+            {
+                int index = ProcessingQueue[i].machineIndex;
 
                 if (index >= 0 && index < machines.Count)
                 {
-                    if (machines[index].status == MACHINE_LOADING) 
-                    {
-                        productionBarImg[i].color = Color.yellow;
-                        productionStatusText[i].color = Color.green;
-                        productionStatusText[i].text = ft.woStatuses[2];
+                    Machine machine = machines[index];
+                    machineName = machine.name;
 
-                        //Debug.Log("productiont text: "+productionMachineText[i].text);
-                        //Debug.Log("machine name: "+machines[i].name);
-
-                        productionMachineText[i].text = machines[index].name;  //This was set to i and not index meaning it wasn't pulling the correct thing.
-                    }
-                    else if (machines[index].status == MACHINE_RUNNING)
+                    switch (machine.status)
                     {
-                        productionBarImg[i].color = Color.green;
-                        productionStatusText[i].color = Color.white;
-                        productionStatusText[i].text = ft.woStatuses[3];
-                    }
-                    else if (machines[index].status == MACHINE_UNLOADING)
-                    {
-                        productionBarImg[i].color = Color.white;
-                        productionStatusText[i].color = Color.red;
-                        productionStatusText[i].text = ft.woStatuses[4];
-
-                    }
-                    else if (machines[index].status == MACHINE_COMPLETED)
-                    {
-                            productionStatusText[i].text = ft.woStatuses[5];
-                            productionBarImg[i].color = Color.white;
-                            productionStatusText[i].color = Color.green;
-                            productionMachineText[i].text = "";
+                        case MACHINE_LOADING:
+                            barColor = Color.yellow;
+                            textColor = Color.green;
+                            statusText = ft.woStatuses[2];
+                            break;
+                        case MACHINE_RUNNING:
+                            barColor = Color.green;
+                            textColor = Color.white;
+                            statusText = ft.woStatuses[3];
+                            break;
+                        case MACHINE_UNLOADING:
+                            barColor = Color.white;
+                            textColor = Color.red;
+                            statusText = ft.woStatuses[4];
+                            break;
+                        case MACHINE_COMPLETED:
+                            barColor = Color.white;
+                            textColor = Color.green;
+                            statusText = ft.woStatuses[5];
+                            machineName = "";
+                            break;
+                        default:
+                            statusText = ft.woStatuses[1];
+                            break;
                     }
                 }
-                else  //unassigned
+                else
                 {
-                    productionBarImg[i].color = Color.white;
-                    productionStatusText[i].color = Color.black;
-                    productionStatusText[i].text = ft.woStatuses[1];
-                    //productionMachineText[i].text = "Not Assigned";
-                    productionMachineText[i].text = "";
+                    statusText = ft.woStatuses[1];
                 }
             }
-            else
-            {
-                productionBarImg[i].color = Color.white;
-                productionStatusText[i].color = Color.black;
-                productionStatusText[i].text = ft.woStatuses[7];
-                //productionMachineText[i].text = "Not Assigned";
-                productionMachineText[i].text = "";
-            }
+
+            UpdateUIElements(i, barColor, textColor, statusText, machineName);
         }
+    }
+
+    private void UpdateUIElements(int i, Color barColor, Color textColor, string statusText, string machineName)
+    {
+        productionBarImg[i].color = barColor;
+        productionStatusText[i].color = textColor;
+        productionStatusText[i].text = statusText;
+        productionMachineText[i].text = machineName;
     }
 
     public void addNewMachine() //add new random machine
@@ -1079,58 +1124,77 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region New Work Order
-    public void assignNewWorkOrderColor(int val)  //sets the new color
+
+    /// <summary>
+    /// This section is for adding a new work order and displaying it.  Organized 10/30/2023
+    /// </summary>
+    /// <param name="val"></param>
+    public void setNewWorkOrderColor(int val)  //sets the new color
     {
         val += 4; //This accounts for the list only having some entries.
         newWorkOrderColor = val;
 
-        updatePixelColor(newWorkOrderPixelImg, val);
+        UpdateUIColor(newWorkOrderPixelImg, val);
     }
 
-    public void updatePixelColor(UnityEngine.UI.Image i, int val)
+    public void UpdateUIColor(UnityEngine.UI.Image img, int val)
     {
         switch (val)
         {
-            case 0: i.color = Color.black; break;
-            case 1: i.color = Color.red; break;
-            case 2: i.color = Color.green; break;
-            case 3: i.color = Color.blue; break;
-            case 4: i.color = Color.yellow; break;
-            case 5: i.color = Color.magenta; break;
-            case 6: i.color = Color.cyan; break;
-            case 7: i.color = Color.white; break;
+            case 0: img.color = Color.black; break;
+            case 1: img.color = Color.red; break;
+            case 2: img.color = Color.green; break;
+            case 3: img.color = Color.blue; break;
+            case 4: img.color = Color.yellow; break;
+            case 5: img.color = Color.magenta; break;
+            case 6: img.color = Color.cyan; break;
+            case 7: img.color = Color.white; break;
         }
     }
-    public void assignNewWorkOrderQuantity(String val)
+    public void SetNewWorkOrderQuantity(string val)
     {
-        bool isNum = int.TryParse(val,out newWorkOrderQuantity);
-
-        if(isNum)
-            newWorkOrderQuantity = int.Parse(val);
-
-        if(val != null)  //This sets what the order is going to get made
+        if (int.TryParse(val, out newWorkOrderQuantity))
+        {
             newWorkOrderQuantityBigText.text = val + "x";
+        }
     }
 
-    public void makeNewWorkOrder()  //updates the button to be used in two ways.
+    public void ToggleNewWorkOrderWindow()  //updates the button to be used in two ways.
     {
         if (newWorkOrderWindow.activeSelf)
-            closeNewWorkOrderWindow();
+            CloseNewWorkOrderWindow();
         else
-            openNewWorkOrderWindow();
+            OpenNewWorkOrderWindow();
     }
 
-    public void addNewWorkOrder()
+    public void OpenNewWorkOrderWindow()
+    {
+        newWorkOrderButton.transform.Rotate(0, 0, 45);
+        newWorkOrderButton.color = Color.red;
+        newWorkOrderWindow.SetActive(true);
+
+    }
+    public void CloseNewWorkOrderWindow()
+    {
+        newWorkOrderWindow.SetActive(false);
+
+        newWorkOrderButton.text = "+";
+        newWorkOrderButton.color = Color.black;
+        newWorkOrderButton.transform.Rotate(0, 0, -45);
+
+    }
+
+    public void AddNewWorkOrderToQueue()
     {
         // Offset the queue if necessary
 
-        if (ProcessingQueue.Count > 0 && HasActiveOrder())
+        if (ProcessingQueue.Count > 0 && HasActiveWorkOrders())
         {
-            OffsetQueue();
+            OffsetActiveWorkOrders();
         }
 
         // Create a new work order based on the color  ? means it might be null
-        workOrder? newOrder = CreateWorkOrderBasedOnColor(newWorkOrderColor, newWorkOrderQuantity);
+        workOrder? newOrder = CreateWorkOrder(newWorkOrderColor, newWorkOrderQuantity);
 
 
         // Add the new work order to the front of the queue
@@ -1140,11 +1204,10 @@ public class LogicCenter : MonoBehaviour
         }
 
 
-        closeNewWorkOrderWindow();
+        CloseNewWorkOrderWindow();
     }
 
-
-    public workOrder? CreateWorkOrderBasedOnColor(int color, int quantity)
+    public workOrder? CreateWorkOrder(int color, int quantity)
     {
         switch (color)
         {
@@ -1162,7 +1225,7 @@ public class LogicCenter : MonoBehaviour
         }
     }
 
-    private void OffsetQueue()
+    private void OffsetActiveWorkOrders()
     {
         for (int i = 0; i < machines.Count; i++)
         {
@@ -1190,42 +1253,13 @@ public class LogicCenter : MonoBehaviour
     }
 
 
-    private bool HasActiveOrder()
+    private bool HasActiveWorkOrders()
     {
         return machines.Any(machine => machine.status > 0);
     }
 
-    public void openNewWorkOrderWindow()
-    {
-        newWorkOrderButton.transform.Rotate(0, 0, 45);
-        newWorkOrderButton.color = Color.red;
-        newWorkOrderWindow.SetActive(true);
-
-    }
-    public void closeNewWorkOrderWindow()
-    {
-        newWorkOrderWindow.SetActive(false);
-
-        newWorkOrderButton.text = "+";
-        newWorkOrderButton.color = Color.black;
-        newWorkOrderButton.transform.Rotate(0, 0, -45);
-
-    }
 
 
-
-    public bool hasActiveOrder()
-    {
-        bool active = false;
-
-        for (int i = 0; i < ProcessingQueue.Count; i++)
-            if (ProcessingQueue[i].isActive)
-            {
-                active = true;
-                break;
-            }
-        return active;
-    }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1398,10 +1432,35 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region update UI
-    public void updateUI()  //this could be setup into 1 loop, maybe?
-    {
+
+    public void updateUI()
+    {//this could only re-write and update only the one it's looking at to speed things up.  But currently not needed
+
         displayInventory();
 
+        UpdateEventUI();
+        UpdateProductionUI();
+        UpdateMachineUI();
+        UpdateEmployeeUI();
+        UpdateTradeUI();
+    }
+    public void displayInventory()
+    {
+        oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
+
+
+        redPixelText.text = inventory[1].ToString();
+        greenPixelText.text = inventory[2].ToString();
+        bluePixelText.text = inventory[3].ToString();
+        yellowPixelText.text = inventory[4].ToString();
+        magentaPixelText.text = inventory[5].ToString();
+        cyanPixelText.text = inventory[6].ToString();
+        whitePixelText.text = inventory[7].ToString();
+
+
+    }
+    public void UpdateEventUI()
+    {
         for (int i = 0; i < history.Length; i++)
         {
             eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>();
@@ -1468,8 +1527,9 @@ public class LogicCenter : MonoBehaviour
 
             }
         }
-
-
+    }
+    public void UpdateProductionUI()
+    {
         for (int i = 0; i < productionEntry.Count; i++)
         {
             if (i < ProcessingQueue.Count)
@@ -1508,6 +1568,10 @@ public class LogicCenter : MonoBehaviour
         }
 
 
+
+    }
+    public void UpdateMachineUI()
+    {
         for (int i = 0; i < machineEntry.Length; i++)  //UPDATE MACHINES
         {
             if (i < machines.Count)
@@ -1518,7 +1582,7 @@ public class LogicCenter : MonoBehaviour
                 machineMenuNameText[i].text = m.name;
 
 
-      
+
                 machineMenuStatusText[i].text = ft.machineStatuses[m.status];    /////////////
 
 
@@ -1549,6 +1613,9 @@ public class LogicCenter : MonoBehaviour
 
         }
 
+    }
+    public void UpdateEmployeeUI()
+    {
         for (int i = 0; i < employeeEntry.Length; i++)   //update employees
         {
             if (i < employees.Count)
@@ -1571,14 +1638,14 @@ public class LogicCenter : MonoBehaviour
             }
         }
 
-        
+
         if (selectedEmployeeIndex < employees.Count)     //selected employee info
         {
             Employee e = employees[selectedEmployeeIndex];
             selectedEmployeeName.text = ft.firstNames[e.firstName] + " " + ft.lastNames[e.lastName];
-            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() +"\nBIRTHDATE: "+e.birthdate.ToString("MM/dd")+
-                "\nSUN SIGN: "+ft.zodiacSigns[e.sunSign]+"\nHOMETOWN: "+ ft.cities[e.hometown] + "\nHOBBY: " + ft.hobbies[e.hobby] + "\n\nSKILLS: \nSPEED: " + e.getSpeed().ToString() + "\nRELIABILITY: " + e.getReliability().ToString() + "\nINTELLIGENCE: " + e.getIntelligence().ToString();
-        
+            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() + "\nBIRTHDATE: " + e.birthdate.ToString("MM/dd") +
+                "\nSUN SIGN: " + ft.zodiacSigns[e.sunSign] + "\nHOMETOWN: " + ft.cities[e.hometown] + "\nHOBBY: " + ft.hobbies[e.hobby] + "\n\nSKILLS: \nSPEED: " + e.getSpeed().ToString() + "\nRELIABILITY: " + e.getReliability().ToString() + "\nINTELLIGENCE: " + e.getIntelligence().ToString();
+
             selectedEmployeeDetails.text = details;
         }
         else
@@ -1587,15 +1654,19 @@ public class LogicCenter : MonoBehaviour
             selectedEmployeeDetails.text = "";
         }
 
-        for(int i = 0;i < tradeEntry.Length; i++)
+
+    }
+    public void UpdateTradeUI()
+    {
+        for (int i = 0; i < tradeEntry.Length; i++)
         {
-            if(i < availableTrades.Count)
+            if (i < availableTrades.Count)
             {
                 tradeCadenceText[i].text = availableTrades[i].cadence.ToString();
                 tradeLengthText[i].text = availableTrades[i].length.ToString();
                 tradeSendText[i].text = availableTrades[i].sendQuantity.ToString();
-                updatePixelColor(tradeSendIMG[i], availableTrades[i].sendColor);
-                updatePixelColor(tradeRecieveIMG[i], availableTrades[i].recieveColor);
+                UpdateUIColor(tradeSendIMG[i], availableTrades[i].sendColor);
+                UpdateUIColor(tradeRecieveIMG[i], availableTrades[i].recieveColor);
                 tradeRecieveText[i].text = availableTrades[i].recieveQuantity.ToString();
             }
             else
@@ -1603,8 +1674,8 @@ public class LogicCenter : MonoBehaviour
                 tradeCadenceText[i].text = "";
                 tradeLengthText[i].text = "";
                 tradeSendText[i].text = "";
-                updatePixelColor(tradeSendIMG[i], 7);
-                updatePixelColor(tradeRecieveIMG[i], 7);
+                UpdateUIColor(tradeSendIMG[i], 7);
+                UpdateUIColor(tradeRecieveIMG[i], 7);
                 tradeRecieveText[i].text = "";
             }
         }
@@ -1615,37 +1686,23 @@ public class LogicCenter : MonoBehaviour
             {
 
                 activeTradeSendText[i].text = activeTrades[i].sendQuantity.ToString();
-                updatePixelColor(activeTradeSendIMG[i], activeTrades[i].sendColor);
-                updatePixelColor(activeTradeRecieveIMG[i], activeTrades[i].recieveColor);
+                UpdateUIColor(activeTradeSendIMG[i], activeTrades[i].sendColor);
+                UpdateUIColor(activeTradeRecieveIMG[i], activeTrades[i].recieveColor);
                 activeTradeRecieveText[i].text = activeTrades[i].recieveQuantity.ToString();
             }
             else
             {
                 activeTradeSendText[i].text = "";
-                updatePixelColor(activeTradeSendIMG[i], 7);
-                updatePixelColor(activeTradeRecieveIMG[i], 7);
+                UpdateUIColor(activeTradeSendIMG[i], 7);
+                UpdateUIColor(activeTradeRecieveIMG[i], 7);
                 activeTradeRecieveText[i].text = "";
             }
         }
 
-    }
-    public void updateEvents(int status)
-    {
-        
-        for (int i = history.Length-1; i > 0; i--)  //moves everything down one
-        {
-            history[i] = history[i-1];
-            timestamps[i].text = timestamps[i - 1].text;
-        }
-        
-        history[0] = status;
 
-        currentTime = DateTime.Now;
-        timeString = currentTime.ToString("hh:MM:sstt");
-        timestamps[0].text = timeString;
-        
     }
-    
+
+    //
     public void oreValueTextColor()
     {
         switch (chosenColor)
@@ -1663,38 +1720,6 @@ public class LogicCenter : MonoBehaviour
         
     }
 
-    public void selectEmployee(int index)
-    {
-        selectedEmployeeIndex = index;
-
-        for(int i = 0;i<employeeEntry.Length;i++)
-        {
-            if (i == index  && index < employees.Count)
-            {
-                employeeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
-            }
-            else
-            {
-                employeeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white; 
-            }          
-        }
-    }
-
-    public void displayInventory()
-    {
-        oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
-
-
-        redPixelText.text = inventory[1].ToString();
-        greenPixelText.text = inventory[2].ToString();
-        bluePixelText.text = inventory[3].ToString();
-        yellowPixelText.text = inventory[4].ToString();
-        magentaPixelText.text = inventory[5].ToString();
-        cyanPixelText.text = inventory[6].ToString();
-        whitePixelText.text = inventory[7].ToString();
-
-
-    }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1789,14 +1814,14 @@ public class LogicCenter : MonoBehaviour
         // Reset all tradeEntry colors to white
         for (int i = 0; i < productionEntry.Count; i++)
         {
-            productionEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+            productionBarImg[i].color = Color.white;
         }
 
         // If the selected index is within the bounds of availableTrades, proceed
         if (index >= 0 && index < ProcessingQueue.Count)
         {
             // Highlight the selected tradeEntry
-            productionEntry[index].GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+            productionBarImg[index].color = Color.yellow;
 
             // Update the selectedTrade index
             selectedWorkOrderIndex = index;

@@ -13,6 +13,7 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
 
     private int[,] pixelValues;  //This is the grid of pixel colors.
     private int[] quantity = new int[8];
+    private Contract c;
     
     public float requiredPixels;  //This is the amount of additional pixels required to make this picture.
 
@@ -29,6 +30,8 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
     {
         //init the quantity of each pixel
         quantity = new int[8];
+
+        c = new();
 
         for (int i = 0; i < quantity.Length; i++)  //init to zero
         {
@@ -56,17 +59,18 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         UpdateTexture();
         canvasImage.texture = canvasTexture;
     }
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void OnPointerDown(PointerEventData eventData)
     {
         paint(eventData);
     }
-
     public void OnDrag(PointerEventData eventData)
     {
         paint(eventData);
     }
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void paint(PointerEventData eventData)
     {
         // Convert screen position to local position within the RawImage
@@ -97,21 +101,52 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         }
 
     }
+    public void clearCanvas()
+    {
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i] = Color.black;
+
+        }
+
+        for (int i = 0; i < quantity.Length; i++)
+        {
+            quantity[i] = 0;   //this gets overwritten when updateTexture() is called.
+        }
+
+        for (int y = 0; y < pixelValues.GetLength(0); y++)
+            for (int x = 0; x < pixelValues.GetLength(1); x++)
+                pixelValues[y, x] = 0;
+
+
+
+
+        UpdateTexture();
+    }
+    public void saveAsJPEG()
+    {
+
+        byte[] bytes = canvasTexture.EncodeToJPG();
+        File.WriteAllBytes(Application.dataPath + "/Work of Art.jpg", bytes);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void UpdateTexture()
     {
         canvasTexture.SetPixels(pixels);
         canvasTexture.Apply();
 
-        updateHueQuantities();
+        //c.setRequirements(pixelValues);
+        //updateHueQuantities();
         updateHueUI();
         updateJobStats();
         //available();
     }
-
     public void updateJobStats() //updates the UI
     {
-        int total = currentTotal();
-        int totalValue = currentTotalValue();
+        int total = c.totalRequirements;
+        int totalValue = c.totalValue;
         float valueDensity = 0f;
 
         
@@ -126,186 +161,19 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
             //lc.pictureStats.text += "Est. completion: "+estimate().ToString()+" seconds \n";
         }
     }    
-
-    public int currentTotal()
-    {
-        int total = 0;
-
-        for (int i = 0; i < quantity.Length; i++)
-            total += quantity[i];
-
-        return total;
-    }
-
-    public int currentTotalValue()
-    {
-        int total = 0;
-        int valueMultiplier = 1;
-        for (int i = 0; i < quantity.Length; i++)
-        { 
-            if(i<4)
-                valueMultiplier = 1;
-            else if(i<7)
-                valueMultiplier = 2;
-            else valueMultiplier = 3;
-            
-            total += quantity[i]*valueMultiplier;
-        }
-        return total;
-    }
-
-    public void updateHueQuantities()
-    {
-
-        for (int i = 0; i < quantity.Length; i++)  //init to zero
-        {
-            quantity[i] = 0;
-        }
-
-        for (int x = 0; x < pixelValues.GetLength(0); x++)
-            for (int y = 0; y < pixelValues.GetLength(1); y++)
-                switch (pixelValues[x, y])
-                {
-                    case 1:
-                        quantity[1]++;
-                        break;
-                    case 2:
-                        quantity[2]++;
-                        break;
-                    case 3:
-                        quantity[3]++;
-                        break;
-                    case 4:
-                        quantity[4]++;
-                        break;
-                    case 5:
-                        quantity[5]++;
-                        break;
-                    case 6:
-                        quantity[6]++;
-                        break;
-                    case 7:
-                        quantity[7]++;
-                        break;
-                }
-    }
-
-    public void updateHueUI()
+    public void updateHueUI()  //updates UI
     {
         int length = lc.hueQuantitiesText.Length;
         for (int i = 1; i < length;i++)  //we're not using 0 for anything because it's ore and not a value in this system.
             if (lc.hueQuantitiesText[i] != null)
                 lc.hueQuantitiesText[i].text = quantity[i].ToString()+"x";
-
-
     }
-    public void convertToWorkOrder()
-    {
-        int[] vals = new int[8];
-        
-        for(int i = 0;i<vals.Length;i++)  //init to zero
-        {
-            vals[i] = 0;
-        }
-
-        for(int x=0; x < pixelValues.GetLength(0);x++)
-            for(int y = 0; y < pixelValues.GetLength(1);y++)
-                switch (pixelValues[x,y])
-                {
-                    case 1:
-                        vals[1]++;
-                        break;
-                    case 2:
-                        vals[2]++;
-                        break;
-                    case 3:
-                        vals[3]++;
-                        break;
-                    case 4:
-                        vals[4]++;
-                        break;
-                    case 5:
-                        vals[5]++;
-                        break;
-                    case 6:
-                        vals[6]++;
-                        break;
-                    case 7:
-                        vals[7]++;
-                        break;
-                }
-        
-        for (int x = 0; x < vals.Length; x++)
-        {
-            
-            if (vals[x] > 3)
-                switch (x)
-                {
-                    
-                    case 4:
-                        lc.ProcessingQueue.Add(new workOrder(vals[x],1,2,4));
-                        break;
-                    case 5:
-                        lc.ProcessingQueue.Add(new workOrder(vals[x],1,3,5));
-                        break;
-                    case 6:
-                        lc.ProcessingQueue.Add(new workOrder(vals[x],2,3,6));
-                        break;
-                    case 7:
-                        switch (ft.rollDice(1, 3))
-                        {
-                            case 1:
-                                lc.ProcessingQueue.Add(new workOrder(vals[x], 3, 4, 7)); //white
-                                break;
-                            case 2:
-                                lc.ProcessingQueue.Add(new workOrder(vals[x], 2, 5, 7)); //white
-                                break;
-                            case 3:
-                                lc.ProcessingQueue.Add(new workOrder(vals[x], 1, 6, 7)); //white
-                                break;
-                        }
-                        break;
-                }
-            
-        }
-
-    }
-
-    public void saveAsJPEG()
-    {
-
-        byte[] bytes = canvasTexture.EncodeToJPG();
-        File.WriteAllBytes(Application.dataPath + "/Work of Art.jpg", bytes);
-    }
-
-    public void clearCanvas()
-    {
-
-        for (int i = 0; i < pixels.Length; i++)
-        {
-            pixels[i] = Color.black;
-            
-        }
-
-        for(int i = 0;i< quantity.Length;i++)  
-        {
-            quantity[i] = 0;   //this gets overwritten when updateTexture() is called.
-        }
-
-        for (int y = 0; y < pixelValues.GetLength(0);y++)
-            for(int x= 0;x<pixelValues.GetLength(1);x++)
-            pixelValues[y,x] = 0;
-
-
-
-
-        UpdateTexture();  
-    }
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public float available()  //what % of the image do you have the resources to make?
     {
         requiredPixels = 0;
-        float total = (float)currentTotal();
+        float total = c.totalValue;
 
         for (int i = 0; i < quantity.Length; i++)  //if you have enough
         {
@@ -315,18 +183,15 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
             if (job > available)
                 requiredPixels += job - available;
         }
-        
-
 
         float difference = requiredPixels / total;
 
-        if (difference == float.NaN)
+        if (difference == float.NaN) //this doesn't seem to work.
             return 0f;
         else return (1f - difference);
       
     }
-    
-    public int estimate()
+    public int estimate()  //used for other things not implemented yet // how long it would take to make this.  It's broken currently, I think?
     {
         int t = 0;
 
@@ -335,32 +200,10 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
             if (i < 4)
                 t += quantity[i];
             else if (i < 7)
-                t += quantity[i] * (int)lc.machineAverage();
-            else t += quantity[i] * (int)lc.machineAverage() * 2;
+                t += quantity[i] / (int)lc.machineAverage();
+            else t += quantity[i] / (int)lc.machineAverage() * 2;
         }
 
         return t;
-    }
-    public void newJobLogic()
-    {
-
-        int required = 0;
-        int total = currentTotal();
-
-        for (int i = 0; i < quantity.Length; i++)  //if you have enough
-        {
-            int req = quantity[i];
-            int available = lc.inventory[i];
-
-            if (req <= available)  //just subtract the amount
-                lc.inventory[i] -= req;
-            else if(req > available)
-                { 
-                    lc.inventory[i] = available;
-                 lc.inventory[i] = available;
-            } 
-        }
-
-
     }
 }
