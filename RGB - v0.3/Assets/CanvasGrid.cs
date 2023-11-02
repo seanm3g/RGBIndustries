@@ -137,11 +137,56 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         canvasTexture.SetPixels(pixels);
         canvasTexture.Apply();
 
-        //c.setRequirements(pixelValues);
+        c.setRequirements(pixelValues);
+        
+        //convertToWorkOrder();
         //updateHueQuantities();
         updateHueUI();
         updateJobStats();
         //available();
+    }
+
+    public void convertToWorkOrder()
+    {
+
+
+        for (int i = 0; i < c.requirements.Length; i++)
+        {
+            if (i < 3)
+            {
+                //if(i == lc.chosenColor)
+                //wait
+                //else
+                //tradeOrder(i,requirements[i]);
+            }
+            else if (i > 3)
+            {
+                if(c.requirements[i]>0)
+                {   
+                    
+                Debug.Log("requirements[i" + i + "]" + c.requirements[i]);
+
+                switch (i)
+                    {
+                        case 4:
+                            lc.ProcessingQueue.Add(new workOrder(c.requirements[i], 1, 2, 4));
+                            break;
+                        case 5:
+                            lc.ProcessingQueue.Add(new workOrder(c.requirements[i], 1, 3, 5));
+                            break;
+                        case 6:
+                            lc.ProcessingQueue.Add(new workOrder(c.requirements[i], 2, 3, 6));
+                            break;
+                        case 7:
+                            int randomCase = ft.rollDice(1, 3);
+                            int param1 = randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1;
+                            int param2 = randomCase + 3;
+                            lc.ProcessingQueue.Add(new workOrder(c.requirements[i], param1, param2, 7));
+                        break;
+                    }
+                }
+            }
+        }
     }
     public void updateJobStats() //updates the UI
     {
@@ -157,7 +202,7 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         if (lc.pictureStats != null)  //the detail stats
         {
             lc.pictureStats.text = "TOTAL PIXELS: " + total.ToString() + "\nTOTAL VALUE: " + totalValue.ToString() + "\nVALUE DENSITY: " + valueDensity.ToString("0.00") + "x\n\n";
-            lc.pictureStats.text += "AVAILABLE: " + available().ToString("P0")+"\n";
+            lc.pictureStats.text += "AVAILABLE: " + currentlyAvailable().ToString("P0")+"\n";
             //lc.pictureStats.text += "Est. completion: "+estimate().ToString()+" seconds \n";
         }
     }    
@@ -166,31 +211,37 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         int length = lc.hueQuantitiesText.Length;
         for (int i = 1; i < length;i++)  //we're not using 0 for anything because it's ore and not a value in this system.
             if (lc.hueQuantitiesText[i] != null)
-                lc.hueQuantitiesText[i].text = quantity[i].ToString()+"x";
+                lc.hueQuantitiesText[i].text = c.requirements[i].ToString()+"x";
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public float available()  //what % of the image do you have the resources to make?
-    {
-        requiredPixels = 0;
-        float total = c.totalValue;
 
-        for (int i = 0; i < quantity.Length; i++)  //if you have enough
+    public float currentlyAvailable()
+    {
+        int requiredPixels = 0;
+
+        for (int i = 0; i < c.requirements.Length; i++)  //if you have enough
         {
-            int job = quantity[i];
-            int available = lc.inventory[i];
+            int job = c.requirements[i];
+            //int available = lc.inventory[i];
+            
+            string color = lc.inv.intToColorKey(i);
+            string hex = lc.inv.ColorToHex(color);
+
+            int available = lc.inv.valueAtSlot(hex);
 
             if (job > available)
                 requiredPixels += job - available;
         }
 
-        float difference = requiredPixels / total;
+        float difference = requiredPixels / (float)c.totalRequirements;
 
         if (difference == float.NaN) //this doesn't seem to work.
             return 0f;
         else return (1f - difference);
-      
+
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public int estimate()  //used for other things not implemented yet // how long it would take to make this.  It's broken currently, I think?
     {
         int t = 0;

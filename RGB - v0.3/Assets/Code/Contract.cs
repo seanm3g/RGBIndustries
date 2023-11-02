@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-public class Contract : MonoBehaviour
+public class Contract
 {
     #region variables
     public LogicCenter lc = new LogicCenter();
@@ -12,16 +12,30 @@ public class Contract : MonoBehaviour
     public int[] requirements;
     public int totalRequirements;
     public int totalValue;
+
+    public float deadline;
     #endregion
+
 
     public Contract()
     {
-        for (int i = 0; i < requirements.Length; i++)  //init to zero
+
+        requirements = new int[8];
+        for(int i = 0;i<requirements.Length;i++)
         {
             requirements[i] = -1;
         }
 
+
+    }
+    public Contract(int[,] pixelValues,float deadline)
+    {
+
         requirements = new int[8];
+        setRequirements(pixelValues);
+        this.deadline = deadline;
+        
+
     }
     public void setRequirements(int[,] pixelValues)
     {
@@ -46,6 +60,8 @@ public class Contract : MonoBehaviour
         updateTotal();
         updateTotalValue();
     }
+
+    /*
     public void fillRequirements()
     {
         for (int i = 0;i < requirements.Length;i++)
@@ -70,20 +86,26 @@ public class Contract : MonoBehaviour
             requirements[i] = req;
             lc.inventory[i] = inv;
         }
-    }
+    }*/
     public void convertToWorkOrder()
     {
-        for (int i = 4; i < requirements.Length; i++)
+        Debug.Log("CONVERT TO WORK ORDER");
+        Debug.Log(requirements.Length);
+
+        for (int i = 0; i < requirements.Length; i++)
         {
-            if (requirements[i] < 3) 
+            Debug.Log("i" + i);
+            if (i < 3) 
             {
                 //if(i == lc.chosenColor)
                     //wait
                 //else
                     //tradeOrder(i,requirements[i]);
             }
-            else if (requirements[i] > 3)
+            else if (i > 3)
             {
+                Debug.Log("requirements[i"+i+"]"+requirements[i]);
+
                 switch (i)
                 {
                     case 4:
@@ -126,7 +148,7 @@ public class Contract : MonoBehaviour
             else valueMultiplier = 3;
 
             totalValue += requirements[i] * valueMultiplier;
-        }         
+        }
     }
     public bool isComplete()
     {
@@ -139,5 +161,27 @@ public class Contract : MonoBehaviour
         }
         return true;
     }
+
+    /*
+    public float currentlyAvailabile()
+    {
+        int requiredPixels = 0;
+
+        for (int i = 0; i < requirements.Length; i++)  //if you have enough
+        {
+            int job = requirements[i];
+            int available = lc.inventory[i];
+
+            if (job > available)
+                requiredPixels += job - available;
+        }
+
+        float difference = requiredPixels / (float)totalRequirements;
+
+        if (difference == float.NaN) //this doesn't seem to work.
+            return 0f;
+        else return (1f - difference);
+      
+    }*/
 
 }

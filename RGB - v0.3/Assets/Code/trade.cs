@@ -14,6 +14,7 @@ public struct Trade
     public int sendColor;
     public int recieveQuantity;
     public int recieveColor;
+    //public string sendColor1, recieveColor1;
     
     public float elapsedTime;
     public bool isActive;

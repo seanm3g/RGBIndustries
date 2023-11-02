@@ -20,7 +20,7 @@ public struct Factory
         maxEmployeeCapacity = 0;
         minEmployeeCapacity = 0;
         maxMachineCapacity = 0;
-        upkeep = 0;
+        upkeep = 10;
         
 
         switch (tier)
@@ -29,31 +29,31 @@ public struct Factory
                 maxEmployeeCapacity = 10;
                 minEmployeeCapacity = 1;
                 maxMachineCapacity = 1;
-                upkeep = 0;
+                upkeep = 10;
                 break;
             case 2:
                 maxEmployeeCapacity = 25;
                 minEmployeeCapacity = 10;
                 maxMachineCapacity = 10;
-                upkeep = 2;
+                upkeep = 20;
                 break;
             case 3:
                 maxEmployeeCapacity = 50;
                 minEmployeeCapacity = 25;
                 maxMachineCapacity = 20;
-                upkeep = 5;
+                upkeep = 50;
                 break;
             case 4:
                 maxEmployeeCapacity = 75;
                 minEmployeeCapacity = 50;
                 maxMachineCapacity = 30;
-                upkeep = 10;
+                upkeep = 75;
                 break;
             case 5:
                 maxEmployeeCapacity = 100;
                 minEmployeeCapacity = 75;
                 maxMachineCapacity = 40;
-                upkeep = 20;
+                upkeep = 100;
                 break;
         }
     }

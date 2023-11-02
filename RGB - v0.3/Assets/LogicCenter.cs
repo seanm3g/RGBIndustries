@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using TMPro;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -133,7 +134,8 @@ public class LogicCenter : MonoBehaviour
     #endregion
 
     #region inventory
-    public int[] inventory = new int[8];
+    //public int[] inventory = new int[8];
+    public InventoryManager inv = new InventoryManager();
     #endregion
 
     #region eventlist
@@ -182,18 +184,24 @@ public class LogicCenter : MonoBehaviour
     public Factory factory = new(1);
     #endregion
 
+    #region harvesting
     public int distribution = 1; //not sure what this is doing
     public int lastChosenColor = 0; //not sure what this is doing either
+    #endregion
 
     #region paint
     public int chosenPaintColor;
 
     public Text pictureStats;
     public Text[] hueQuantitiesText = new UnityEngine.UI.Text[8];
+
+    public List<Contract> availableJobs = new List<Contract>();
+    public List<Contract> ProductionContracts = new List<Contract>();
     #endregion
 
     #region costs
     float expenseElapsedTime = 0;
+    public Text burnRateText;
     #endregion
 
     #endregion
@@ -294,9 +302,11 @@ public class LogicCenter : MonoBehaviour
     }
     public void setupInventory()  //init the inventory
     {
+        inv.setupInventory(1);
+        /*
         for (int i = 0; i < inventory.Length; i++)
             inventory[i] = 0; //set everything to start as zero
-
+        */
     }
     public void setupEmployees(int quantity)
     {
@@ -521,7 +531,7 @@ public class LogicCenter : MonoBehaviour
             timer = 0f;
             
         }
-        runMachines();   //these should live inside the above else statement and increment by 1 isntead of by timedelta.
+        runMachines();   //these should live inside the above else statement and increment by 1 instead of by timedelta.
         
         runEmployees();
         runExpenses();
@@ -558,7 +568,7 @@ public class LogicCenter : MonoBehaviour
             
             updateEvents(16);
 
-            payBill(employeeExpenses);
+            inv.payBill(employeeExpenses);
         
         }
     }
@@ -569,50 +579,23 @@ public class LogicCenter : MonoBehaviour
 
         if (factory.elapsedTime > 60)  //pay rent every minute
         {
-            int highestValue = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+            //int highestValue = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
 
             factory.elapsedTime = 0f;
 
-            payBill(factory.upkeep);
+            inv.payBill(factory.upkeep);
 
         }
-    }
-
-    public void payBill(int c)
-    {
-        int highestValueIndex = highestQuantityColorIndex();
-
-
-        inventory[highestValueIndex] -= c;
-        
-        if (inventory[highestValueIndex] < 0)  //this is wrong but works for now.
-            inventory[highestValueIndex] = 0;
-    }
-
-    public int highestQuantityColorIndex()
-    {
-
-        int highestValueQuantity = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
-        int highestValueIndex = 0;
-
-        for (int i = 1; i < 4; i++)  //check the primaries
-        {
-            if (inventory[i] == highestValueQuantity)
-                highestValueIndex = i;
-        }
-
-        return highestValueIndex;
-
     }
 
     public int calculateExpenses()
     {
         int totalExpenses = 0;
         int employeeExpenses = calculateEmployeeExpenses();
+
         updateEvents(16);
 
         expenseElapsedTime = 0f;
-        int index = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
         totalExpenses += employeeExpenses;
         totalExpenses += factory.upkeep;
 
@@ -628,18 +611,6 @@ public class LogicCenter : MonoBehaviour
             employeeExpenses += employees[i].compensation;
 
         return employeeExpenses;
-    }
-
-    public int maxInventorySlot()
-    {
-        int max = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
-        return max;
-    }
-
-    public int minInventorySlot()
-    {
-        int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
-        return min;
     }
 
     #endregion
@@ -739,7 +710,6 @@ public class LogicCenter : MonoBehaviour
     #region employees
     private void employeeHarvester(Employee e)  // this is all of the things an employee can do, if any action is taken, the consume their action.
     {
-        int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
 
 
         /*
@@ -755,27 +725,27 @@ public class LogicCenter : MonoBehaviour
             }
         */
 
-        if (inventory[0] >= harvestCapacity)
+        if (inv.getOre() >= 0)
             if(competance(e))
             {
-                employeeSelectColor(min);
+                employeeSelectColor(inv.MinInventorySlot());
                 harvest();    //if they have initiatve
                 return;
             }
 
 
     }
-    private void employeeSelectColor(int min)
+    private void employeeSelectColor(String min)
     {
-        if (min == inventory[1])
+        if (min == inv.ColorToHex("Red"))
         {
             updateRed();
         }
-        else if (min == inventory[2])
+        else if (min == inv.ColorToHex("Green"))
         {
             updateGreen();
         }
-        else if (min == inventory[3])
+        else if (min == inv.ColorToHex("Blue"))
         {
             updateBlue();
         }
@@ -905,7 +875,8 @@ public class LogicCenter : MonoBehaviour
         if (m.elapsedTime >= m.cycleTime)
         {
             int inventoryIndex = ProcessingQueue[m.orderIndex].c3index;
-            inventory[inventoryIndex] += m.unloadMachine();
+            
+            inv.AddToInventory(1,inv.intToColorKey(inventoryIndex),m.unloadMachine());
 
             m.status = MACHINE_COMPLETED;
             m.elapsedTime = 0f;
@@ -1043,10 +1014,10 @@ public class LogicCenter : MonoBehaviour
 
     public void addNewMachine() //add new random machine
     {
-        if (inventory[highestQuantityColorIndex()] > 25)
+        if (inv.valueAtSlot(inv.MaxInventorySlot()) > 25)  //Checks
         {
             machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), ft.rollDice(3, 6), ft.rollDice(3, 3) + 1, 103 - ft.rollDice(3, 6)));
-            payBill(25); //right now machines cost 25 pixels each
+            inv.payBill(25); //right now machines cost 25 pixels each
         }
     }
 
@@ -1086,8 +1057,8 @@ public class LogicCenter : MonoBehaviour
 
             // Reset the selectedTrade index
             selectedMachineIndex = -1;
-
-            payBill(-5);
+            inv.ShowInventoryStatus();
+            inv.payBill(-5);
 
             // Reset all machine colors to white
             for (int i = 0; i < machineEntry.Length; i++)
@@ -1377,20 +1348,16 @@ public class LogicCenter : MonoBehaviour
     {
         Trade t = activeTrades[i];  //check trade out
 
-        inventory[t.sendColor] -= t.sendQuantity;  //swap send
-        inventory[t.recieveColor] += t.recieveQuantity; //swap recieve
+        if(inv.executeTrade(t))
+        {
+            t.length -= 1;  //reduce the iterations by 1.
 
-        t.length -= 1;  //reduce the iterations by 1.
-        activeTrades[i] = t;    //check back in
+            activeTrades[i] = t;    //check back in
 
-
-        if (activeTrades[i].length < 1)  //if it's run the length of it's trade, remove it from the queue
-            activeTrades.RemoveAt(i);
-        
-        
-    
+            if (activeTrades[i].length < 1)  //if it's run the length of it's trade, remove it from the queue
+                activeTrades.RemoveAt(i);
+        }        
     }
-
     public void setActiveTrade(int i)
     {
         activeTrades.Add(availableTrades[i]);
@@ -1446,16 +1413,18 @@ public class LogicCenter : MonoBehaviour
     }
     public void displayInventory()
     {
-        oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
+        //oreValueText.text = inventory[0].ToString();
+        //oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;   //OLD WAY OF DOING IT
+        oreValueText.text = inv.valueAtSlot(inv.ColorToHex("Black")).ToString();
+        redPixelText.text = inv.valueAtSlot(inv.ColorToHex("Red")).ToString();
+        greenPixelText.text = inv.valueAtSlot(inv.ColorToHex("Green")).ToString();
+        bluePixelText.text = inv.valueAtSlot(inv.ColorToHex("Blue")).ToString();
+        yellowPixelText.text = inv.valueAtSlot(inv.ColorToHex("Yellow")).ToString();
+        magentaPixelText.text = inv.valueAtSlot(inv.ColorToHex("Magenta")).ToString();
+        cyanPixelText.text = inv.valueAtSlot(inv.ColorToHex("Cyan")).ToString();
+        whitePixelText.text = inv.valueAtSlot(inv.ColorToHex("White")).ToString();
 
-
-        redPixelText.text = inventory[1].ToString();
-        greenPixelText.text = inventory[2].ToString();
-        bluePixelText.text = inventory[3].ToString();
-        yellowPixelText.text = inventory[4].ToString();
-        magentaPixelText.text = inventory[5].ToString();
-        cyanPixelText.text = inventory[6].ToString();
-        whitePixelText.text = inventory[7].ToString();
+        burnRateText.text = calculateExpenses().ToString();
 
 
     }
@@ -1643,7 +1612,7 @@ public class LogicCenter : MonoBehaviour
         {
             Employee e = employees[selectedEmployeeIndex];
             selectedEmployeeName.text = ft.firstNames[e.firstName] + " " + ft.lastNames[e.lastName];
-            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() + "\nBIRTHDATE: " + e.birthdate.ToString("MM/dd") +
+            String details = "ROLE: " + ft.factoryJobs[e.job] + "\nSTART DATE: 04/21/2011 \nCOMPENSATION: " + e.compensation.ToString() + "■\n\nAGE: " + e.age.ToString() + "\nBIRTHDATE: " + e.birthdate.ToString("M/dd") +
                 "\nSUN SIGN: " + ft.zodiacSigns[e.sunSign] + "\nHOMETOWN: " + ft.cities[e.hometown] + "\nHOBBY: " + ft.hobbies[e.hobby] + "\n\nSKILLS: \nSPEED: " + e.getSpeed().ToString() + "\nRELIABILITY: " + e.getReliability().ToString() + "\nINTELLIGENCE: " + e.getIntelligence().ToString();
 
             selectedEmployeeDetails.text = details;
@@ -1782,8 +1751,11 @@ public class LogicCenter : MonoBehaviour
             wo.isActive = true;
 
             m.assignOrder(wo);
-            inventory[m.c1] -= c1Quantity;
-            inventory[m.c2] -= c2Quantity;
+            //inventory[m.c1] -= c1Quantity;
+            //inventory[m.c2] -= c2Quantity;
+
+            inv.removeFromInventory(1,inv.ColorToHex(inv.intToColorKey(m.c1)), c1Quantity);
+            inv.removeFromInventory(1,inv.ColorToHex(inv.intToColorKey(m.c2)), c2Quantity);
             m.loadMachine(c1Quantity, c2Quantity);
 
         }
@@ -1794,7 +1766,9 @@ public class LogicCenter : MonoBehaviour
    
     private int DetermineQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
     {
-        int availableQuantity = inventory[componentIndex];
+        int availableQuantity = inv.valueAtSlot(inv.intToColorKey(componentIndex));
+
+        //int availableQuantity = inventory[componentIndex];
         int quantityToUse;
 
         if (availableQuantity >= requiredQuantity)
@@ -1926,34 +1900,37 @@ public class LogicCenter : MonoBehaviour
         {
             distribution = 1;  //reset the distribution
             lastChosenColor=chosenColor;  //reset the color
-            inventory[0] = 0;  //no carryover.
-            oreValueText.text = inventory[0].ToString();
+            inv.resetOre();  //no carryover.
+
+            oreValueText.text = inv.getOre().ToString();
         }
 
-        if (inventory[0] < harvestCapacity && chosenColor != 0)
+
+        Debug.Log("chosen color"+chosenColor);
+        if (chosenColor != 0)
         {
-            inventory[0]+=distribution;
+            Debug.Log("do we ever get inside of this?" + chosenColor);
+            inv.AddToInventory(1,"Black",distribution);
 
             distribution++;
 
-            if (inventory[0]>10)
-                inventory[0]=10;
-
-            if (inventory[0] == harvestCapacity)  //warns when it is full.
+            if (inv.getOre() > 10)
             {
+                inv.maxOre();
                 oreValueText.color = Color.red;
-                updateEvents(10);
+                //updateEvents(10);
             }
         }
 
     }
     public void harvest()
     {
-        if(inventory[0] > 0) 
+        Debug.Log("Harvesting: "+inv.getOre());
+        if(inv.getOre() > 0) 
         {
 
             updateEvents(8);
-            cg.available();
+            //cg.available();
             cg.UpdateTexture();
             oreValueText.color = Color.white;
 
@@ -1961,19 +1938,19 @@ public class LogicCenter : MonoBehaviour
             switch (chosenColor)
             {
                 case 1:  //red
-                    inventory[1]+= inventory[0];
-                    inventory[0]= 0;
-                    redPixelText.text = inventory[1].ToString();
+                    inv.AddToInventory(1,"Red",inv.getOre());
+                    inv.resetOre();
+                    redPixelText.text = inv.key("Red").ToString();
                     break;
                 case 2:  //green
-                    inventory[2] += inventory[0];
-                    inventory[0] = 0;
-                    greenPixelText.text = inventory[2].ToString();
+                    inv.AddToInventory(1, "Green", inv.getOre());
+                    inv.resetOre();
+                    greenPixelText.text = inv.key("Green").ToString();
                     break;
                 case 3:  //blue
-                    inventory[3] += inventory[0];
-                    inventory[0] = 0;
-                    bluePixelText.text = inventory[3].ToString();
+                    inv.AddToInventory(1, "Blue", inv.getOre());
+                    inv.resetOre();
+                    bluePixelText.text = inv.key("Blue").ToString();
                     break;
                 default:
                     Debug.Log("not selected"); 
@@ -1981,6 +1958,8 @@ public class LogicCenter : MonoBehaviour
             }   
         }
     }
+
+    /*
     public void harvestUpgrade()
     {
 
@@ -2002,7 +1981,7 @@ public class LogicCenter : MonoBehaviour
          
         }
         
-    }
+    }*/
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

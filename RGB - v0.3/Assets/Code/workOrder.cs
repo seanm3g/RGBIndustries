@@ -15,12 +15,14 @@ public struct workOrder
     public int machineIndex;
     public string name;
     FlavorText fl;
+    public int priorityIndex;  // 1 = inventory, 2 = trade, 3 = Job, 4 = craft
 
     public workOrder(int q, ColorRGB p1, ColorRGB p2, ColorRGB p3)
     {
         colorLib = new ColorLibrary();
         fl = new FlavorText();
-        
+
+        priorityIndex = 0;
         name = fl.orderName();
         isActive = false;
         quantity = q;
@@ -33,6 +35,8 @@ public struct workOrder
     }
     public workOrder(int q, int p1, int p2, int p3)
     {
+
+        priorityIndex = 0;
         colorLib = new ColorLibrary();
 
         fl = new FlavorText();
@@ -50,6 +54,8 @@ public struct workOrder
     }
     public workOrder(workOrder w)
     {
+        priorityIndex = 0;
+
         colorLib = new ColorLibrary();
 
         fl = new FlavorText();
