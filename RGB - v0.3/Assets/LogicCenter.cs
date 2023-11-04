@@ -24,20 +24,15 @@ public class LogicCenter : MonoBehaviour
     #region basic functions
 
     /// </summary>
-    public int oreTokens = 10;
-
+    public int oreTokens = 0;
     public int selectedColor = 0;  //color being selected in the menu
     public int chosenColor = 0;  //color currently set as primary
-
     public int harvestCapacity = 10;
+    public float gameTimer = 0;
+    public float spawnRate = 1;  //how frequently the game ticks
+    #endregion
 
-    public int runningIndex = 0;
-
-    public float timer = 0;
-    public float spawnRate = 1;
-    #endregion     //right panel
-
-    #region basicUI
+    #region INVENTORY UI
     public Text oreValueText;
     public Text redPixelText;
     public Text greenPixelText;
@@ -46,16 +41,12 @@ public class LogicCenter : MonoBehaviour
     public Text magentaPixelText;
     public Text cyanPixelText;
     public Text whitePixelText;
-    public Text chosenColorText;
     #endregion
 
     #region UI Game Objects
     public GameObject SelectMenu;           //top bar
-    public GameObject UIbackground;         //
-    public GameObject CanvasGO;             //
-    public GameObject ProductionPage;       //
-    public GameObject newWorkOrderWindow;   //
-    public GameObject machineObject;        // machine object?
+    public GameObject ProductionPage;       //Production Page GO
+    public GameObject newWorkOrderWindow;   //new Work order WIndow
     public GameObject machineryPage;        //machine page
 
     public TabGroup tabgroup;               //used to control the top part
@@ -73,9 +64,12 @@ public class LogicCenter : MonoBehaviour
     public Text[] machineMenuBText = new UnityEngine.UI.Text[12];
     public Text[] machineMenuCText = new UnityEngine.UI.Text[12];
     public Text[] machineMenuYText = new UnityEngine.UI.Text[12];
-    public Text[] machineOEEText = new UnityEngine.UI.Text[12];
+    public Text[] machineMenuOeeText = new UnityEngine.UI.Text[12];
     public int selectedMachineIndex = -1;
 
+
+
+    //machine CONSTANTS
     private const int MACHINE_IDLE = 0;
     private const int MACHINE_LOADING = 1;
     private const int MACHINE_RUNNING = 2;
@@ -141,14 +135,14 @@ public class LogicCenter : MonoBehaviour
     public int[] history = new int[8]; //the recent 8 events.  // this would get larger if the game scales.
     public GameObject[] events = new GameObject[8];
     public UnityEngine.UI.Text[] timestamps = new Text[8];
-    public UnityEngine.UI.Image[] eventImg = new UnityEngine.UI.Image[8];
-    public UnityEngine.UI.Text[] eventText = new UnityEngine.UI.Text[8];
+    public UnityEngine.UI.Image[] eventEntryImg = new UnityEngine.UI.Image[8];
+    public UnityEngine.UI.Text[] eventEntryText = new UnityEngine.UI.Text[8];
     public DateTime currentTime;
     public String timeString;
     #endregion
 
     #region production Queue
-    public List<workOrder> ProcessingQueue = new List<workOrder>();  //this is the production queue
+    public List<workOrder> ProductionQueue = new List<workOrder>();  //this is the production queue
     public List<GameObject> productionEntry = new List<GameObject>();
     public UnityEngine.UI.Image[] productionBarImg = new UnityEngine.UI.Image[8];
     public UnityEngine.UI.Image[] productionPixelImg = new UnityEngine.UI.Image[8];
@@ -162,7 +156,7 @@ public class LogicCenter : MonoBehaviour
     #endregion
 
     #region new work order
-    public TextMeshProUGUI NewWorkOrderoutput;
+    public TextMeshProUGUI NewWorkOrderOutput;
     public TMP_InputField NewWorkOrderQuantityText;
     public UnityEngine.UI.Image newWorkOrderPixelImg;
 
@@ -200,42 +194,41 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region Start
+    
     void Start()
     {
-        setupGame();
+        setupGame(1,0,0,0);  //factory, machines,employees, Production Queue
     }
-    public void setupGame()
+    public void setupGame(int factory,int machines, int employees, int queue)
     {
-
-        setupInventory();
+        
         setupMenu();
+        setupInventory();
+        startingPage();
 
-        setupEmployees(0);
+        setupEmployees(employees);
         setupEmployeeMenu();
 
-        setupMachines(5);
+        setupMachines(machines);
         setupMachineMenu();
 
         setupTrades(5);
         setupTradeMenu();
 
-        setupQueue(0);
+        setupQueue(queue);
         setupProcessingMenu();
 
         setupRandomEvents();
 
         setupPainting();
-
-        startingPage();
+   
     }
-
     #endregion
 
     #region Setup Functions
     public void startingPage()  //sets the window that shows up when the game is run.
     {
         SelectMenu.SetActive(true);
-        UIbackground.SetActive(true);
         ProductionPage.SetActive(false);
         newWorkOrderWindow.SetActive(false);
     }
@@ -267,25 +260,25 @@ public class LogicCenter : MonoBehaviour
             switch (r)
             {
                 case 1:
-                    ProcessingQueue.Add(new workOrder(q, 1, 2, 4));  //make yellow
+                    ProductionQueue.Add(new workOrder(q, 1, 2, 4));  //make yellow
                     break;
                 case 2:
-                    ProcessingQueue.Add(new workOrder(q, 1, 3, 5));  //makes magenta
+                    ProductionQueue.Add(new workOrder(q, 1, 3, 5));  //makes magenta
                     break;
                 case 3:
-                    ProcessingQueue.Add(new workOrder(q, 2, 3, 6)); //makes cyan
+                    ProductionQueue.Add(new workOrder(q, 2, 3, 6)); //makes cyan
                     break;
                 case 4:
                     switch (ft.rollDice(1, 3))
                     {
                         case 1:
-                            ProcessingQueue.Add(new workOrder(q, 3, 4, 7)); //white
+                            ProductionQueue.Add(new workOrder(q, 3, 4, 7)); //white
                             break;
                         case 2:
-                            ProcessingQueue.Add(new workOrder(q, 2, 5, 7)); //white
+                            ProductionQueue.Add(new workOrder(q, 2, 5, 7)); //white
                             break;
                         case 3:
-                            ProcessingQueue.Add(new workOrder(q, 1, 6, 7)); //white
+                            ProductionQueue.Add(new workOrder(q, 1, 6, 7)); //white
                             break;
                     }
                     break;
@@ -324,24 +317,7 @@ public class LogicCenter : MonoBehaviour
             return;
         }
 
-        GameObject productionlayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/Production layout");
-
-        if (productionlayout == null)
-        {
-            Debug.LogError("Could not find GameObject named 'productionlayout'");
-            return;
-        }
-
-        if (machineryPage == null)
-        {
-            Debug.LogError("Could not find GameObject named 'machineryPage'");
-            return;
-        }
-
         GameObject eve = Resources.Load<GameObject>("Prefabs/event");  //creates an object of a prefab to be instantiated for each panel.
-
-
-        //makeMachine();
 
         for (int i = 7; i >= 0; i--)  //INITALIZE THE OBJECTS TO INTERACT WITH FOR THE EVENTLIST
         {
@@ -356,15 +332,24 @@ public class LogicCenter : MonoBehaviour
 
 
             timestamps[i] = events[i].transform.Find("time").GetComponent<Text>(); //set the timestamp from panels
-            eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>(); //set the text from panels
-            eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>(); //set the
+            eventEntryText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>(); //set the text from panels
+            eventEntryImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>(); //set the
         }
 
-        newWorkOrderWindow = GameObject.Find("Canvas/");
+        newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order"); 
 
     }
     public void setupProcessingMenu()
     {
+
+        GameObject productionlayout = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/Production layout");
+
+        if (productionlayout == null)
+        {
+            Debug.LogError("Could not find GameObject named 'productionlayout'");
+            return;
+        }
+
         setupNewWorkOrderMenu();
 
         for (int i = 0; i < productionEntry.Count; i++)
@@ -383,7 +368,7 @@ public class LogicCenter : MonoBehaviour
     {
         newWorkOrderWindow = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order");
         newWorkOrderQuantityBigText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X").GetComponent<Text>();
-        NewWorkOrderoutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/COLOR/Dropdown").GetComponent<TextMeshProUGUI>();
+        NewWorkOrderOutput = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/COLOR/Dropdown").GetComponent<TextMeshProUGUI>();
         NewWorkOrderQuantityText = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/Quantity/QuantityText").GetComponent<TMP_InputField>();
         newWorkOrderPixelImg = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Production Page/new order/25X/CHOSEN COLOR").GetComponent<UnityEngine.UI.Image>();
 
@@ -391,6 +376,11 @@ public class LogicCenter : MonoBehaviour
     public void setupMachineMenu()
     {
 
+        if (machineryPage == null)
+        {
+            Debug.LogError("Could not find GameObject named 'machineryPage'");
+            return;
+        }
         for (int i = 0; i < machineEntry.Length; i++)  //SETS UP MACHINE ENTRY
         {
             if (i == 0) machineEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/Machinery Page/MACHINE LIST/MACHINE ENTRY");
@@ -407,7 +397,7 @@ public class LogicCenter : MonoBehaviour
                 machineMenuBText[i] = machineEntry[i].transform.Find("BATCH SIZE").GetComponent<Text>();
                 machineMenuCText[i] = machineEntry[i].transform.Find("CYCLE TIME").GetComponent<Text>();
                 machineMenuYText[i] = machineEntry[i].transform.Find("YIELD").GetComponent<Text>();
-                machineOEEText[i] = machineEntry[i].transform.Find("OEE").GetComponent<Text>();
+                machineMenuOeeText[i] = machineEntry[i].transform.Find("OEE").GetComponent<Text>();
             }
         }
 
@@ -493,7 +483,6 @@ public class LogicCenter : MonoBehaviour
         randomEventElapsedTime = 0;
         randomEventTriggerTime = ft.rollDice(10, 10);
     }
-
     public void setupPainting()
     {
         for (int i = 0; i < hueQuantitiesText.Length; i++)
@@ -511,17 +500,19 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void Update()
     {
-        if (timer < spawnRate)
+        if (gameTimer < spawnRate)
         {
-            timer += Time.deltaTime;
+            gameTimer += Time.deltaTime;
         }
         else
         {
             distributeTokens();
-            timer = 0f;
+            gameTimer = 0f;
             
         }
-        runMachines();   //these should live inside the above else statement and increment by 1 isntead of by timedelta.
+
+        //these should live inside the above else statement and increment by 1 isntead of by timedelta.
+        runMachines();   
         
         runEmployees();
         runExpenses();
@@ -540,7 +531,6 @@ public class LogicCenter : MonoBehaviour
     {
         employeeCosts();
         factoryCosts();
-
     }
 
     public void employeeCosts()
@@ -559,7 +549,6 @@ public class LogicCenter : MonoBehaviour
             updateEvents(16);
 
             payBill(employeeExpenses);
-        
         }
     }
 
@@ -574,14 +563,12 @@ public class LogicCenter : MonoBehaviour
             factory.elapsedTime = 0f;
 
             payBill(factory.upkeep);
-
         }
     }
 
     public void payBill(int c)
     {
         int highestValueIndex = highestQuantityColorIndex();
-
 
         inventory[highestValueIndex] -= c;
         
@@ -769,15 +756,15 @@ public class LogicCenter : MonoBehaviour
     {
         if (min == inventory[1])
         {
-            updateRed();
+            updateSelectedColor(1);
         }
         else if (min == inventory[2])
         {
-            updateGreen();
+            updateSelectedColor(2);
         }
         else if (min == inventory[3])
         {
-            updateBlue();
+            updateSelectedColor(3);
         }
 
 
@@ -904,7 +891,7 @@ public class LogicCenter : MonoBehaviour
 
         if (m.elapsedTime >= m.cycleTime)
         {
-            int inventoryIndex = ProcessingQueue[m.orderIndex].c3index;
+            int inventoryIndex = ProductionQueue[m.orderIndex].c3index;
             inventory[inventoryIndex] += m.unloadMachine();
 
             m.status = MACHINE_COMPLETED;
@@ -926,22 +913,22 @@ public class LogicCenter : MonoBehaviour
 
         if (m.elapsedTime >= m.cycleTime)
         {
-            workOrder wo = ProcessingQueue[m.orderIndex];
+            workOrder wo = ProductionQueue[m.orderIndex];
             wo.quantity -= m.c3q;
             wo.isActive = false;
 
             if (wo.quantity > 0)
             {
-                ProcessingQueue.Add(new workOrder(wo));
+                ProductionQueue.Add(new workOrder(wo));
             }
 
             m.elapsedTime = 0;
             m.status = 0;  // Free the machine
             
 
-            ProcessingQueue[m.orderIndex] = wo;
+            ProductionQueue[m.orderIndex] = wo;
 
-            ProcessingQueue.RemoveAt(m.orderIndex);
+            ProductionQueue.RemoveAt(m.orderIndex);
 
             m.orderIndex = -1;  // Unlink the machine from the work order
             machines[i] = m;
@@ -986,9 +973,9 @@ public class LogicCenter : MonoBehaviour
             string statusText = ft.woStatuses[7];
             string machineName = "";
 
-            if (i < ProcessingQueue.Count)
+            if (i < ProductionQueue.Count)
             {
-                int index = ProcessingQueue[i].machineIndex;
+                int index = ProductionQueue[i].machineIndex;
 
                 if (index >= 0 && index < machines.Count)
                 {
@@ -1125,10 +1112,6 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region New Work Order
 
-    /// <summary>
-    /// This section is for adding a new work order and displaying it.  Organized 10/30/2023
-    /// </summary>
-    /// <param name="val"></param>
     public void setNewWorkOrderColor(int val)  //sets the new color
     {
         val += 4; //This accounts for the list only having some entries.
@@ -1188,7 +1171,7 @@ public class LogicCenter : MonoBehaviour
     {
         // Offset the queue if necessary
 
-        if (ProcessingQueue.Count > 0 && HasActiveWorkOrders())
+        if (ProductionQueue.Count > 0 && HasActiveWorkOrders())
         {
             OffsetActiveWorkOrders();
         }
@@ -1200,7 +1183,7 @@ public class LogicCenter : MonoBehaviour
         // Add the new work order to the front of the queue
         if (newOrder.HasValue)  // Check if newOrder is not null
         {
-            ProcessingQueue.Insert(0, newOrder.Value);  // Use .Value to get the underlying workOrder
+            ProductionQueue.Insert(0, newOrder.Value);  // Use .Value to get the underlying workOrder
         }
 
 
@@ -1239,15 +1222,15 @@ public class LogicCenter : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < ProcessingQueue.Count; i++)
+        for (int i = 0; i < ProductionQueue.Count; i++)
         {
-            workOrder wo = ProcessingQueue[i];
+            workOrder wo = ProductionQueue[i];
 
             // If the machine is actively working on a work order, increment its orderIndex
             if (wo.isActive && wo.machineIndex >= 2)
             {
                 wo.machineIndex--;
-                ProcessingQueue[i] = wo; // Update the original struct in the collection
+                ProductionQueue[i] = wo; // Update the original struct in the collection
             }
         }
     }
@@ -1386,65 +1369,24 @@ public class LogicCenter : MonoBehaviour
 
         if (activeTrades[i].length < 1)  //if it's run the length of it's trade, remove it from the queue
             activeTrades.RemoveAt(i);
-        
-        
-    
     }
-
-    public void setActiveTrade(int i)
-    {
-        activeTrades.Add(availableTrades[i]);
-
-    }
-
 
 
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void makeMachine()
-    {
-        Text[] machineAttributes = new Text[10];
-        //This pulls the specific parent and sets it as the parent without having to create an object for it.
-        GameObject machineObjectGO = Resources.Load<GameObject>("Resources/Prefabs/Machine info");
-        //GameObject workOrderEntry = Resources.Load<GameObject>("Resources/Prefabs/Work Order Entry");
-
-
-        machineObject = Instantiate(Resources.Load<GameObject>("Prefabs/Machine info"), new Vector3(0f, 0f, 0f), Quaternion.identity);
-        machineObject.transform.SetParent(machineryPage.transform, false);
-
-        machineAttributes[0] = machineObject.transform.Find("Layout/MACHINE").GetComponent<Text>();
-        machineAttributes[1] = machineObject.transform.Find("Layout/Top Body/STATUS/STATUS info").GetComponent<Text>();  // IN PRODUCTION
-        machineAttributes[5] = machineObject.transform.Find("Layout/Bottom Body/DURABILITY/durabilityValue").GetComponent<Text>();
-        //machineAttributes[6] = machineObject.transform.Find("Layout/Bottom Body/DURABILITY/maxDurabilityValue").GetComponent<Text>();
-        machineAttributes[7] = machineObject.transform.Find("Layout/Bottom Body/DURABILITY/cycleTimeValue").GetComponent<Text>();
-        machineAttributes[8] = machineObject.transform.Find("Layout/Bottom Body/DURABILITY/batchSizeValue").GetComponent<Text>();
-        machineAttributes[9] = machineObject.transform.Find("Layout/Bottom Body/DURABILITY/yieldValue").GetComponent<Text>();
-
-        machineAttributes[0].text = machines[0].name.ToUpper();
-        machineAttributes[5].text = machines[0].durability.ToString() + " / " + machines[0].maxDurability.ToString() + " CYCLES";
-        //machineAttributes[6].text = machines[0].maxDurability.ToString()+ " CYCLES";
-        machineAttributes[7].text = machines[0].cycleTime.ToString() + " MINUTES";
-        machineAttributes[8].text = machines[0].batchSize.ToString() + " PIXELS".ToUpper();
-        machineAttributes[9].text = machines[0].Yield.ToString() + "%";
-
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region update UI
-
-    public void updateUI()
-    {//this could only re-write and update only the one it's looking at to speed things up.  But currently not needed
-
-        displayInventory();
-
+    
+    public void updateUI()  //this could be re-written to update the one it's looking versus the entire list to speed things up.  But currently not needed
+    {
+        UpdateInventoryUI();
         UpdateEventUI();
         UpdateProductionUI();
         UpdateMachineUI();
         UpdateEmployeeUI();
         UpdateTradeUI();
     }
-    public void displayInventory()
+    public void UpdateInventoryUI()
     {
         oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
 
@@ -1463,66 +1405,66 @@ public class LogicCenter : MonoBehaviour
     {
         for (int i = 0; i < history.Length; i++)
         {
-            eventText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>();
-            eventImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>();
+            eventEntryText[i] = events[i].transform.Find("bg/message").gameObject.GetComponent<Text>();
+            eventEntryImg[i] = events[i].transform.Find("bg").GetComponent<UnityEngine.UI.Image>();
 
             //update the sprite for each event type.
 
-            eventText[i].text = " " + ft.eventStatuses[history[i]].ToUpper() + " ";  // Assuming ft is an array or list
+            eventEntryText[i].text = " " + ft.eventStatuses[history[i]].ToUpper() + " ";  // Assuming ft is an array or list
 
             switch (history[i])
             {
                 case 1:
-                    eventImg[i].color = Color.red;
-                    eventText[i].color = Color.cyan;
+                    eventEntryImg[i].color = Color.red;
+                    eventEntryText[i].color = Color.cyan;
                     break;
                 case 2:  //chose green
-                    eventImg[i].color = Color.green;
-                    eventText[i].color = Color.magenta;
+                    eventEntryImg[i].color = Color.green;
+                    eventEntryText[i].color = Color.magenta;
                     break;
                 case 3:  //blue
-                    eventImg[i].color = Color.blue;
-                    eventText[i].color = Color.yellow;
+                    eventEntryImg[i].color = Color.blue;
+                    eventEntryText[i].color = Color.yellow;
                     break;
                 case 4:  //halted machine
-                    eventImg[i].color = Color.red;
-                    eventText[i].color = Color.yellow;
+                    eventEntryImg[i].color = Color.red;
+                    eventEntryText[i].color = Color.yellow;
                     break;
                 case 5:  //running machine
-                    eventImg[i].color = Color.green;
-                    eventText[i].color = Color.white;
+                    eventEntryImg[i].color = Color.green;
+                    eventEntryText[i].color = Color.white;
                     break;
                 case 6:  //random event
-                    eventImg[i].color = Color.blue;
-                    eventText[i].color = Color.white;
+                    eventEntryImg[i].color = Color.blue;
+                    eventEntryText[i].color = Color.white;
                     break;
                 case 7:  //machine is starved
-                    eventImg[i].color = Color.red;
-                    eventText[i].color = Color.yellow;
+                    eventEntryImg[i].color = Color.red;
+                    eventEntryText[i].color = Color.yellow;
                     break;
                 case 8: //harvesting
-                    eventImg[i].color = Color.green;
-                    eventText[i].color = Color.black;
+                    eventEntryImg[i].color = Color.green;
+                    eventEntryText[i].color = Color.black;
                     break;
                 case 9: //upgrade harvester
-                    eventImg[i].color = Color.yellow;
-                    eventText[i].color = Color.black;
+                    eventEntryImg[i].color = Color.yellow;
+                    eventEntryText[i].color = Color.black;
                     break;
                 case 10: //harvester at capacity
-                    eventImg[i].color = Color.black;
-                    eventText[i].color = Color.red;
+                    eventEntryImg[i].color = Color.black;
+                    eventEntryText[i].color = Color.red;
                     break;
                 case 11: // seasonal
-                    eventImg[i].color = Color.white;
-                    eventText[i].color = Color.black;
+                    eventEntryImg[i].color = Color.white;
+                    eventEntryText[i].color = Color.black;
                     break;
                 case 12:  //System
-                    eventImg[i].color = Color.white;
-                    eventText[i].color = Color.black;
+                    eventEntryImg[i].color = Color.white;
+                    eventEntryText[i].color = Color.black;
                     break;
                 case 15:  //System
-                    eventImg[i].color = Color.white;
-                    eventText[i].color = Color.white;
+                    eventEntryImg[i].color = Color.white;
+                    eventEntryText[i].color = Color.white;
                     break;
 
             }
@@ -1532,14 +1474,14 @@ public class LogicCenter : MonoBehaviour
     {
         for (int i = 0; i < productionEntry.Count; i++)
         {
-            if (i < ProcessingQueue.Count)
+            if (i < ProductionQueue.Count)
             {
-                int outputIndex = ProcessingQueue[i].c3index;
+                int outputIndex = ProductionQueue[i].c3index;
 
-                int ingredientAindex = ProcessingQueue[i].c1index;
-                int ingredientBindex = ProcessingQueue[i].c2index;
-                //Debug.Log("ingredient A: "+ ProcessingQueue[i].c1index);           RESUME HERE
-                //Debug.Log("ingredient B: " + ProcessingQueue[i].c2index);
+                int ingredientAindex = ProductionQueue[i].c1index;
+                int ingredientBindex = ProductionQueue[i].c2index;
+                //Debug.Log("ingredient A: "+ ProductionQueue[i].c1index);           RESUME HERE
+                //Debug.Log("ingredient B: " + ProductionQueue[i].c2index);
 
                 Color tempColor = new Color(colorLib.colors[outputIndex].r, colorLib.colors[outputIndex].g, colorLib.colors[outputIndex].b);
                 Color ingredientA = new Color(colorLib.colors[ingredientAindex].r, colorLib.colors[ingredientAindex].g, colorLib.colors[ingredientAindex].b);
@@ -1548,11 +1490,11 @@ public class LogicCenter : MonoBehaviour
                 productionPixelImg[i].color = tempColor;
                 productionIngredientAImg[i].color = ingredientA;
                 productionIngredientBImg[i].color = ingredientB;
-                productionNameText[i].text = ProcessingQueue[i].name;
+                productionNameText[i].text = ProductionQueue[i].name;
 
-                //if (!ProcessingQueue[i].isActive)
-                productionQuantityText[i].text = ProcessingQueue[i].quantity.ToString();
-                ///else productionQuantityText[i].text = ProcessingQueue[i].quantity.ToString() + "(-" + machines[ProcessingQueue[i].machineIndex].c2q +")";
+                //if (!ProductionQueue[i].isActive)
+                productionQuantityText[i].text = ProductionQueue[i].quantity.ToString();
+                ///else productionQuantityText[i].text = ProductionQueue[i].quantity.ToString() + "(-" + machines[ProductionQueue[i].machineIndex].c2q +")";
 
             }
             else
@@ -1589,13 +1531,13 @@ public class LogicCenter : MonoBehaviour
                 if (m.orderIndex == -1)
                     machineMenuAssignementText[i].text = "not assigned";
                 else
-                    machineMenuAssignementText[i].text = ProcessingQueue[m.orderIndex].name;
+                    machineMenuAssignementText[i].text = ProductionQueue[m.orderIndex].name;
 
                 machineMenuDMDText[i].text = m.durability + "/" + m.maxDurability;
                 machineMenuBText[i].text = m.batchSize.ToString();
                 machineMenuCText[i].text = m.cycleTime.ToString();
                 machineMenuYText[i].text = m.Yield.ToString() + "%";
-                machineOEEText[i].text = m.OEE.ToString("F0");
+                machineMenuOeeText[i].text = m.OEE.ToString("F0");
 
             }
             else //unassigned
@@ -1607,7 +1549,7 @@ public class LogicCenter : MonoBehaviour
                 machineMenuBText[i].text = "";
                 machineMenuCText[i].text = "";
                 machineMenuYText[i].text = "";
-                machineOEEText[i].text = "";
+                machineMenuOeeText[i].text = "";
 
             }
 
@@ -1698,26 +1640,6 @@ public class LogicCenter : MonoBehaviour
                 activeTradeRecieveText[i].text = "";
             }
         }
-
-
-    }
-
-    //
-    public void oreValueTextColor()
-    {
-        switch (chosenColor)
-        {
-            case 1:
-                oreValueText.color = new Color(1, 0, 0);
-                break;
-            case 2:
-                oreValueText.color = new Color(0, 1, 0);
-                break;
-            case 3:
-                oreValueText.color = new Color(0, 0, 1);
-                break;
-        }
-        
     }
 
     #endregion
@@ -1748,9 +1670,9 @@ public class LogicCenter : MonoBehaviour
     }
     private int FindFirstUnassignedOrder()
     {
-        for (int i = 0; i < ProcessingQueue.Count; i++)
+        for (int i = 0; i < ProductionQueue.Count; i++)
         {
-            if (!ProcessingQueue[i].isActive)
+            if (!ProductionQueue[i].isActive)
             {
                 return i;
             }
@@ -1759,11 +1681,11 @@ public class LogicCenter : MonoBehaviour
     }
     private void AssignOrderToMachine(int machineIndex, int orderIndex)
     {
-        workOrder wo = ProcessingQueue[orderIndex];
+        workOrder wo = ProductionQueue[orderIndex];
         Machine m = machines[machineIndex];
 
-        int c1Quantity = DetermineQuantity(wo.c1index, wo.quantity); //Determine if there's enough in the inventory to run the order.
-        int c2Quantity = DetermineQuantity(wo.c2index, c1Quantity);
+        int c1Quantity = calculateAvailableQuantity(wo.c1index, wo.quantity); //Determine if there's enough in the inventory to run the order.
+        int c2Quantity = calculateAvailableQuantity(wo.c2index, c1Quantity);
         c1Quantity = c2Quantity;
 
         if(m.batchSize < wo.quantity) //This sets the number of cycles needed to produce the whole amount.
@@ -1777,7 +1699,7 @@ public class LogicCenter : MonoBehaviour
             wo.machineIndex = machineIndex; //sets the machine being used for the order.
             m.orderIndex = orderIndex;  //sets the order being run for the machine
 
-            ProcessingQueue[orderIndex] = wo;
+            ProductionQueue[orderIndex] = wo;
 
             wo.isActive = true;
 
@@ -1789,10 +1711,10 @@ public class LogicCenter : MonoBehaviour
         }
 
         machines[machineIndex] = m;
-        ProcessingQueue[orderIndex] = wo;
+        ProductionQueue[orderIndex] = wo;
     }
    
-    private int DetermineQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
+    private int calculateAvailableQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
     {
         int availableQuantity = inventory[componentIndex];
         int quantityToUse;
@@ -1809,7 +1731,7 @@ public class LogicCenter : MonoBehaviour
         return quantityToUse;
     }
 
-    public void selectWorkOrder(int index)
+    public void selectWorkOrder(int index)  //used for the UI interacting with the elements.
     {
         // Reset all tradeEntry colors to white
         for (int i = 0; i < productionEntry.Count; i++)
@@ -1818,7 +1740,7 @@ public class LogicCenter : MonoBehaviour
         }
 
         // If the selected index is within the bounds of availableTrades, proceed
-        if (index >= 0 && index < ProcessingQueue.Count)
+        if (index >= 0 && index < ProductionQueue.Count)
         {
             // Highlight the selected tradeEntry
             productionBarImg[index].color = Color.yellow;
@@ -1836,85 +1758,45 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region Token Selection
-    public void selectRed()
+    public void selectColor(int i)
     {
-        selectedColor = 1;
+        switch (i)
+        {
+            case 1: selectedColor = 1; break;
+            case 2: selectedColor = 2; break;
+            case 3: selectedColor = 3; break;
+        }
     }
-    public void selectGreen()
+    public void chooseToken()
     {
-        selectedColor = 2;
-    }
-    public void selectBlue()
-    {
-        selectedColor = 3;   
-    }
-    public void selectToken()
-    {
-        updateToken();
+        chosenColor = selectedColor;
 
         SelectMenu.SetActive(false);
-        UIbackground.SetActive(true);
+        ProductionPage.SetActive(true);
 
-
-        if (chosenColor == 1)
+        switch (chosenColor)
         {
-            updateEvents(1);
+            case 1: updateEvents(1); break;
+            case 2: updateEvents(2); break;
+            case 3: updateEvents(3); break;
         }
-        else if (chosenColor == 2)
-        {
-            updateEvents(2);
-        }
-
-        else if (chosenColor == 3)
-        {
-            updateEvents(3);
-        }
-
     }
     public void updateToken()
     {
         chosenColor = selectedColor;
-        switch (chosenColor)
+
+        tabgroup.updateColor();
+
+    }
+    public void updateSelectedColor(int i)
+    {
+        switch (i)
         {
-            case 1:
-                chosenColorText.text = "RED";
-                chosenColorText.color = Color.red;
-                break;
-            case 2:
-                chosenColorText.text = "GREEN";
-                chosenColorText.color = Color.green;
-                break;
-            case 3:
-                chosenColorText.text = "BLUE";
-                chosenColorText.color = Color.blue;
-                break; 
+            case 1: chosenColor = 1; break;
+            case 2: chosenColor = 2; break;
+            case 3: chosenColor = 3; break;
         }
-
-    }
-    public void updateRed()
-    {
-        selectedColor = 1;
-        updateToken();
         tabgroup.updateColor();
-       // updateEvents(1);
-        
-    }
-    public void updateGreen()
-    {
-        selectedColor = 2;
-        updateToken();
-        tabgroup.updateColor();
-
-        // updateEvents(2);
-
-    }
-    public void updateBlue()
-    {
-        selectedColor = 3;
-        updateToken();
-        tabgroup.updateColor();
-
-        // updateEvents(3);    
     }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2013,13 +1895,5 @@ public class LogicCenter : MonoBehaviour
         chosenPaintColor = i;
 
     }
-
-    public void updateHueQuantities()
-    {
-
-
-    }
-
-
     #endregion
 }

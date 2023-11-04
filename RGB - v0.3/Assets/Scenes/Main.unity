@@ -1539,12 +1539,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2035661155}
         m_TargetAssemblyTypeName: LogicCenter, Assembly-CSharp
-        m_MethodName: updateRed
-        m_Mode: 1
+        m_MethodName: updateSelectedColor
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -9614,12 +9614,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2035661155}
         m_TargetAssemblyTypeName: LogicCenter, Assembly-CSharp
-        m_MethodName: selectGreen
-        m_Mode: 1
+        m_MethodName: selectColor
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -11641,7 +11641,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2035661155}
         m_TargetAssemblyTypeName: LogicCenter, Assembly-CSharp
-        m_MethodName: selectToken
+        m_MethodName: chooseToken
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12165,12 +12165,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2035661155}
         m_TargetAssemblyTypeName: LogicCenter, Assembly-CSharp
-        m_MethodName: selectRed
-        m_Mode: 1
+        m_MethodName: selectColor
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -14521,12 +14521,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2035661155}
         m_TargetAssemblyTypeName: LogicCenter, Assembly-CSharp
-        m_MethodName: updateGreen
-        m_Mode: 1
+        m_MethodName: updateSelectedColor
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -16519,12 +16519,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2035661155}
         m_TargetAssemblyTypeName: LogicCenter, Assembly-CSharp
-        m_MethodName: updateBlue
-        m_Mode: 1
+        m_MethodName: updateSelectedColor
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -18916,12 +18916,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2035661155}
         m_TargetAssemblyTypeName: LogicCenter, Assembly-CSharp
-        m_MethodName: selectBlue
-        m_Mode: 1
+        m_MethodName: selectColor
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -28880,7 +28880,6 @@ MonoBehaviour:
   magentaPixelText: {fileID: 2050617228}
   cyanPixelText: {fileID: 32466985}
   whitePixelText: {fileID: 1149835033}
-  chosenColorText: {fileID: 780420333}
   SelectMenu: {fileID: 1729240257}
   UIbackground: {fileID: 1658437}
   CanvasGO: {fileID: 524605654}
@@ -29322,7 +29321,7 @@ MonoBehaviour:
   - {fileID: 690756640}
   - {fileID: 1297513700}
   selectedWorkOrderIndex: -1
-  NewWorkOrderoutput: {fileID: 0}
+  NewWorkOrderOutput: {fileID: 0}
   NewWorkOrderQuantityText: {fileID: 0}
   newWorkOrderPixelImg: {fileID: 0}
   workOrderEntry: {fileID: 5590210099146532732, guid: c68dc4f3041c5074ab33162f0b913b8c, type: 3}

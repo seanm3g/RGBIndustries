@@ -16,12 +16,14 @@ public class Contract : MonoBehaviour
 
     public Contract()
     {
+        requirements = new int[8];
+
         for (int i = 0; i < requirements.Length; i++)  //init to zero
         {
             requirements[i] = -1;
         }
 
-        requirements = new int[8];
+        
     }
     public void setRequirements(int[,] pixelValues)
     {
@@ -82,24 +84,24 @@ public class Contract : MonoBehaviour
                 //else
                     //tradeOrder(i,requirements[i]);
             }
-            else if (requirements[i] > 3)
+            else if (requirements[i] > 3)  //this shouldn't be calling production queue.  It should call a method in LC
             {
                 switch (i)
                 {
                     case 4:
-                        lc.ProcessingQueue.Add(new workOrder(requirements[i], 1, 2, 4));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 2, 4));
                         break;
                     case 5:
-                        lc.ProcessingQueue.Add(new workOrder(requirements[i], 1, 3, 5));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 3, 5));
                         break;
                     case 6:
-                        lc.ProcessingQueue.Add(new workOrder(requirements[i], 2, 3, 6));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 2, 3, 6));
                         break;
                     case 7:
                         int randomCase = ft.rollDice(1, 3);
                         int param1 = randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1;
                         int param2 = randomCase + 3;
-                        lc.ProcessingQueue.Add(new workOrder(requirements[i], param1, param2, 7));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], param1, param2, 7));
                         break;
                 }
             }
