@@ -1323,7 +1323,7 @@ public class LogicCenter : MonoBehaviour
         }
     }
 
-    public void acceptTrade()
+    public void acceptTrade()     // this is good clean code
     {
         // Check if a trade has been selected
         if (selectedTrade >= 0 && selectedTrade < availableTrades.Count)
