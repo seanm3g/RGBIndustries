@@ -756,15 +756,15 @@ public class LogicCenter : MonoBehaviour
     {
         if (min == inventory[1])
         {
-            updateSelectedColor(1);
+            selectColor(1);
         }
         else if (min == inventory[2])
         {
-            updateSelectedColor(2);
+            selectColor(2);
         }
         else if (min == inventory[3])
         {
-            updateSelectedColor(3);
+            selectColor(3);
         }
 
 
@@ -774,31 +774,26 @@ public class LogicCenter : MonoBehaviour
         if(competance(e))
             updateQueue();
     }
-
     public void fireEmployee() 
     {
         employees.RemoveAt(selectedEmployeeIndex); //there's probably a better way to do selectedEmployeeIndex with just passing the right value when a thing is selected.
 
     }
-
     public void performanceReview()  //doesn't do anything yet.
     {
 
 
     }
-    
     public void pickEmployeeJob(int i)
     {
         //Debug.Log("JOB:"+i);
         newEmployeeJob = 1+i;
         //Debug.Log("new Employee Job:" + newEmployeeJob);
     }
-
     public void hireEmployee()
     {
         employees.Add(new(newEmployeeJob));
     }
-
     public void selectEmployee(int index)
     {
         selectedEmployeeIndex = index;
@@ -843,8 +838,6 @@ public class LogicCenter : MonoBehaviour
 
             }
         }
-        
-
     }
 
     public void machineIsLoading(int i)
@@ -1074,7 +1067,7 @@ public class LogicCenter : MonoBehaviour
             // Reset the selectedTrade index
             selectedMachineIndex = -1;
 
-            payBill(-5);
+            //payBill(-5);
 
             // Reset all machine colors to white
             for (int i = 0; i < machineEntry.Length; i++)
@@ -1086,8 +1079,6 @@ public class LogicCenter : MonoBehaviour
         {
             Debug.LogWarning("No trade selected or selected index is out of bounds.");
         }
-
-        
     }
 
     public float machineAverage()  //This gives you the average rate of production per pixel based on the machines you have.
@@ -1247,7 +1238,6 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region trade
-
     public void runTrades()
     {
         for (int i = 0; i < activeTrades.Count; i++)
@@ -1271,7 +1261,6 @@ public class LogicCenter : MonoBehaviour
             }
         }
     }
-
     public void runMarket()
     {
         MarketElapsedTime += Time.deltaTime;
@@ -1298,7 +1287,6 @@ public class LogicCenter : MonoBehaviour
             }
         }
     }
-
     public void selectTrade(int index)  ///used for the button
     {
         // Reset all tradeEntry colors to white
@@ -1322,7 +1310,6 @@ public class LogicCenter : MonoBehaviour
             selectedTrade = -1;
         }
     }
-
     public void acceptTrade()     // this is good clean code
     {
         // Check if a trade has been selected
@@ -1354,8 +1341,6 @@ public class LogicCenter : MonoBehaviour
             Debug.LogWarning("No trade selected or selected index is out of bounds.");
         }
     }
-
-
     public void executeTrade(int i)  //i is the index of the trade being executed
     {
         Trade t = activeTrades[i];  //check trade out
@@ -1370,13 +1355,10 @@ public class LogicCenter : MonoBehaviour
         if (activeTrades[i].length < 1)  //if it's run the length of it's trade, remove it from the queue
             activeTrades.RemoveAt(i);
     }
-
-
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region update UI
-    
     public void updateUI()  //this could be re-written to update the one it's looking versus the entire list to speed things up.  But currently not needed
     {
         UpdateInventoryUI();
@@ -1641,7 +1623,6 @@ public class LogicCenter : MonoBehaviour
             }
         }
     }
-
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1713,7 +1694,6 @@ public class LogicCenter : MonoBehaviour
         machines[machineIndex] = m;
         ProductionQueue[orderIndex] = wo;
     }
-   
     private int calculateAvailableQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
     {
         int availableQuantity = inventory[componentIndex];
@@ -1730,7 +1710,6 @@ public class LogicCenter : MonoBehaviour
 
         return quantityToUse;
     }
-
     public void selectWorkOrder(int index)  //used for the UI interacting with the elements.
     {
         // Reset all tradeEntry colors to white
@@ -1760,26 +1739,20 @@ public class LogicCenter : MonoBehaviour
     #region Token Selection
     public void selectColor(int i)
     {
-        switch (i)
-        {
-            case 1: selectedColor = 1; break;
-            case 2: selectedColor = 2; break;
-            case 3: selectedColor = 3; break;
-        }
+        selectedColor = i;
+
+        tabgroup.updateColor();
     }
     public void chooseToken()
     {
         chosenColor = selectedColor;
 
-        SelectMenu.SetActive(false);
-        ProductionPage.SetActive(true);
-
-        switch (chosenColor)
-        {
-            case 1: updateEvents(1); break;
-            case 2: updateEvents(2); break;
-            case 3: updateEvents(3); break;
+        if(SelectMenu.activeSelf)
+        {     
+            SelectMenu.SetActive(false);
+            ProductionPage.SetActive(true);
         }
+        updateEvents(chosenColor);
     }
     public void updateToken()
     {
@@ -1790,13 +1763,8 @@ public class LogicCenter : MonoBehaviour
     }
     public void updateSelectedColor(int i)
     {
-        switch (i)
-        {
-            case 1: chosenColor = 1; break;
-            case 2: chosenColor = 2; break;
-            case 3: chosenColor = 3; break;
-        }
-        tabgroup.updateColor();
+        selectColor(i);
+        updateToken();
     }
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1804,88 +1772,91 @@ public class LogicCenter : MonoBehaviour
     #region Harvesting
     public void distributeTokens()
     {
-        if(lastChosenColor != chosenColor)//checks to see if it's changed since last time and if it has then reset the momentum;
-        {
-            distribution = 1;  //reset the distribution
-            lastChosenColor=chosenColor;  //reset the color
-            inventory[0] = 0;  //no carryover.
-            oreValueText.text = inventory[0].ToString();
-        }
+        ResetDistributionIfNeeded();
+        IncrementAndCapInventory();
+        CheckHarvestCapacity();
+    }
 
+    private void ResetDistributionIfNeeded()
+    {
+        if (lastChosenColor != chosenColor) // Reset if color has changed
+        {
+            distribution = 1; // Reset distribution
+            lastChosenColor = chosenColor; // Update last chosen color
+            inventory[0] = 0; // Reset ore inventory
+            oreValueText.text = "0"; // Update text display
+        }
+    }
+
+    private void IncrementAndCapInventory()
+    {
         if (inventory[0] < harvestCapacity && chosenColor != 0)
         {
-            inventory[0]+=distribution;
-
-            distribution++;
-
-            if (inventory[0]>10)
-                inventory[0]=10;
-
-            if (inventory[0] == harvestCapacity)  //warns when it is full.
-            {
-                oreValueText.color = Color.red;
-                updateEvents(10);
-            }
+            inventory[0] = Math.Min(inventory[0] + distribution++, harvestCapacity);
+            oreValueText.text = inventory[0].ToString(); // Update text display
         }
-
     }
+
+    private void CheckHarvestCapacity()
+    {
+        if (inventory[0] == harvestCapacity) // Check if inventory is full
+        {
+            oreValueText.color = Color.red; // Change text color to red
+            updateEvents(10); // Trigger full capacity event
+        }
+    }
+
     public void harvest()
     {
-        if(inventory[0] > 0) 
+        if (inventory[0] > 0)
         {
-
             updateEvents(8);
             cg.available();
             cg.UpdateTexture();
-            oreValueText.color = Color.white;
+            oreValueText.color = Color.white; // Reset text color
 
-
-            switch (chosenColor)
-            {
-                case 1:  //red
-                    inventory[1]+= inventory[0];
-                    inventory[0]= 0;
-                    redPixelText.text = inventory[1].ToString();
-                    break;
-                case 2:  //green
-                    inventory[2] += inventory[0];
-                    inventory[0] = 0;
-                    greenPixelText.text = inventory[2].ToString();
-                    break;
-                case 3:  //blue
-                    inventory[3] += inventory[0];
-                    inventory[0] = 0;
-                    bluePixelText.text = inventory[3].ToString();
-                    break;
-                default:
-                    Debug.Log("not selected"); 
-                    break;
-            }   
+            TransferOreToColorInventory();
         }
     }
+
+    private void TransferOreToColorInventory()
+    {
+        if (chosenColor >= 1 && chosenColor <= 3)
+        {
+            inventory[chosenColor] += inventory[0];
+            inventory[0] = 0;
+            UpdatePixelText(chosenColor);
+        }
+        else
+        {
+            Debug.Log("Color not selected");
+        }
+    }
+
+    private void UpdatePixelText(int colorIndex)
+    {
+        switch (colorIndex)
+        {
+            case 1: redPixelText.text = inventory[1].ToString(); break;
+            case 2: greenPixelText.text = inventory[2].ToString(); break;
+            case 3: bluePixelText.text = inventory[3].ToString(); break;
+        }
+    }
+
     public void harvestUpgrade()
     {
-
-        int chosenQuant = inventory[chosenColor];
-        
-        if (chosenQuant >= harvestCapacity)
+        if (inventory[chosenColor] >= harvestCapacity)
         {
             updateEvents(9);
-
-            oreValueText.color = Color.white;
+            oreValueText.color = Color.white; // Reset text color
 
             inventory[chosenColor] -= harvestCapacity;
             harvestCapacity++;
-
-            // Updates the text on screen
-            if (chosenColor == 1) redPixelText.text = inventory[1].ToString();
-            else if (chosenColor == 2) greenPixelText.text = inventory[2].ToString();
-            else if (chosenColor == 3) bluePixelText.text = inventory[3].ToString();
-         
+            UpdatePixelText(chosenColor); // Update text display based on color
         }
-        
     }
     #endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region painting
