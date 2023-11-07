@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*Things to do:
+ * Re-write Trade to include the quantity
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -184,6 +196,9 @@ public class LogicCenter : MonoBehaviour
 
     public Text pictureStats;
     public Text[] hueQuantitiesText = new UnityEngine.UI.Text[8];
+
+    public List<Contract> availableContracts = new List<Contract>();
+    public List<Contract> activeContracts = new List<Contract>();
     #endregion
 
     #region costs
@@ -197,13 +212,13 @@ public class LogicCenter : MonoBehaviour
     
     void Start()
     {
-        setupGame(1,0,0,0);  //factory, machines,employees, Production Queue
+        setupGame(1,3,5,8,100);  //factory, machines,employees, Production Queue , starting quantity
     }
-    public void setupGame(int factory,int machines, int employees, int queue)
+    public void setupGame(int factory,int machines, int employees, int queue, int inventory)
     {
         
         setupMenu();
-        setupInventory();
+        setupInventory(inventory);
         startingPage();
 
         setupEmployees(employees);
@@ -260,35 +275,35 @@ public class LogicCenter : MonoBehaviour
             switch (r)
             {
                 case 1:
-                    ProductionQueue.Add(new workOrder(q, 1, 2, 4));  //make yellow
+                    ProductionQueue.Add(new workOrder(q, 1, 2, 4,4));  //make yellow
                     break;
                 case 2:
-                    ProductionQueue.Add(new workOrder(q, 1, 3, 5));  //makes magenta
+                    ProductionQueue.Add(new workOrder(q, 1, 3, 5,4));  //makes magenta
                     break;
                 case 3:
-                    ProductionQueue.Add(new workOrder(q, 2, 3, 6)); //makes cyan
+                    ProductionQueue.Add(new workOrder(q, 2, 3, 6,4)); //makes cyan
                     break;
                 case 4:
                     switch (ft.rollDice(1, 3))
                     {
                         case 1:
-                            ProductionQueue.Add(new workOrder(q, 3, 4, 7)); //white
+                            ProductionQueue.Add(new workOrder(q, 3, 4, 7,4)); //white
                             break;
                         case 2:
-                            ProductionQueue.Add(new workOrder(q, 2, 5, 7)); //white
+                            ProductionQueue.Add(new workOrder(q, 2, 5, 7,4)); //white
                             break;
                         case 3:
-                            ProductionQueue.Add(new workOrder(q, 1, 6, 7)); //white
+                            ProductionQueue.Add(new workOrder(q, 1, 6, 7,4)); //white
                             break;
                     }
                     break;
             }
         }
     }
-    public void setupInventory()  //init the inventory
+    public void setupInventory(int init)  //init the inventory
     {
         for (int i = 0; i < inventory.Length; i++)
-            inventory[i] = 0; //set everything to start as zero
+            inventory[i] = init; //set everything to start as zero
 
     }
     public void setupEmployees(int quantity)
@@ -814,142 +829,284 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region Machine Functions
-    private void runMachines()  //could add an idle condition
+    private void runMachines()
     {
-
         updateProductionUI();
 
         for (int i = 0; i < machines.Count; i++)
         {
-            switch (machines[i].status)
+            Machine machine = machines[i];  //check out
+
+            switch (machine.status)
             {
-                case 1:  
-                    machineIsLoading(i);break;
+                
+                case 1:
+                    machineIsLoading(ref machine);
+                    break;
                 case 2:
-                    machineIsRunning(i); break;
+                    machineIsRunning(ref machine);
+                    break;
                 case 3:
-                    machineIsUnloading(i); break;
+                    machineIsUnloading(ref machine);
+                    break;
                 case 4:
-                    machineIsComplete(i); break;
+                    machineIsComplete(ref machine);
+                    break;
                 case 5:
-                    machineIsBroken(i); break;
+                    machineIsBroken(ref machine); // Assuming you have a method for this
+                    break;
                 case 6:
-                    machineIsRepairing(i); break;
-
+                    machineIsRepairing(ref machine); // Assuming you have a method for this
+                    break;
             }
+
+            machines[i] = machine;   //check in
         }
     }
 
-    public void machineIsLoading(int i)
+    public void machineIsLoading(ref Machine machine)
     {
-        Machine m = machines[i];
+        machine.elapsedTime += Time.deltaTime;
 
-        m.elapsedTime += Time.deltaTime;
-
-        if (m.elapsedTime >= m.cycleTime)  //finishes processing
+        if (machine.elapsedTime >= machine.cycleTime)
         {
-            // Reset the elapsed time and stop processing
-            m.elapsedTime = 0f;
-
-           // Debug.Log("but are we getting here?");
-            // Signal that the output is ready
-            m.status = MACHINE_RUNNING;
+            machine.elapsedTime = 0f;
+            machine.status = MACHINE_RUNNING; // Assuming MACHINE_RUNNING is a constant or static readonly field
         }
-        machines[i] = m;
     }
 
-    public void machineIsRunning(int i)
+    public void machineIsRunning(ref Machine machine)
     {
-        Machine m = machines[i];
-        m.elapsedTime += Time.deltaTime;
+        machine.elapsedTime += Time.deltaTime;
 
-        if (machines[i].elapsedTime >= machines[i].cycleTime)  //finishes processing
+        if (machine.elapsedTime >= machine.cycleTime)
         {
-            m.status = MACHINE_UNLOADING;
-            // Reset the elapsed time and stop processing
-            m.runMachine();
-            m.elapsedTime = 0f;
-
-            // Signal that the output is ready
+            machine.status = MACHINE_UNLOADING; // Assuming MACHINE_UNLOADING is a constant or static readonly field
+            machine.runMachine(); // Assuming runMachine is a method that exists within the Machine struct
+            machine.elapsedTime = 0f;
             updateEvents(5);
+        }
+    }
+
+    public void machineIsUnloading(ref Machine machine)
+    {
+        machine.elapsedTime += Time.deltaTime;
+
+        if (machine.elapsedTime >= machine.cycleTime)
+        {
+            Debug.Log("UNLOADING pre-machine:" + machine.name + "\n Order Index:" + machine.orderIndex);
+            workOrder order = ProductionQueue[machine.orderIndex];
+
+            Debug.Log("UNLOADING: machine:" + machine.name + "\n Order Index:" + machine.orderIndex);
+            workOrderDestination(ref order);
             
+
+            //this might get cut and moved into workOrderOutput (likely)
+           // int inventoryIndex = ProductionQueue[machine.orderIndex].c3index;
+           // inventory[inventoryIndex] += machine.unloadMachine(); // Assuming unloadMachine is a method that exists within the Machine struct
+            
+            machine.status = MACHINE_COMPLETED; // Assuming MACHINE_COMPLETED is a constant or static readonly field
+            machine.elapsedTime = 0f;
+
+            ProductionQueue[machine.orderIndex] = order; //I'm not sure where this line of code goes yet.
+
         }
-        machines[i] = m;
     }
 
-    public void machineIsUnloading(int i)
+
+    public void workOrderDestination(ref workOrder order)  //called whenever a workorder is unloading. It determines where it goes.
     {
-        Machine m = machines[i];
-        m.elapsedTime += Time.deltaTime;
 
-        if (m.elapsedTime >= m.cycleTime)
+        //what is the right sequence here of priority?  Should this be a setting the user gets?
+        switch(order.destination)
         {
-            int inventoryIndex = ProductionQueue[m.orderIndex].c3index;
-            inventory[inventoryIndex] += m.unloadMachine();
+            case 1: checkWorkOrders(ref order); break;
+            case 2: checkTrades(ref order); break;
+            case 3: checkJobs(ref order); break;
 
-            m.status = MACHINE_COMPLETED;
-            m.elapsedTime = 0f;
-            //m.orderIndex = -1;  // Unlink the machine from the work order
+            default:  //sends to inventory
+                int inventoryIndex = order.c3index;
+                inventory[inventoryIndex] += machines[order.machineIndex].unloadMachine(); // Assuming unloadMachine is a method that exists within the Machine struct
+            break;
         }
-        machines[i] = m;
     }
 
-    public void machineIsComplete(int i)
+    public void checkWorkOrders(ref workOrder order)
     {
-        if (i < 0 || i >= machines.Count)
+        // Iterate through the production queue to find work orders waiting for this color
+        for (int i = 0; i < ProductionQueue.Count; i++)
         {
-            return;
-        }
+            workOrder queuedOrder = ProductionQueue[i];
 
-        Machine m = machines[i];
-        m.elapsedTime += Time.deltaTime;
-
-        if (m.elapsedTime >= m.cycleTime)
-        {
-            workOrder wo = ProductionQueue[m.orderIndex];
-            wo.quantity -= m.c3q;
-            wo.isActive = false;
-
-            if (wo.quantity > 0)
+            // Only proceed if the work order status indicates it's waiting for input
+            if (queuedOrder.status == 5)
             {
-                ProductionQueue.Add(new workOrder(wo));
+                // Determine the quantity that can be transferred based on the matching color index
+                int transferQuantity = DetermineTransferQuantity(ref order, ref queuedOrder);
+
+                // Add to queuedOrder and remove from order
+                queuedOrder.quantity += transferQuantity;
+                order.quantity -= transferQuantity;
+
+                // Update the work order in the queue
+                ProductionQueue[i] = queuedOrder;
+
+                // If the current order is depleted, break out of the loop
+                if (order.quantity <= 0) break;
             }
+        }
 
-            m.elapsedTime = 0;
-            m.status = 0;  // Free the machine
-            
+        // If there's any remaining quantity, send it to inventory or next destination
+        if (order.quantity > 0)
+        {
+            sendToInventory(ref order);
+        }
+    }
 
-            ProductionQueue[m.orderIndex] = wo;
+    private int DetermineTransferQuantity(ref workOrder order, ref workOrder queuedOrder)
+    {
+        // Check if the queued order requires the color from the current order
+        if (order.c3index == queuedOrder.c1index)
+        {
+            return Math.Min(order.quantity, queuedOrder.requiredAQuantity - queuedOrder.currentAQuantity);
+        }
+        else if (order.c3index == queuedOrder.c2index)
+        {
+            return Math.Min(order.quantity, queuedOrder.requiredBQuantity - queuedOrder.currentBQuantity);
+        }
+        return 0; // No transfer needed if color indices don't match
+    }
 
-            ProductionQueue.RemoveAt(m.orderIndex);
-
-            m.orderIndex = -1;  // Unlink the machine from the work order
-            machines[i] = m;
-
-            // Adjust the orderIndex for all other machines
-            for (int j = 0; j < machines.Count; j++)
+    public void checkTrades(ref workOrder order)  //need to re-write trades
+    {
+        // Iterate through active trades to find trades waiting for this color
+        for (int i = 0; i < activeTrades.Count; i++)
+        {
+            Trade trade = activeTrades[i];
+            // Assuming we match trades by color index and there's a quantity to send
+            if (trade.sendColor == order.c3index && trade.sendQuantity > 0)
             {
-                Machine tempMachine = machines[j];
-                if (tempMachine.orderIndex > m.orderIndex)
+                // Determine the quantity that can be transferred
+                int transferQuantity = Math.Min(order.quantity, trade.sendQuantity);  //pull as much of the order as possible.
+
+                trade.sendQuantity -= transferQuantity;
+                order.quantity -= transferQuantity;
+
+                // Update the trade
+                activeTrades[i] = trade;
+
+                // If the current order is depleted, break out of the loop
+                if (order.quantity <= 0) break;
+            }
+        }
+
+        // If there's any remaining quantity, send it to inventory or next destination
+        if (order.quantity > 0)
+        {
+            sendToInventory(ref order);
+        }
+    }
+    public void checkJobs(ref workOrder order)
+    {
+        if(activeContracts.Count >= 0)
+        // Iterate through active contracts to find jobs waiting for this color
+        for (int i = 0; i < activeContracts.Count; i++)
+        {
+            Contract contract = activeContracts[i];
+            int index = order.c3index;
+            // Check if the contract requires this color and has an outstanding quantity
+            if (contract.requirements[index] > 0)
+            {
+                // Determine the quantity that can be fulfilled
+                int fulfillQuantity = Math.Min(order.quantity, contract.requirements[index]);
+                contract.requirements[index] -= fulfillQuantity;
+                order.quantity -= fulfillQuantity;
+
+                // Update the contract
+                activeContracts[i] = contract;
+
+                // If the contract is fulfilled, trigger any additional logic
+                if (contract.isFulfilled())
                 {
-                    tempMachine.orderIndex -= 1;
-                    machines[j] = tempMachine;
+                    Debug.Log("Contract Finished");
+                    // Contract fulfillment logic here
                 }
+
+                // If the current order is depleted, break out of the loop
+                if (order.quantity <= 0) break;
             }
         }
-        machines[i] = m;
+
+        // If there's any remaining quantity, send it to inventory
+        if (order.quantity > 0)
+        {
+            sendToInventory(ref order);
+        }
+    }
+
+    private void sendToInventory(ref workOrder order)
+    {
+        // Add remaining quantity to inventory
+        int index = order.c3index;
+        inventory[index] += order.quantity;
+        order.quantity = 0; // Clear the order quantity as it's now in inventory
+    }
+
+    public void machineIsComplete(ref Machine machine)
+    {
+        machine.elapsedTime += Time.deltaTime;
+
+        if (machine.elapsedTime >= machine.cycleTime)
+        {
+            if (machine.orderIndex >= 0 && machine.orderIndex < ProductionQueue.Count)
+            {
+                workOrder wo = ProductionQueue[machine.orderIndex];
+                // ... rest of the completion logic ...
+
+                // Remove the completed order from the queue
+                ProductionQueue.RemoveAt(machine.orderIndex);
+
+                // Adjust the orderIndex for all machines since the queue has changed
+                AdjustMachineOrderIndices(machine.orderIndex);
+
+                // Reset the machine's orderIndex to indicate it's no longer linked to an order
+                machine.orderIndex = -1;
+            }
+            else
+            {
+                // Handle invalid orderIndex case
+            }
+
+            // Reset machine status to idle
+            machine.status = MACHINE_IDLE;
+            machine.elapsedTime = 0f;
+        }
+    }
+
+    private void AdjustMachineOrderIndices(int removedOrderIndex)
+    {
+        // Iterate over all machines to update their orderIndex if it's affected by the removal
+        for (int i = 0; i < machines.Count; i++)
+        {
+            Machine currentMachine = machines[i];
+            if (currentMachine.orderIndex > removedOrderIndex)
+            {
+                // Decrement the orderIndex to account for the removed order
+                currentMachine.orderIndex--;
+                machines[i] = currentMachine; // Save the updated machine back to the list
+            }
+        }
     }
 
 
-
-    public void machineIsBroken(int i) //not setup yet
+    public void machineIsBroken(ref Machine machine) //not setup yet
     {
 
 
 
     }
 
-    public void machineIsRepairing(int i)  //not setup yet.
+    public void machineIsRepairing(ref Machine machine)  //not setup yet.
     {
 
 
@@ -1186,14 +1343,14 @@ public class LogicCenter : MonoBehaviour
         switch (color)
         {
             case 4:
-                return new workOrder(quantity, 1, 2, color);
+                return new workOrder(quantity, 1, 2, color,4);
             case 5:
-                return new workOrder(quantity, 2, 3, color);
+                return new workOrder(quantity, 1, 3, color,4);
             case 6:
-                return new workOrder(quantity, 1, 3, color);
+                return new workOrder(quantity, 2, 3, color,4);
             case 7:
                 int randomCase = ft.rollDice(1, 3);
-                return new workOrder(5, randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1, randomCase + 3, color);
+                return new workOrder(5, randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1, randomCase + 3, color,4);
             default:
                 return null;
         }
@@ -1212,18 +1369,18 @@ public class LogicCenter : MonoBehaviour
                 machines[i] = tempMachine; // Update the original struct in the collection
             }
         }
-
+        /*
         for (int i = 0; i < ProductionQueue.Count; i++)
         {
             workOrder wo = ProductionQueue[i];
 
-            // If the machine is actively working on a work order, increment its orderIndex
+            // If the wo is active, increment its orderIndex
             if (wo.isActive && wo.machineIndex >= 2)
             {
                 wo.machineIndex--;
-                ProductionQueue[i] = wo; // Update the original struct in the collection
+                ProductionQueue[i] = wo; // check in
             }
-        }
+        }*/
     }
 
 
@@ -1280,13 +1437,20 @@ public class LogicCenter : MonoBehaviour
             else
             {
                 if (maxSize > 1)
-                { 
-                    int removeIndex = ft.rollDice(1, maxSize);
-                    availableTrades.RemoveAt(removeIndex - 1);
+                {
+                    // Ensure the range for rollDice starts after the selectedTrade and ends at the last index
+                    int rangeStart = selectedTrade + 1;
+                    int rangeEnd = maxSize; // No need to subtract selectedTrade here
+                                            // Roll the dice for the range after the selected trade
+                    int removeIndex = rangeStart + ft.rollDice(0, rangeEnd - rangeStart) - 1; // Adjusted range for dice roll
+
+                    // Remove the trade at the calculated index
+                    availableTrades.RemoveAt(removeIndex); // No need to subtract one, as removeIndex is already in the correct range
                 }
             }
         }
     }
+
     public void selectTrade(int index)  ///used for the button
     {
         // Reset all tradeEntry colors to white
@@ -1313,27 +1477,34 @@ public class LogicCenter : MonoBehaviour
     public void acceptTrade()     // this is good clean code
     {
         // Check if a trade has been selected
+
         if (selectedTrade >= 0 && selectedTrade < availableTrades.Count)
         {
-            // Get the selected trade
-            Trade t = availableTrades[selectedTrade];
+            
+            Trade selected = availableTrades[selectedTrade];
+            int tradeColorIndex = selected.sendColor;
 
-            // Mark it as active
-            t.isActive = true;
-
-            // Add it to the list of active trades
-            activeTrades.Add(t);
-
-            // Remove it from the list of available trades
-            availableTrades.RemoveAt(selectedTrade);
-
-            // Reset the selectedTrade index
-            selectedTrade = -1;
-
-            // Reset all tradeEntry colors to white
-            for (int i = 0; i < tradeEntry.Length; i++)
+            if (inventory[tradeColorIndex] > selected.sendQuantity)  //if there's enough for the trade it does it, otherwise it doesn't.
             {
-                tradeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+                // Get the selected trade
+
+                // Mark it as active
+                selected.isActive = true;
+
+                // Add it to the list of active trades
+                activeTrades.Add(selected);
+
+                // Remove it from the list of available trades
+                availableTrades.RemoveAt(selectedTrade);
+
+                // Reset the selectedTrade index
+                selectedTrade = -1;
+
+                // Reset all tradeEntry colors to white
+                for (int i = 0; i < tradeEntry.Length; i++)
+                {
+                    tradeEntry[i].GetComponent<UnityEngine.UI.Image>().color = Color.white;
+                }
             }
         }
         else
@@ -1663,35 +1834,35 @@ public class LogicCenter : MonoBehaviour
     private void AssignOrderToMachine(int machineIndex, int orderIndex)
     {
         workOrder wo = ProductionQueue[orderIndex];
-        Machine m = machines[machineIndex];
+        Machine machine = machines[machineIndex];
 
         int c1Quantity = calculateAvailableQuantity(wo.c1index, wo.quantity); //Determine if there's enough in the inventory to run the order.
         int c2Quantity = calculateAvailableQuantity(wo.c2index, c1Quantity);
         c1Quantity = c2Quantity;
 
-        if(m.batchSize < wo.quantity) //This sets the number of cycles needed to produce the whole amount.
-            while(m.cycles*m.batchSize<wo.quantity)
+        if(machine.batchSize < wo.quantity) //This sets the number of cycles needed to produce the whole amount.
+            while(machine.productionCycles*machine.batchSize<wo.quantity)
             {
-                m.cycles++;
+                machine.productionCycles++;
             }
 
         if (c1Quantity == wo.quantity)  //it's a full order
         {
             wo.machineIndex = machineIndex; //sets the machine being used for the order.
-            m.orderIndex = orderIndex;  //sets the order being run for the machine
+            machine.orderIndex = orderIndex;  //sets the order being run for the machine
 
             ProductionQueue[orderIndex] = wo;
 
             wo.isActive = true;
 
-            m.assignOrder(wo);
-            inventory[m.c1] -= c1Quantity;
-            inventory[m.c2] -= c2Quantity;
-            m.loadMachine(c1Quantity, c2Quantity);
+            machine.assignOrder(wo);
+            inventory[machine.c1] -= c1Quantity;
+            inventory[machine.c2] -= c2Quantity;
+            machine.loadMachine(c1Quantity, c2Quantity);
 
         }
 
-        machines[machineIndex] = m;
+        machines[machineIndex] = machine;
         ProductionQueue[orderIndex] = wo;
     }
     private int calculateAvailableQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
@@ -1856,7 +2027,6 @@ public class LogicCenter : MonoBehaviour
         }
     }
     #endregion
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region painting

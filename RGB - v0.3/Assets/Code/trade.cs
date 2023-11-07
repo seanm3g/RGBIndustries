@@ -18,10 +18,12 @@ public struct Trade
     public float elapsedTime;
     public bool isActive;
 
+    public int quantity;
+
     public Trade(int t)
     {
         f = new();
-
+        quantity = 0;
         //cadence = 15*f.rollDice(1,4);
         //length = f.rollDice(1, 10);
         cadence = 1;
@@ -80,5 +82,14 @@ public struct Trade
             recieveQuantity += f.rollDice(1, 5);
         else
             recieveQuantity -= f.rollDice(1, 5);
+    }
+
+    public bool isFulfilled()
+    {
+
+        if (quantity >= sendQuantity) //if the order is full  
+            return true;
+        else
+            return false;
     }
 }

@@ -10,15 +10,22 @@ public struct Machine
 {
 
     public int type, durability, maxDurability, batchSize, cycleTime, Yield;
+    public float OEE;
+
     public int status; //0 = idle, 1 = loading, 2 = running, 3 = unloading, 4 = completed, 5 = broken, 6 = in maintenance, 7 = choked 8= TOTALED;
     public String name;
     public int c1, c2, c3, c1q, c2q, c3q;  //color 1, color 2, color 1 quantity, color 2 quantity.
     public int result;
-    public float elapsedTime;
+    
     public int orderIndex;
-    public float OEE;
-    public int cycles;
+   
+    public int productionCycles;
+    public int manufacturer;
 
+    public float elapsedTime;
+
+
+    FlavorText ft;
     private const int MACHINE_IDLE = 0;
     private const int MACHINE_LOADING = 1;
     private const int MACHINE_RUNNING = 2;
@@ -31,9 +38,10 @@ public struct Machine
 
     public Machine(String name, int type, int maxDurability, int batchSize, int cycleTime, int Yield)
     {
-        cycles = 0;
+        productionCycles = 0;
         result = 0;
         this.name = name;
+        
         this.type = type;
 
         this.maxDurability = maxDurability;
@@ -57,8 +65,12 @@ public struct Machine
 
         OEE = 0;
 
+        manufacturer = UnityEngine.Random.Range(1, 4);
+        ft = new FlavorText();
+
+        this.name = generateName();
         OEE = calculateOEE();
-        //Debug.Log("OEE: "+OEE);
+
     }
 
     public override string ToString()
@@ -85,9 +97,9 @@ public struct Machine
     }
     public void runMachine()
     {
-        if (cycles > 0)
+        if (productionCycles > 0)
         {
-            cycles--;
+            productionCycles--;
             status = MACHINE_RUNNING;
 
             if (durability > 0)
@@ -98,9 +110,6 @@ public struct Machine
             else status = 5;  //broken
         } 
         else result = c1q;  //add yield in, and recognize an order with still quanity       
-        
-       
-
 
     }
 
@@ -145,6 +154,33 @@ public struct Machine
         //Debug.Log("OEE: " + tempOEE);
 
         return tempOEE;
+    }
+
+
+    private string generateName()
+    {
+        string name = "";
+
+        switch(manufacturer)
+        {
+            case 1:
+                name += "N";
+                break;
+            case 2:
+                name += "E";
+                break;
+            case 3:
+                name += "S";
+                break;
+            case 4:
+                name += "W";
+                break;
+        }
+        name += "-";
+
+        int productionRate = (int)(batchSize / cycleTime * Yield)/100;
+        name += productionRate.ToString();
+        return name;
     }
 
 

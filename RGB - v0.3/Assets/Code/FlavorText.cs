@@ -607,11 +607,32 @@ public class FlavorText
     public int highestDice(int dice, int sides)
     {
         int highest=0;
+        int count = 1;
 
         for(int i = 0;i<dice;i++)
-            if(sides > highest)
-                highest = sides;
+            if (sides >= highest)
+            {
+                if (sides == highest && highest == 20)
+                    count++;
 
-        return highest;
+                highest = sides;
+            }
+
+        return highest * count;
+
+    }
+
+    public int rarity()
+    {
+        int roll = rollDice(1, 100);
+
+        if (roll > 90)
+            return 3;
+        else if (roll > 60)
+            return 2;
+        else 
+            return 1;
+
+
     }
 }

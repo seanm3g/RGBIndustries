@@ -27,25 +27,16 @@ public class Contract : MonoBehaviour
     }
     public void setRequirements(int[,] pixelValues)
     {
-        for (int i = 0; i < requirements.Length; i++)  //init to zero
-        {
+        for (int i = 0; i < requirements.Length; i++)
             requirements[i] = 0;
-        }
+        if (pixelValues.GetLength(0) > 0)
+            for (int i = 0; i < pixelValues.GetLength(0); i++)
+                for (int j = 0; j < pixelValues.GetLength(1); j++)
+                    requirements[pixelValues[i, j]]++;  //adds quantity per pixel in the image.
 
-        for (int x = 0; x < pixelValues.GetLength(0); x++)
-            for (int y = 0; y < pixelValues.GetLength(1); y++)
-                switch (pixelValues[x,y])
-                {
-                    case 1: requirements[1]++; break;
-                    case 2: requirements[2]++; break;
-                    case 3: requirements[3]++; break;
-                    case 4: requirements[4]++; break;
-                    case 5: requirements[5]++; break;
-                    case 6: requirements[6]++; break;
-                    case 7: requirements[7]++; break;
-                }
 
-        updateTotal();
+
+    updateTotal();
         updateTotalValue();
     }
     public void fillRequirements()
@@ -73,7 +64,7 @@ public class Contract : MonoBehaviour
             lc.inventory[i] = inv;
         }
     }
-    public void convertToWorkOrder()
+    public void convertToWorkOrder()  //this is maybe getting truncated?
     {
         for (int i = 4; i < requirements.Length; i++)
         {
@@ -89,19 +80,19 @@ public class Contract : MonoBehaviour
                 switch (i)
                 {
                     case 4:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 2, 4));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 2, 4,3));
                         break;
                     case 5:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 3, 5));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 3, 5,3));
                         break;
                     case 6:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 2, 3, 6));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 2, 3, 6,3));
                         break;
                     case 7:
                         int randomCase = ft.rollDice(1, 3);
                         int param1 = randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1;
                         int param2 = randomCase + 3;
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], param1, param2, 7));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], param1, param2, 7,3));
                         break;
                 }
             }
@@ -140,6 +131,14 @@ public class Contract : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public bool isFulfilled()
+    {
+        if (totalRequirements == 0)
+            return true;
+        else 
+            return false;
     }
 
 }

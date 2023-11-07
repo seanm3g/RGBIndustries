@@ -4,9 +4,14 @@ using UnityEngine.UI;
 using System.IO;
 using UnityEditor.Experimental.GraphView;
 using Unity.VisualScripting;
+using UnityEngine.UIElements;
 
 public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
+
+    public LogicCenter lc = new LogicCenter();
+    ColorLibrary ColorLibrary = new ColorLibrary();
+
     public RawImage canvasImage;
     private Texture2D canvasTexture;
     private Color[] pixels;  //This is the actual canvas texture
@@ -19,8 +24,7 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
 
     FlavorText ft = new();
 
-    public LogicCenter lc = new LogicCenter();
-    ColorLibrary ColorLibrary = new ColorLibrary();
+
 
     private int canvasWidth = 500;  // 50 pixels * 10 width each
     private int canvasHeight = 500; // 50 pixels * 10 height each
@@ -138,10 +142,22 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         canvasTexture.Apply();
 
         //c.setRequirements(pixelValues);
-        //updateHueQuantities();
+        updateHueQuantities();
         updateHueUI();
         updateJobStats();
         //available();
+    }
+
+    public void updateHueQuantities()
+    {
+        for (int i = 0; i < quantity.Length; i++)
+            quantity[i] = 0;
+        if(pixelValues.GetLength(0) > 0)
+            for (int i = 0; i < pixelValues.GetLength(0); i++)
+                for (int j = 0; j < pixelValues.GetLength(1); j++)
+                    quantity[pixelValues[i, j]]++;  //adds quantity per pixel in the image.
+
+
     }
     public void updateJobStats() //updates the UI
     {
@@ -163,10 +179,58 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
     }    
     public void updateHueUI()  //updates UI
     {
+        
         int length = lc.hueQuantitiesText.Length;
         for (int i = 1; i < length;i++)  //we're not using 0 for anything because it's ore and not a value in this system.
+        {
+
+           // Debug.Log("i:"+i+"Quantity:"+quantity[i]);
+
             if (lc.hueQuantitiesText[i] != null)
-                lc.hueQuantitiesText[i].text = quantity[i].ToString()+"x";
+                lc.hueQuantitiesText[i].text = quantity[i].ToString() + "x";
+        }
+            
+    }
+
+    public void convertToWorkOrder()
+    {
+        Contract c = new Contract();
+        c.setRequirements(pixelValues);
+        lc.activeContracts.Add(c);
+        c.convertToWorkOrder();
+
+        /*
+        for (int i = 4; i < quantity.Length; i++)
+        {
+            if (quantity[i] < 3)
+            {
+                //if(i == lc.chosenColor)
+                //wait
+                //else
+                //tradeOrder(i,quantity[i]);
+            }
+            else if (quantity[i] > 3)  //this shouldn't be calling production queue.  It should call a method in LC
+            {
+                switch (i)
+                {
+                    case 4:
+                        lc.ProductionQueue.Add(new workOrder(quantity[i], 1, 2, 4, 3));
+                        break;
+                    case 5:
+                        lc.ProductionQueue.Add(new workOrder(quantity[i], 1, 3, 5, 3));
+                        break;
+                    case 6:
+                        lc.ProductionQueue.Add(new workOrder(quantity[i], 2, 3, 6, 3));
+                        break;
+                    case 7:
+                        int randomCase = ft.rollDice(1, 3);
+                        int param1 = randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1;
+                        int param2 = randomCase + 3;
+                        lc.ProductionQueue.Add(new workOrder(quantity[i], param1, param2, 7, 3));
+                        break;
+                }
+            }
+        }*/
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
