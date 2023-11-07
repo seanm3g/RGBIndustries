@@ -6,7 +6,7 @@ using UnityEngine;
 public class Contract : MonoBehaviour
 {
     #region variables
-    public LogicCenter lc = new LogicCenter();
+    public LogicCenter lc;
     public FlavorText ft = new FlavorText();
 
     public int[] requirements;
@@ -36,7 +36,7 @@ public class Contract : MonoBehaviour
 
 
 
-    updateTotal();
+        updateTotal();
         updateTotalValue();
     }
     public void fillRequirements()
@@ -64,40 +64,47 @@ public class Contract : MonoBehaviour
             lc.inventory[i] = inv;
         }
     }
-    public void convertToWorkOrder()  //this is maybe getting truncated?
+    public void convertToWorkOrder() //this creates a local copy of LC for some reason
     {
-        for (int i = 4; i < requirements.Length; i++)
+        for (int i = 1; i < requirements.Length; i++)
         {
-            if (requirements[i] < 3) 
+            // Correcting the logic to subtract the requirements from inventory when enough items are available
+            if (i <= 3)
             {
-                //if(i == lc.chosenColor)
-                    //wait
-                //else
-                    //tradeOrder(i,requirements[i]);
+                if (lc.inventory[i] >= requirements[i])  // Check if you have enough inventory to meet the requirements
+                {
+                    lc.inventory[i] -= requirements[i];  // Subtract requirements from inventory
+                    requirements[i] = 0;  // Set the requirements for this item to 0 since it's been fulfilled
+                }
             }
-            else if (requirements[i] > 3)  //this shouldn't be calling production queue.  It should call a method in LC
+            else // This can be just 'else' since the condition is the direct opposite of 'if (i <= 3)'
             {
                 switch (i)
                 {
+                    // Adding work orders to the production queue
                     case 4:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 2, 4,3));
+                        Debug.Log("Before PQ update: " + lc.ProductionQueue.Count);
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 2, 4, 3));
+                        Debug.Log("After PQ update: " + lc.ProductionQueue.Count);
                         break;
                     case 5:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 3, 5,3));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 3, 5, 3));
                         break;
                     case 6:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 2, 3, 6,3));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], 2, 3, 6, 3));
                         break;
                     case 7:
                         int randomCase = ft.rollDice(1, 3);
                         int param1 = randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1;
                         int param2 = randomCase + 3;
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], param1, param2, 7,3));
+                        lc.ProductionQueue.Add(new workOrder(requirements[i], param1, param2, 7, 3));
                         break;
+                        // No default case is necessary if all cases are covered
                 }
             }
         }
     }
+
     public void updateTotal()
     {
         totalRequirements = 0;

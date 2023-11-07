@@ -178,8 +178,21 @@ public struct Machine
         }
         name += "-";
 
-        int productionRate = (int)(batchSize / cycleTime * Yield)/100;
-        name += productionRate.ToString();
+        int productionRate = (int)Math.Round((double)batchSize / cycleTime * Yield);  //this is garbage
+
+        int maxcycles = maxDurability / 2 * (1 + maxDurability);
+
+        int serialNum = productionRate * maxcycles;
+
+        name += serialNum.ToString();
+
+        switch(ft.rarity())
+        {
+            case 1: name += "c"; break;
+            case 2: name += "u"; break;
+            case 3: name += "r"; break;
+        }
+        
         return name;
     }
 

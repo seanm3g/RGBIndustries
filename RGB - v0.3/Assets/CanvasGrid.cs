@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
 
-    public LogicCenter lc = new LogicCenter();
+    public LogicCenter lc;
     ColorLibrary ColorLibrary = new ColorLibrary();
 
     public RawImage canvasImage;
@@ -194,12 +194,13 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
 
     public void convertToWorkOrder()
     {
-        Contract c = new Contract();
-        c.setRequirements(pixelValues);
-        lc.activeContracts.Add(c);
-        c.convertToWorkOrder();
+        Contract contract = new Contract();
+        contract.setRequirements(pixelValues);
+        lc.activeContracts.Add(contract);
 
-        /*
+    
+
+        
         for (int i = 4; i < quantity.Length; i++)
         {
             if (quantity[i] < 3)
@@ -230,7 +231,7 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
                         break;
                 }
             }
-        }*/
+        }
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
