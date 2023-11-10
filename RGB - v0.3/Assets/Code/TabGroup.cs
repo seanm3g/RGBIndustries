@@ -64,7 +64,7 @@ public class TabGroup : MonoBehaviour
         updateColor();
 
         index = button.transform.GetSiblingIndex();
-        for(int i = 0; i<objectsToSwap.Count; i++)
+        for(int i = 0; i<objectsToSwap.Count; i++)  //this updates things
         {
             if(i==index)
             {

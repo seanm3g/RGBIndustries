@@ -35,7 +35,6 @@ public struct Machine
     private const int MACHINE_IN_MAINTENANCE = 6;
     private const int MACHINE_CHOKED = 7;
     
-
     public Machine(String name, int type, int maxDurability, int batchSize, int cycleTime, int Yield)
     {
         productionCycles = 0;
@@ -72,13 +71,11 @@ public struct Machine
         OEE = calculateOEE();
 
     }
-
     public override string ToString()
     {
         String strng = $"Machine Name: {name}\n status: {status}\n Order Index: {orderIndex}\n Durability: {durability}\n Batch Size: {batchSize}\n Cycle Time: {cycleTime}\n Yield: {Yield}";
         return strng;
     }
-
     public void assignOrder(workOrder wo)
     {
         c1 = wo.c1index; //set the first ingredient index
@@ -86,7 +83,6 @@ public struct Machine
         c3 = wo.c3index; //set the desired result index
         c3q = wo.quantity; //set the desired quantity
     }
-
     public void loadMachine(int c1q, int c2q)
     {
 
@@ -112,7 +108,6 @@ public struct Machine
         else result = c1q;  //add yield in, and recognize an order with still quanity       
 
     }
-
     public int unloadMachine()
     {
         int sendOff = result;
@@ -121,7 +116,6 @@ public struct Machine
         return sendOff;
 
     }
-
     void repair()
     {
         status = 6;
@@ -139,7 +133,6 @@ public struct Machine
         status = 0;
         orderIndex = -1;
     }
-
     public float calculateOEE()
     {
         //Debug.Log("Are we calcuating OEE?");
@@ -155,9 +148,7 @@ public struct Machine
 
         return tempOEE;
     }
-
-
-    private string generateName()
+    private string generateName()  //machine name generation v2
     {
         string name = "";
 

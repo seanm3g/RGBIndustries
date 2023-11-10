@@ -3,43 +3,63 @@ using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-public class Contract : MonoBehaviour
+public class Contract
 {
     #region variables
     public LogicCenter lc;
     public FlavorText ft = new FlavorText();
 
     public int[] requirements;
-    public int totalRequirements;
-    public int totalValue;
+    public int currentRequirements;  //what is the remaining pixels required
+    public int currentCost;  //what is remaining cost to be filled?
+
+    public int totalRequirements;  //what is the total number of pixels required
+    public int totalCost;  //what is the total cost of those pixels?
+
+    
+
+    public string clientName;
+    public string contractName;
+    public int status = 0;
+    public int progress;
     #endregion
 
     public Contract()
     {
+        clientName = ft.companyNames[ft.rollDice(1,ft.companyNames.Length)-1];
+        contractName = ft.contractName[ft.rollDice(1, ft.contractName.Length) - 1];
         requirements = new int[8];
 
         for (int i = 0; i < requirements.Length; i++)  //init to zero
         {
             requirements[i] = -1;
         }
-
-        
     }
     public void setRequirements(int[,] pixelValues)
     {
         for (int i = 0; i < requirements.Length; i++)
             requirements[i] = 0;
-        if (pixelValues.GetLength(0) > 0)
-            for (int i = 0; i < pixelValues.GetLength(0); i++)
-                for (int j = 0; j < pixelValues.GetLength(1); j++)
-                    requirements[pixelValues[i, j]]++;  //adds quantity per pixel in the image.
 
 
+        for (int i = 0; i < pixelValues.GetLength(0); i++)
+            for (int j = 0; j < pixelValues.GetLength(1); j++)
+                requirements[pixelValues[i, j]]++;  //adds quantity per pixel in the image.
 
+
+        setTotal();
+        setTotalCost();
         updateTotal();
-        updateTotalValue();
+        updateCurrentCost();
     }
-    public void fillRequirements()
+
+    public void setTotal()
+    {
+        totalRequirements = 0;
+
+        for (int i = 1; i < requirements.Length; i++) //start at one to remove canvas color
+            totalRequirements += requirements[i];
+    }
+    public void fillRequirements()  //this isn't getting called anywhere.
     {
         for (int i = 0;i < requirements.Length;i++)
         {
@@ -64,57 +84,17 @@ public class Contract : MonoBehaviour
             lc.inventory[i] = inv;
         }
     }
-    public void convertToWorkOrder() //this creates a local copy of LC for some reason
-    {
-        for (int i = 1; i < requirements.Length; i++)
-        {
-            // Correcting the logic to subtract the requirements from inventory when enough items are available
-            if (i <= 3)
-            {
-                if (lc.inventory[i] >= requirements[i])  // Check if you have enough inventory to meet the requirements
-                {
-                    lc.inventory[i] -= requirements[i];  // Subtract requirements from inventory
-                    requirements[i] = 0;  // Set the requirements for this item to 0 since it's been fulfilled
-                }
-            }
-            else // This can be just 'else' since the condition is the direct opposite of 'if (i <= 3)'
-            {
-                switch (i)
-                {
-                    // Adding work orders to the production queue
-                    case 4:
-                        Debug.Log("Before PQ update: " + lc.ProductionQueue.Count);
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 2, 4, 3));
-                        Debug.Log("After PQ update: " + lc.ProductionQueue.Count);
-                        break;
-                    case 5:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 1, 3, 5, 3));
-                        break;
-                    case 6:
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], 2, 3, 6, 3));
-                        break;
-                    case 7:
-                        int randomCase = ft.rollDice(1, 3);
-                        int param1 = randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1;
-                        int param2 = randomCase + 3;
-                        lc.ProductionQueue.Add(new workOrder(requirements[i], param1, param2, 7, 3));
-                        break;
-                        // No default case is necessary if all cases are covered
-                }
-            }
-        }
-    }
-
     public void updateTotal()
     {
-        totalRequirements = 0;
+        currentRequirements = 0;
 
-        for (int i = 0; i < requirements.Length; i++)
-            totalRequirements += requirements[i];
+        for (int i = 1; i < requirements.Length; i++) //start at one to remove canvas color
+            currentRequirements += requirements[i];
     }
-    public void updateTotalValue()
+
+    public void setTotalCost()
     {
-        totalValue = 0;
+        currentCost = 0;
         int valueMultiplier = 1;
 
         for (int i = 0; i < requirements.Length; i++)
@@ -125,7 +105,23 @@ public class Contract : MonoBehaviour
                 valueMultiplier = 2;
             else valueMultiplier = 3;
 
-            totalValue += requirements[i] * valueMultiplier;
+            currentCost += requirements[i] * valueMultiplier;
+        }
+    }
+    public void updateCurrentCost()
+    {
+        currentCost = 0;
+        int valueMultiplier = 1;
+
+        for (int i = 0; i < requirements.Length; i++)
+        {
+            if (i < 4)
+                valueMultiplier = 1;
+            else if (i < 7)
+                valueMultiplier = 2;
+            else valueMultiplier = 3;
+
+            currentCost += requirements[i] * valueMultiplier;
         }         
     }
     public bool isComplete()
@@ -138,14 +134,6 @@ public class Contract : MonoBehaviour
             }
         }
         return true;
-    }
-
-    public bool isFulfilled()
-    {
-        if (totalRequirements == 0)
-            return true;
-        else 
-            return false;
     }
 
 }

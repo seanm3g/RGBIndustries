@@ -187,10 +187,22 @@ public class LogicCenter : MonoBehaviour
 
     public List<Contract> availableContracts = new List<Contract>();
     public List<Contract> activeContracts = new List<Contract>();
+    public CanvasGrid canvasGrid;
+
+    public GameObject paintCanvasGO;  //assigned in Unity
+    public GameObject contractGO;  //assigned in Unity
+
+    public GameObject[] contractEntry = new GameObject[8];
+    public Text[] contractClientNameText = new UnityEngine.UI.Text[8];
+    public Text[] contractNameText = new UnityEngine.UI.Text[8];
+    public Text[] contractStatusText = new UnityEngine.UI.Text[8];
+    public Text[] contractProgressText = new UnityEngine.UI.Text[8];
+
     #endregion
 
     #region costs
     float expenseElapsedTime = 0;
+    
     #endregion
 
     #endregion
@@ -200,7 +212,7 @@ public class LogicCenter : MonoBehaviour
     
     void Start()
     {
-        setupGame(1,3,5,5,100);  //factory, machines, employees, Production Queue, starting quantity
+        setupGame(1,3,5,0,0);  //factory, machines, employees, Production Queue, starting quantity
     }
     public void setupGame(int factory,int machines, int employees, int queue, int inventory)
     {
@@ -224,6 +236,7 @@ public class LogicCenter : MonoBehaviour
         setupRandomEvents();
 
         setupPainting();
+        setupContracts();
    
     }
     #endregion
@@ -489,11 +502,22 @@ public class LogicCenter : MonoBehaviour
         for (int i = 0; i < hueQuantitiesText.Length; i++)
         {
             int index = hueQuantitiesText.Length - i - 1;
-            hueQuantitiesText[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/paint canvas/quantity/Text (Legacy) ("+index+")").GetComponent<Text>();
+            hueQuantitiesText[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/PAINT CANVAS/paint canvas/quantity/Text (Legacy) ("+index+")").GetComponent<Text>();
             hueQuantitiesText[i].text = "0x";
         }
 
-        pictureStats = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/paint canvas/TOTAL").GetComponent<Text>();
+        pictureStats = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/PAINT CANVAS/paint canvas/TOTAL").GetComponent<Text>();
+        paintCanvasGO = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/PAINT CANVAS");
+        contractGO = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/CONTRACT");
+    }
+
+    public void setupContracts()
+    {
+
+        for(int i = 0;i<contractEntry.Length;i++)
+        {
+            contractEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/CONTRACT/CONTRACT LIST/CONTRACT ENTRY ("+i+")");
+        }
     }
 
     #endregion
@@ -521,6 +545,8 @@ public class LogicCenter : MonoBehaviour
         runMarket();
 
         runRandomEvents();
+
+        runContracts();
 
         updateUI();
 
@@ -838,6 +864,8 @@ public class LogicCenter : MonoBehaviour
         machine.elapsedTime += Time.deltaTime;
 
         if (machine.elapsedTime >= machine.cycleTime)
+
+            Debug.Log("LOADING - ACTIVE CONTRACTS:" + activeContracts.Count);
         {
             machine.elapsedTime = 0f;
             machine.status = MACHINE_RUNNING; // Assuming MACHINE_RUNNING is a constant or static readonly field
@@ -862,6 +890,8 @@ public class LogicCenter : MonoBehaviour
         if (machine.elapsedTime >= machine.cycleTime)
         {
             workOrder order = ProductionQueue[machine.orderIndex];
+
+            Debug.Log("UNLOADING - ACTIVE CONTRACTS:" + activeContracts.Count);
 
             workOrderDestination(ref order);
             
@@ -967,17 +997,25 @@ public class LogicCenter : MonoBehaviour
     }
     public void checkJobs(ref workOrder order)
     {
-        if(activeContracts.Count >= 0)
-        // Iterate through active contracts to find jobs waiting for this color
+        Debug.Log("Do we check jobs?");
+        Debug.Log("(CHECK JOBS) ACTIVE CONTRACTS:"+activeContracts.Count);
+
+        if (activeContracts.Count >= 0)// Iterate through active contracts to find jobs waiting for this color
         for (int i = 0; i < activeContracts.Count; i++)
         {
             Contract contract = activeContracts[i];
             int index = order.c3index;
-            // Check if the contract requires this color and has an outstanding quantity
-            if (contract.requirements[index] > 0)
+                // Check if the contract requires this color and has an outstanding quantity
+
+                Debug.Log("order c3index:" + index);
+                Debug.Log("Do we get inside the loop? I:" + i);
+                Debug.Log("REQUIREMENTS:" + contract.requirements[index]);
+                if (contract.requirements[index] > 0)
             {
-                // Determine the quantity that can be fulfilled
-                int fulfillQuantity = Math.Min(order.quantity, contract.requirements[index]);
+
+                    Debug.Log("Do we get inside requirements? I:" + i);
+                    // Determine the quantity that can be fulfilled
+                    int fulfillQuantity = Math.Min(order.quantity, contract.requirements[index]);
                 contract.requirements[index] -= fulfillQuantity;
                 order.quantity -= fulfillQuantity;
 
@@ -985,10 +1023,12 @@ public class LogicCenter : MonoBehaviour
                 activeContracts[i] = contract;
 
                 // If the contract is fulfilled, trigger any additional logic
-                if (contract.isFulfilled())
+                if (contract.isComplete())
                 {
                     Debug.Log("Contract Finished");        /////////////////This needs work
-                    // Contract fulfillment logic here
+                                                            // Contract fulfillment logic here
+                    canvasGrid.clearCanvas();
+                    activeContracts.RemoveAt(i);
                 }
 
                 // If the current order is depleted, break out of the loop
@@ -1489,8 +1529,6 @@ public class LogicCenter : MonoBehaviour
         UpdateMachineUI();
         UpdateEmployeeUI();
         UpdateTradeUI();
-
-        Debug.Log("active contracts: "+activeContracts.Count);
     }
     public void UpdateInventoryUI()
     {
@@ -1678,11 +1716,7 @@ public class LogicCenter : MonoBehaviour
             else //unassigned
             {
                 employeeEntry[i].SetActive(false);
-                employeeEntryNameText[i].text = "";
-                employeeJobText[i].text = "";
-                employeeStatusText[i].text = "";
-                employeeHobbyText[i].text = "";
-                employeeAgeText[i].text = "";
+
 
             }
         }
@@ -1740,6 +1774,23 @@ public class LogicCenter : MonoBehaviour
             {
                 activeTradeEntry[i].SetActive(false); 
             }
+        }
+    }
+
+    public void UpdateContractUI()
+    {
+        for(int i = 0;i<contractEntry.Length;i++)
+        {
+
+            if (i < activeContracts.Count)
+            {
+                contractClientNameText[i].text = activeContracts[i].clientName.ToString();
+                contractNameText[i].text = activeContracts[i].contractName.ToString();
+                contractStatusText[i].text = activeContracts[i].status.ToString();
+                contractProgressText[i].text = activeContracts[i].progress.ToString();
+            }
+            else
+                contractEntry[i] = null;
         }
     }
     #endregion
@@ -1974,6 +2025,100 @@ public class LogicCenter : MonoBehaviour
     public void setPaintColor(int i)
     {
         chosenPaintColor = i;
+    }
+
+    public void convertToContract()
+    {
+        Contract c = new Contract();
+        c.setRequirements(canvasGrid.pixelValues); // Assuming pixelValues is directly assignable to requirements
+        Debug.Log("c cyan req:"+c.requirements[6]);
+        // Process inventory and requirements
+        processInventory(ref c, inventory);
+
+
+        // Remove fully satisfied contracts
+        if (c.totalRequirements == 0)
+        {
+            activeContracts.Remove(c);
+        }
+        Debug.Log("(pre)ACTIVE CONTRACTS: " + activeContracts.Count);
+        activeContracts.Add(c);
+        Debug.Log("Contract Requirements:"+activeContracts[0].totalRequirements);
+        Debug.Log("cyan Requirements:" + activeContracts[0].requirements[6]);
+        Debug.Log("(post)ACTIVE CONTRACTS: " + activeContracts.Count);
+    }
+
+    // Helper method to process inventory against requirements
+    private void processInventory(ref Contract c, int[] inventory)
+    {
+        for (int i = 1; i < c.requirements.Length; i++)
+        {
+            if (c.requirements[i] <= inventory[i])
+            {
+                // If inventory can cover the requirements, subtract and reset requirement
+                inventory[i] -= c.requirements[i];
+                c.requirements[i] = 0;
+            }
+            else
+            {
+                // If inventory can't cover, add a workOrder for the shortfall and reset inventory
+                int shortfall = c.requirements[i] - inventory[i]; // Calculate the shortfall
+                c.requirements[i] = 0; // Requirement is set to zero as it will now be processed by the work order
+                inventory[i] = 0; // Inventory is depleted for this item
+                ProductionQueue.Add(generateWorkOrder(shortfall, i)); // Add only the shortfall amount to the production queue
+            }
+        }
+    }
+
+    // Helper method to generate a work order based on shortfall
+    private workOrder generateWorkOrder(int shortfall, int index)
+    {
+        // This method now only takes the shortfall, which is the amount needed to be produced
+        switch (index)
+        {
+            case 4:
+                return new workOrder(shortfall, 1, 2, 4, 3);
+            case 5:
+                return new workOrder(shortfall, 1, 3, 5, 3);
+            case 6:
+                return new workOrder(shortfall, 2, 3, 6, 3);
+            case 7:
+                int randomCase = ft.rollDice(1, 3);
+                int param1 = randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1;
+                int param2 = randomCase + 3;
+                return new workOrder(shortfall, param1, param2, 7, 3);
+            default:
+                // Handle default case or throw an exception if index is out of expected range
+                throw new ArgumentException("Invalid index for work order generation");
+        }
+    }
+
+    public void openCanvas()
+    {
+        paintCanvasGO.SetActive(true);
+        contractGO.SetActive(false);
+    }
+
+    public void openContracts()
+    {
+        paintCanvasGO.SetActive(false);
+        contractGO.SetActive(true);
+    }
+
+    #endregion
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Contracts
+
+    public void runContracts()  //check if there are contracts to update
+    { 
+        for(int i = 0;i<activeContracts.Count;i++)
+        {
+            Contract c = activeContracts[i];
+
+            //c.requirements[i];
+        }
+        
     }
     #endregion
 }

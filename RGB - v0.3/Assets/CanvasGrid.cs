@@ -16,15 +16,14 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
     private Texture2D canvasTexture;
     private Color[] pixels;  //This is the actual canvas texture
 
-    private int[,] pixelValues;  //This is the grid of pixel colors.
-    private int[] quantity = new int[8];
-    private Contract c;
-    
+    public int[,] pixelValues;  //This is the grid of pixel colors.
+    public int[] quantity = new int[8];
+    private Contract contract;
+
+
     public float requiredPixels;  //This is the amount of additional pixels required to make this picture.
 
     FlavorText ft = new();
-
-
 
     private int canvasWidth = 500;  // 50 pixels * 10 width each
     private int canvasHeight = 500; // 50 pixels * 10 height each
@@ -35,7 +34,7 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         //init the quantity of each pixel
         quantity = new int[8];
 
-        c = new();
+         contract = new();
 
         for (int i = 0; i < quantity.Length; i++)  //init to zero
         {
@@ -161,9 +160,18 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
     }
     public void updateJobStats() //updates the UI
     {
-        int total = c.totalRequirements;
-        int totalValue = c.totalValue;
+        int total = updateTotal();
+        int totalValue = 15;
         float valueDensity = 0f;
+
+        Debug.Log("total:"+total);
+        Debug.Log("totalValue:" + totalValue);
+
+        if (lc.activeContracts.Count>0)
+        {
+            total = updateTotal();
+            totalValue = lc.activeContracts[0].totalCost;
+        }
 
         
         if (total > 0) { 
@@ -238,7 +246,7 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
     public float available()  //what % of the image do you have the resources to make?
     {
         requiredPixels = 0;
-        float total = c.totalValue;
+        float total = contract.currentCost;
 
         for (int i = 0; i < quantity.Length; i++)  //if you have enough
         {
@@ -270,5 +278,16 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         }
 
         return t;
+    }
+
+    public int updateTotal()
+    {
+        int totalPixels = 0;
+
+        for (int i = 1; i < quantity.Length; i++)
+            totalPixels += quantity[i];
+
+
+        return totalPixels;
     }
 }
