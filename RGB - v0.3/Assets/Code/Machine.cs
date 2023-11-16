@@ -24,7 +24,6 @@ public struct Machine
 
     public float elapsedTime;
 
-
     FlavorText ft;
     private const int MACHINE_IDLE = 0;
     private const int MACHINE_LOADING = 1;

@@ -21,7 +21,7 @@ public class Contract
     public string clientName;
     public string contractName;
     public int status = 0;
-    public int progress;
+    public float progress;
     #endregion
 
     public Contract()

@@ -164,8 +164,6 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         int totalValue = 15;
         float valueDensity = 0f;
 
-        Debug.Log("total:"+total);
-        Debug.Log("totalValue:" + totalValue);
 
         if (lc.activeContracts.Count>0)
         {

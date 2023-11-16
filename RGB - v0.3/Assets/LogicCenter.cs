@@ -212,7 +212,7 @@ public class LogicCenter : MonoBehaviour
     
     void Start()
     {
-        setupGame(1,3,5,0,0);  //factory, machines, employees, Production Queue, starting quantity
+        setupGame(1,3,5,0,100);  //factory, machines, employees, Production Queue, starting quantity
     }
     public void setupGame(int factory,int machines, int employees, int queue, int inventory)
     {
@@ -236,7 +236,8 @@ public class LogicCenter : MonoBehaviour
         setupRandomEvents();
 
         setupPainting();
-        setupContracts();
+        setupContracts(0);
+        setupContractsMenu();
    
     }
     #endregion
@@ -511,13 +512,40 @@ public class LogicCenter : MonoBehaviour
         contractGO = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/CONTRACT");
     }
 
-    public void setupContracts()
+    public void setupContractsMenu()
     {
 
-        for(int i = 0;i<contractEntry.Length;i++)
+
+        for (int i = 0;i<contractEntry.Length;i++)
         {
+            
             contractEntry[i] = GameObject.Find("Canvas/UI LAYOUT/MAIN AREA/PAGE AREA/OEE Page/CONTRACT/CONTRACT LIST/CONTRACT ENTRY ("+i+")");
+
+            if (contractEntry[i] == null)
+            {
+                Debug.Log("This crashes!" + i);
+            }
+            else
+            {
+
+                contractClientNameText[i] = contractEntry[i].transform.Find("CLIENT NAME").GetComponent<Text>();
+                contractNameText[i] = contractEntry[i].transform.Find("CONTRACT NAME").GetComponent<Text>();
+                contractStatusText[i] = contractEntry[i].transform.Find("CONTRACT STATUS").GetComponent<Text>();
+                contractProgressText[i] = contractEntry[i].transform.Find("CONTRACT PROGRESS").GetComponent<Text>();
+            }
+
         }
+
+    }
+
+    public void setupContracts(int startingContracts)
+    {
+        for (int i = 0; i < startingContracts; i++)
+        {
+            Contract c = new Contract();
+            activeContracts.Add(c);
+        }
+
     }
 
     #endregion
@@ -538,15 +566,16 @@ public class LogicCenter : MonoBehaviour
 
         //these should live inside the above else statement and increment by 1 isntead of by timedelta.
         runMachines();   
-        
         runEmployees();
         runExpenses();
+
         runTrades();
         runMarket();
+        runContracts();
 
         runRandomEvents();
 
-        runContracts();
+        
 
         updateUI();
 
@@ -1008,7 +1037,7 @@ public class LogicCenter : MonoBehaviour
                 // Check if the contract requires this color and has an outstanding quantity
 
                 Debug.Log("order c3index:" + index);
-                Debug.Log("Do we get inside the loop? I:" + i);
+
                 Debug.Log("REQUIREMENTS:" + contract.requirements[index]);
                 if (contract.requirements[index] > 0)
             {
@@ -1529,6 +1558,7 @@ public class LogicCenter : MonoBehaviour
         UpdateMachineUI();
         UpdateEmployeeUI();
         UpdateTradeUI();
+        UpdateContractUI();
     }
     public void UpdateInventoryUI()
     {
@@ -1664,11 +1694,7 @@ public class LogicCenter : MonoBehaviour
                 //Debug.Log(m);
 
                 machineMenuNameText[i].text = m.name;
-
-
-
                 machineMenuStatusText[i].text = ft.machineStatuses[m.status];    /////////////
-
 
                 if (m.orderIndex == -1)
                     machineMenuAssignementText[i].text = "not assigned";
@@ -1697,7 +1723,6 @@ public class LogicCenter : MonoBehaviour
             }
 
         }
-
     }
     public void UpdateEmployeeUI()
     {
@@ -1776,21 +1801,23 @@ public class LogicCenter : MonoBehaviour
             }
         }
     }
-
     public void UpdateContractUI()
     {
         for(int i = 0;i<contractEntry.Length;i++)
         {
-
             if (i < activeContracts.Count)
             {
+                contractEntry[i].SetActive(true);
                 contractClientNameText[i].text = activeContracts[i].clientName.ToString();
                 contractNameText[i].text = activeContracts[i].contractName.ToString();
                 contractStatusText[i].text = activeContracts[i].status.ToString();
-                contractProgressText[i].text = activeContracts[i].progress.ToString();
+                contractProgressText[i].text = activeContracts[i].progress.ToString()+"%";
             }
             else
-                contractEntry[i] = null;
+            {
+                contractEntry[i].SetActive(false);
+            }
+         
         }
     }
     #endregion
@@ -2026,26 +2053,25 @@ public class LogicCenter : MonoBehaviour
     {
         chosenPaintColor = i;
     }
-
     public void convertToContract()
     {
         Contract c = new Contract();
         c.setRequirements(canvasGrid.pixelValues); // Assuming pixelValues is directly assignable to requirements
-        Debug.Log("c cyan req:"+c.requirements[6]);
         // Process inventory and requirements
         processInventory(ref c, inventory);
 
-
         // Remove fully satisfied contracts
-        if (c.totalRequirements == 0)
+        if (c.totalRequirements > 0)
         {
-            activeContracts.Remove(c);
+            c.clientName = "SEANYE";
+            c.contractName = "water bottle";
+            c.status = 1;
+            c.progress = c.currentRequirements / c.totalRequirements;
+            Debug.Log("progress: " + c.progress);
+            activeContracts.Add(c);
         }
-        Debug.Log("(pre)ACTIVE CONTRACTS: " + activeContracts.Count);
-        activeContracts.Add(c);
-        Debug.Log("Contract Requirements:"+activeContracts[0].totalRequirements);
-        Debug.Log("cyan Requirements:" + activeContracts[0].requirements[6]);
-        Debug.Log("(post)ACTIVE CONTRACTS: " + activeContracts.Count);
+
+            
     }
 
     // Helper method to process inventory against requirements
@@ -2053,19 +2079,20 @@ public class LogicCenter : MonoBehaviour
     {
         for (int i = 1; i < c.requirements.Length; i++)
         {
-            if (c.requirements[i] <= inventory[i])
+            if (c.requirements[i] <= inventory[i])   //if there is enough
             {
                 // If inventory can cover the requirements, subtract and reset requirement
                 inventory[i] -= c.requirements[i];
                 c.requirements[i] = 0;
             }
-            else
+            else  //if there is not enough
             {
                 // If inventory can't cover, add a workOrder for the shortfall and reset inventory
                 int shortfall = c.requirements[i] - inventory[i]; // Calculate the shortfall
                 c.requirements[i] = 0; // Requirement is set to zero as it will now be processed by the work order
                 inventory[i] = 0; // Inventory is depleted for this item
-                ProductionQueue.Add(generateWorkOrder(shortfall, i)); // Add only the shortfall amount to the production queue
+                if(i>3)
+                    ProductionQueue.Add(generateWorkOrder(shortfall, i)); // Add only the shortfall amount to the production queue
             }
         }
     }
@@ -2118,7 +2145,17 @@ public class LogicCenter : MonoBehaviour
 
             //c.requirements[i];
         }
-        
+    }
+
+    public void addContract(Contract c)  //it doesn't seem like this gets called.
+    {
+
+        c.clientName = "SEANYE";
+        c.contractName = "water bottle";
+        c.status = 1;
+        c.progress = c.currentRequirements / c.totalRequirements;
+        Debug.Log("progress: "+c.progress);
+        activeContracts.Add(c);
     }
     #endregion
 }
