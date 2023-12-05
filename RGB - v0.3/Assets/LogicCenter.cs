@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using TMPro;
@@ -212,10 +213,50 @@ public class LogicCenter : MonoBehaviour
     
     void Start()
     {
-        setupGame(1,3,5,0,100);  //factory, machines, employees, Production Queue, starting quantity
+        //setupGame(1,3,5,0,100);  //factory, machines, employees, Production Queue, starting quantity
+        setupGame(3);
     }
-    public void setupGame(int factory,int machines, int employees, int queue, int inventory)
+    
+    //public void setupGame(int factory,int machines, int employees, int queue, int inventory)
+    public void setupGame(int startMode)
     {
+        int inventory=0;
+        int employees=0;
+        int machines = 0;
+        int queue = 0;
+        int contracts = 0;
+      
+        switch(startMode)
+        {
+            case 0:      //default no help
+                inventory = 0;
+                employees = 0;
+                machines = 0;
+                queue = 0;
+                contracts = 0;
+                break;
+            case 1:   //starting game
+                inventory = 10;
+                employees = 0;
+                machines = 1;
+                queue = 10;
+                contracts = 0;
+                break;
+            case 2:   //queue game
+                inventory = 50;
+                employees = 2;
+                machines = 3;
+                queue = 25;
+                contracts = 0;
+                break;
+            case 3:   //cheating game
+                inventory = 100;
+                employees = 10;
+                machines = 10;
+                queue = 0;
+                contracts = 0;
+                break;
+        }
         
         setupMenu();
         setupInventory(inventory);
@@ -236,7 +277,8 @@ public class LogicCenter : MonoBehaviour
         setupRandomEvents();
 
         setupPainting();
-        setupContracts(0);
+
+        setupContracts(contracts);
         setupContractsMenu();
    
     }
@@ -305,7 +347,12 @@ public class LogicCenter : MonoBehaviour
     public void setupInventory(int init)  //init the inventory
     {
         for (int i = 0; i < inventory.Length; i++)
-            inventory[i] = init; //set everything to start as zero
+        {
+           // if (i < 4)
+                inventory[i] = init; //set everything to start as zero
+            //else inventory[i] = 0;
+        }    
+            
     }
     public void setupEmployees(int quantity)
     {
@@ -951,7 +998,7 @@ public class LogicCenter : MonoBehaviour
             break;
         }
     }
-    public void checkWorkOrders(ref workOrder order)
+    public void checkWorkOrders(ref workOrder order) //THIS IS USED FOR SEQUENCING TOGETHER
     {
         // Iterate through the production queue to find work orders waiting for this color
         for (int i = 0; i < ProductionQueue.Count; i++)
@@ -961,6 +1008,7 @@ public class LogicCenter : MonoBehaviour
             // Only proceed if the work order status indicates it's waiting for input
             if (queuedOrder.status == 5)
             {
+                Debug.Log("There is a work order to be filled");
                 // Determine the quantity that can be transferred based on the matching color index
                 int transferQuantity = DetermineTransferQuantity(ref order, ref queuedOrder);
 
@@ -1026,8 +1074,6 @@ public class LogicCenter : MonoBehaviour
     }
     public void checkJobs(ref workOrder order)
     {
-        Debug.Log("Do we check jobs?");
-        Debug.Log("(CHECK JOBS) ACTIVE CONTRACTS:"+activeContracts.Count);
 
         if (activeContracts.Count >= 0)// Iterate through active contracts to find jobs waiting for this color
         for (int i = 0; i < activeContracts.Count; i++)
@@ -1036,13 +1082,11 @@ public class LogicCenter : MonoBehaviour
             int index = order.c3index;
                 // Check if the contract requires this color and has an outstanding quantity
 
-                Debug.Log("order c3index:" + index);
 
                 Debug.Log("REQUIREMENTS:" + contract.requirements[index]);
                 if (contract.requirements[index] > 0)
             {
 
-                    Debug.Log("Do we get inside requirements? I:" + i);
                     // Determine the quantity that can be fulfilled
                     int fulfillQuantity = Math.Min(order.quantity, contract.requirements[index]);
                 contract.requirements[index] -= fulfillQuantity;
@@ -1811,7 +1855,9 @@ public class LogicCenter : MonoBehaviour
                 contractClientNameText[i].text = activeContracts[i].clientName.ToString();
                 contractNameText[i].text = activeContracts[i].contractName.ToString();
                 contractStatusText[i].text = activeContracts[i].status.ToString();
-                contractProgressText[i].text = activeContracts[i].progress.ToString()+"%";
+                //Debug.Log(activeContracts[i].progress);
+                contractProgressText[i].text = (activeContracts[i].progress * 100).ToString("00.0") + "%";
+
             }
             else
             {
@@ -2011,7 +2057,7 @@ public class LogicCenter : MonoBehaviour
             TransferOreToColorInventory();
         }
     }
-    private void TransferOreToColorInventory()
+    private void TransferOreToColorInventory()  //what does this do?
     {
         if (chosenColor >= 1 && chosenColor <= 3)
         {
@@ -2021,7 +2067,7 @@ public class LogicCenter : MonoBehaviour
         }
         else
         {
-            Debug.Log("Color not selected");
+            Debug.Log("Color not selected for harvesting");
         }
     }
     private void UpdatePixelText(int colorIndex)
@@ -2057,26 +2103,32 @@ public class LogicCenter : MonoBehaviour
     {
         Contract c = new Contract();
         c.setRequirements(canvasGrid.pixelValues); // Assuming pixelValues is directly assignable to requirements
-        // Process inventory and requirements
-        processInventory(ref c, inventory);
+
+
+        processInventory(ref c); //does this assign it correctly?
+        
+        c.updateCurrentRequirements();  //this one isn't working, but the one inside is.
+
+        c.updateCurrentCost();  //this doesn't.
+
 
         // Remove fully satisfied contracts
+
         if (c.totalRequirements > 0)
         {
+            //Debug.Log("requirements are above 0");
             c.clientName = "SEANYE";
             c.contractName = "water bottle";
             c.status = 1;
-            c.progress = c.currentRequirements / c.totalRequirements;
-            Debug.Log("progress: " + c.progress);
+            
             activeContracts.Add(c);
         }
-
-            
     }
 
     // Helper method to process inventory against requirements
-    private void processInventory(ref Contract c, int[] inventory)
+    private void processInventory(ref Contract c)  //should this get moved to the Contract class?
     {
+
         for (int i = 1; i < c.requirements.Length; i++)
         {
             if (c.requirements[i] <= inventory[i])   //if there is enough
@@ -2084,12 +2136,13 @@ public class LogicCenter : MonoBehaviour
                 // If inventory can cover the requirements, subtract and reset requirement
                 inventory[i] -= c.requirements[i];
                 c.requirements[i] = 0;
+
             }
             else  //if there is not enough
             {
                 // If inventory can't cover, add a workOrder for the shortfall and reset inventory
                 int shortfall = c.requirements[i] - inventory[i]; // Calculate the shortfall
-                c.requirements[i] = 0; // Requirement is set to zero as it will now be processed by the work order
+                c.requirements[i] -= inventory[i]; // Requirement is set to zero as it will now be processed by the work order
                 inventory[i] = 0; // Inventory is depleted for this item
                 if(i>3)
                     ProductionQueue.Add(generateWorkOrder(shortfall, i)); // Add only the shortfall amount to the production queue
@@ -2150,11 +2203,10 @@ public class LogicCenter : MonoBehaviour
     public void addContract(Contract c)  //it doesn't seem like this gets called.
     {
 
-        c.clientName = "SEANYE";
+        c.clientName = "SEANYEf";
         c.contractName = "water bottle";
         c.status = 1;
         c.progress = c.currentRequirements / c.totalRequirements;
-        Debug.Log("progress: "+c.progress);
         activeContracts.Add(c);
     }
     #endregion

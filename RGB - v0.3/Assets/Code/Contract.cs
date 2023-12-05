@@ -35,9 +35,10 @@ public class Contract
             requirements[i] = -1;
         }
     }
+
     public void setRequirements(int[,] pixelValues)
     {
-        for (int i = 0; i < requirements.Length; i++)
+        for (int i = 0; i < requirements.Length; i++)  //sets to zero
             requirements[i] = 0;
 
 
@@ -46,10 +47,18 @@ public class Contract
                 requirements[pixelValues[i, j]]++;  //adds quantity per pixel in the image.
 
 
+
+        //Debug.Log("CYAN REQUIREMENTS:" + requirements[6]);
+        //Debug.Log("MAGENTA REQUIREMENTS:" + requirements[5]);
+
+        updateCurrentRequirements();
         setTotal();
         setTotalCost();
-        updateTotal();
-        updateCurrentCost();
+
+        /*
+         * updateTotal();
+         updateCurrentCost();
+         */
     }
 
     public void setTotal()
@@ -84,17 +93,22 @@ public class Contract
             lc.inventory[i] = inv;
         }
     }
-    public void updateTotal()
+    public void updateCurrentRequirements()  //this isn't getting updated.
     {
         currentRequirements = 0;
 
-        for (int i = 1; i < requirements.Length; i++) //start at one to remove canvas color
+        for (int i = 1; i < requirements.Length; i++) //start at one to ignore canvas color
+        {
             currentRequirements += requirements[i];
+        }
+
+        if (totalRequirements > 0)
+            progress = 1-((float)currentRequirements / totalRequirements);
     }
 
-    public void setTotalCost()
+    public void setTotalCost()  //cost of the pixels (based on expense of making each pixel)
     {
-        currentCost = 0;
+        totalCost = 0;
         int valueMultiplier = 1;
 
         for (int i = 0; i < requirements.Length; i++)
@@ -105,7 +119,7 @@ public class Contract
                 valueMultiplier = 2;
             else valueMultiplier = 3;
 
-            currentCost += requirements[i] * valueMultiplier;
+            totalCost += requirements[i] * valueMultiplier;
         }
     }
     public void updateCurrentCost()
