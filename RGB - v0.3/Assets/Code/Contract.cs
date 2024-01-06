@@ -140,7 +140,7 @@ public class Contract
     }
     public bool isComplete()
     {
-        for(int i = 0; i < requirements.Length; i++)
+        for(int i = 1; i < requirements.Length; i++)
         {
             if (requirements[i] != 0)  //if any entry has some left
             {

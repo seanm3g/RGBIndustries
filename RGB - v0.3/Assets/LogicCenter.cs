@@ -991,12 +991,9 @@ public class LogicCenter : MonoBehaviour
             case 1: checkWorkOrders(ref order); break;
             case 2: checkTrades(ref order); break;
             case 3: checkJobs(ref order); break;
-
-            default:  //sends to inventory
-                int inventoryIndex = order.c3index;
-                inventory[inventoryIndex] += machines[order.machineIndex].unloadMachine(); // Assuming unloadMachine is a method that exists within the Machine struct
-            break;
         }
+        if(order.quantity>0)  //if there is any leftovers put them in the inventory
+            inventory[order.c3index] += machines[order.machineIndex].unloadMachine(); // Assuming unloadMachine is a method that exists within the Machine struct
     }
     public void checkWorkOrders(ref workOrder order) //THIS IS USED FOR SEQUENCING TOGETHER
     {
@@ -1030,7 +1027,7 @@ public class LogicCenter : MonoBehaviour
             sendToInventory(ref order);
         }
     }
-    private int DetermineTransferQuantity(ref workOrder order, ref workOrder queuedOrder)
+    private int DetermineTransferQuantity(ref workOrder order, ref workOrder queuedOrder) //support method for checkWorkOrders
     {
         // Check if the queued order requires the color from the current order
         if (order.c3index == queuedOrder.c1index)
@@ -1052,6 +1049,8 @@ public class LogicCenter : MonoBehaviour
             // Assuming we match trades by color index and there's a quantity to send
             if (trade.sendColor == order.c3index && trade.sendQuantity > 0)
             {
+
+                Debug.Log("There is a trade order to be filled");
                 // Determine the quantity that can be transferred
                 int transferQuantity = Math.Min(order.quantity, trade.sendQuantity);  //pull as much of the order as possible.
 
@@ -1082,27 +1081,32 @@ public class LogicCenter : MonoBehaviour
             int index = order.c3index;
                 // Check if the contract requires this color and has an outstanding quantity
 
-
-                Debug.Log("REQUIREMENTS:" + contract.requirements[index]);
+                
+                
+                
                 if (contract.requirements[index] > 0)
-            {
+                {
 
                     // Determine the quantity that can be fulfilled
                     int fulfillQuantity = Math.Min(order.quantity, contract.requirements[index]);
-                contract.requirements[index] -= fulfillQuantity;
-                order.quantity -= fulfillQuantity;
 
-                // Update the contract
-                activeContracts[i] = contract;
 
-                // If the contract is fulfilled, trigger any additional logic
-                if (contract.isComplete())
-                {
-                    Debug.Log("Contract Finished");        /////////////////This needs work
-                                                            // Contract fulfillment logic here
-                    canvasGrid.clearCanvas();
-                    activeContracts.RemoveAt(i);
-                }
+                    contract.requirements[index] -= fulfillQuantity;
+                    order.quantity -= fulfillQuantity;
+
+
+
+                    activeContracts[i] = contract;  // Update the contract
+
+
+                    if (contract.isComplete())
+                    {
+                        Debug.Log("Contract Finished");        /////////////////This needs work
+                                                               // Contract fulfillment logic here
+                        canvasGrid.SaveAsJPEG();
+                        canvasGrid.clearCanvas();
+                        activeContracts.RemoveAt(i);
+                    }
 
                 // If the current order is depleted, break out of the loop
                 if (order.quantity <= 0) break;
@@ -2123,6 +2127,7 @@ public class LogicCenter : MonoBehaviour
             
             activeContracts.Add(c);
         }
+        else canvasGrid.SaveAsJPEG();
     }
 
     // Helper method to process inventory against requirements

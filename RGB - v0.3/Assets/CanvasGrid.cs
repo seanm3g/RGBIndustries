@@ -127,15 +127,41 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
 
         UpdateTexture();
     }
-    public void saveAsJPEG()
-    {
+public void SaveAsJPEG()
+{
+    byte[] bytes = canvasTexture.EncodeToJPG();
+    string filePath = GetUniqueFilePathOnDesktop("Work of Art.jpg");
+    File.WriteAllBytes(filePath, bytes);
+    Debug.Log("Does this run?");
+}
 
-        byte[] bytes = canvasTexture.EncodeToJPG();
-        File.WriteAllBytes(Application.dataPath + "/Work of Art.jpg", bytes);
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void UpdateTexture()
+private string GetUniqueFilePathOnDesktop(string fileName)
+{
+    string desktopPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory)+"/art";
+    string filePath = Path.Combine(desktopPath, fileName);
+
+        // Check if the file already exists
+        if (File.Exists(filePath))
+        {
+            int counter = 1;
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            string fileExtension = Path.GetExtension(fileName);
+
+            // Keep incrementing the counter until a unique filename is found
+            while (File.Exists(filePath))
+            {
+                fileName = $"{fileNameWithoutExtension}_{counter}{fileExtension}";
+                filePath = Path.Combine(desktopPath, fileName);
+                counter++;
+            }
+        }
+
+    return filePath;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+public void UpdateTexture()
     {
         canvasTexture.SetPixels(pixels);
         canvasTexture.Apply();
