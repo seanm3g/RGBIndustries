@@ -127,8 +127,11 @@ public class LogicCenter : MonoBehaviour
     public GameObject[] activeTradeEntry = new GameObject[8];
     #endregion
 
-    #region inventory
+    #region inventory                           //this should be two ints
     public int[] inventory = new int[8];
+    public int[] inventoryColorValue = new int[100];
+    public int[] inventoryQuantity = new int[100];
+    public int inventoryIndex;
     #endregion
 
     #region eventlist
@@ -217,11 +220,10 @@ public class LogicCenter : MonoBehaviour
         setupGame(3);
     }
     
-    //public void setupGame(int factory,int machines, int employees, int queue, int inventory)
     public void setupGame(int startMode)
     {
-        int inventory=0;
-        int employees=0;
+        int inventory = 0;
+        int employees = 0;
         int machines = 0;
         int queue = 0;
         int contracts = 0;
@@ -242,7 +244,7 @@ public class LogicCenter : MonoBehaviour
                 queue = 10;
                 contracts = 0;
                 break;
-            case 2:   //queue game
+            case 2:   //tower defense game
                 inventory = 50;
                 employees = 2;
                 machines = 3;
@@ -629,7 +631,7 @@ public class LogicCenter : MonoBehaviour
     }  
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #region costs
+    #region expenses
     public void runExpenses()  //break expenses up
     {
         employeeCosts();
@@ -735,7 +737,7 @@ public class LogicCenter : MonoBehaviour
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #region Events
+    #region Event History
     public void updateEvents(int status)
     {
 

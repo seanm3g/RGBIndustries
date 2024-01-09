@@ -14,23 +14,15 @@ public struct Pixel
         this.c = c;
     }
 
-    public int[] leveled()  //returns the value of the color by level translated to 8bit.
+    public int[] Leveled(int level, int x)
     {
         int[] vals = new int[3];
-        for(int i=0; i<vals.Length;i++)
+        for (int i = 0; i < vals.Length; i++)
         {
-            switch (level)
-            {
-                case 1:
-                    vals[i] = level * 255;
-                    break;
-                case 2:
-                    vals[i] = level * 85;
-                    break;
-                case 3:
-                    vals[i] = level * 32;
-                    break;
-            }
+            int maxValue = 255; // 8-bit maximum value
+
+            // Calculate the scaled value based on bit depth
+            vals[i] = (int)((level / 8.0) * maxValue * x);
         }
         return vals;
     }
