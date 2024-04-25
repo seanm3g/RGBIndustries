@@ -22,7 +22,7 @@ public class LogicCenter : MonoBehaviour
     public CanvasGrid cg;
     #endregion
 
-    #region basic functions
+    #region basic variables
 
     /// </summary>
     public int oreTokens = 0;
@@ -68,18 +68,28 @@ public class LogicCenter : MonoBehaviour
     public Text[] machineMenuOeeText = new UnityEngine.UI.Text[12];
     public int selectedMachineIndex = -1;
 
+    public const int MACHINE_COST = 25;
+
 
 
     //machine CONSTANTS
     private const int MACHINE_IDLE = 0;
     private const int MACHINE_LOADING = 1;
+    private const int MACHINE_WAITING = 5;
     private const int MACHINE_RUNNING = 2;
     private const int MACHINE_UNLOADING = 3;
     private const int MACHINE_COMPLETED = 4;
     private const int MACHINE_BROKEN = 5;
     private const int MACHINE_IN_MAINTENANCE = 6;
-    private const int MACHINE_CHOKED = 7;
-    
+    private const int MACHINE_STARVED = 7;
+    private const int MACHINE_CHOKED = 8;
+
+    public const int TYPE_HARVESTER = 0;  // USED TO TURN ORE INTO PIXELS
+    public const int TYPE_TRANSFIBULATOR = 1;  //converts a primary pixel into another primary pixel || SLOW
+    public const int TYPE_ASSEMBLER = 2;   // combines to pixels
+    public const int TYPE_SEPERATOR = 3;  //splits 1 pixel into 2
+    public const int TYPE_REFINERY = 4;  //merges pixels to a higher level
+
     #endregion
 
     #region employees
@@ -127,11 +137,16 @@ public class LogicCenter : MonoBehaviour
     public GameObject[] activeTradeEntry = new GameObject[8];
     #endregion
 
-    #region inventory                           //this should be two ints
+    #region inventory OLD                           //this should be two ints
+    /*
     public int[] inventory = new int[8];
     public int[] inventoryColorValue = new int[100];
     public int[] inventoryQuantity = new int[100];
-    public int inventoryIndex;
+    public int inventoryIndex;*/
+    #endregion
+
+    #region inventory
+    public Inventory inventory = new Inventory();
     #endregion
 
     #region eventlist
@@ -168,6 +183,7 @@ public class LogicCenter : MonoBehaviour
     public Text newWorkOrderButton;
     public Text newWorkOrderQuantityBigText;
     public int newWorkOrderColor;
+    public Pixel newWorkOrderColor2;
     public int newWorkOrderQuantity = 1;
     #endregion
 
@@ -180,11 +196,25 @@ public class LogicCenter : MonoBehaviour
     public Factory factory = new(1);
     #endregion
 
-    public int distribution = 1; //not sure what this is doing
-    public int lastChosenColor = 0; //not sure what this is doing either
+    public int distribution = 1; //This is the amount of ore issued each tick
+
+    #region constants
+
+    public Pixel PIXEL_ORE = new(1, 0 , 0, 0);
+    public Pixel PIXEL_RED = new(1, 1, 0, 0);
+    public Pixel PIXEL_GREEN = new(1, 0, 1, 0);
+    public Pixel PIXEL_BLUE = new(1, 0, 0, 1);
+    public Pixel PIXEL_YELLOW = new(1, 1, 1, 0);
+    public Pixel PIXEL_MAGENTA = new(1, 1, 0, 1);
+    public Pixel PIXEL_CYAN = new(1, 0, 1, 1);
+    public Pixel PIXEL_WHITE = new(1, 1, 1, 1);
+    #endregion
 
     #region paint
-    public int chosenPaintColor;
+    public int chosenPaintColor;  //this needs to be a pixel now.
+    public Pixel chosenPaintColor2;
+
+    public int lastChosenColor = 0; //not sure what this is doing either
 
     public Text pictureStats;
     public Text[] hueQuantitiesText = new UnityEngine.UI.Text[8];
@@ -222,7 +252,6 @@ public class LogicCenter : MonoBehaviour
     
     public void setupGame(int startMode)
     {
-        int inventory = 0;
         int employees = 0;
         int machines = 0;
         int queue = 0;
@@ -231,28 +260,24 @@ public class LogicCenter : MonoBehaviour
         switch(startMode)
         {
             case 0:      //default no help
-                inventory = 0;
                 employees = 0;
                 machines = 0;
                 queue = 0;
                 contracts = 0;
                 break;
             case 1:   //starting game
-                inventory = 10;
                 employees = 0;
                 machines = 1;
                 queue = 10;
                 contracts = 0;
                 break;
             case 2:   //tower defense game
-                inventory = 50;
                 employees = 2;
                 machines = 3;
                 queue = 25;
                 contracts = 0;
                 break;
-            case 3:   //cheating game
-                inventory = 100;
+            case 3:   //cheats game
                 employees = 10;
                 machines = 10;
                 queue = 0;
@@ -261,7 +286,7 @@ public class LogicCenter : MonoBehaviour
         }
         
         setupMenu();
-        setupInventory(inventory);
+        setupInventory();  //this doesn't really do anything yet
         startingPage();
 
         setupEmployees(employees);
@@ -297,63 +322,148 @@ public class LogicCenter : MonoBehaviour
     {
         r = new System.Random();
     }  //just sets up random for now.
-    public void setupQueue(int quantity) //production queue
+    public void setupQueue(int orders) //production queue
     {
-        ColorRGB[] level1 = new ColorRGB[8];
+        int level = 1;
 
-        level1[1] = new ColorRGB(1, 0, 0);
-        level1[2] = new ColorRGB(0, 1, 0);
-        level1[3] = new ColorRGB(0, 0, 1);
-        level1[4] = new ColorRGB(1, 1, 0);
-        level1[5] = new ColorRGB(1, 0, 1);
-        level1[6] = new ColorRGB(0, 1, 1);
-        level1[7] = new ColorRGB(1, 1, 1);
-
-        for (int i = 0; i < quantity; i++)
+        /*
+        for(int i = 0; i < orders; i++)
         {
             int r = ft.rollDice(1, 4);
+            Pixel p = new Pixel(1, ft.rollDice(1, 2) - 1, ft.rollDice(1, 2) - 1, ft.rollDice(1, 2) - 1);
+            int quantity = ft.rollDice(1, 20);
 
-            if (i < 6)
-                r = ft.rollDice(1, 3);
+            workOrder wo = new workOrder(p, quantity);
+            ProductionQueue.Add(wo);
 
-            int q = ft.rollDice(2, 4);
+        }*/
 
-            switch (r)
+        //this approach fills the color with random pixels until the total supply is gone.
+
+        for (int i = 0; i < orders; i++)
+        {
+            int range = (int)Math.Pow(2, level);
+            int cap = ft.rollDice(1, range) - 1;
+            int r = 0;
+            int g = 0;
+            int b = 0;
+
+            while (cap > 0)
             {
-                case 1:
-                    ProductionQueue.Add(new workOrder(q, 1, 2, 4,4));  //make yellow
-                    break;
-                case 2:
-                    ProductionQueue.Add(new workOrder(q, 1, 3, 5,4));  //makes magenta
-                    break;
-                case 3:
-                    ProductionQueue.Add(new workOrder(q, 2, 3, 6,4)); //makes cyan
-                    break;
-                case 4:
-                    switch (ft.rollDice(1, 3))
-                    {
-                        case 1:
-                            ProductionQueue.Add(new workOrder(q, 3, 4, 7,4)); //white
-                            break;
-                        case 2:
-                            ProductionQueue.Add(new workOrder(q, 2, 5, 7,4)); //white
-                            break;
-                        case 3:
-                            ProductionQueue.Add(new workOrder(q, 1, 6, 7,4)); //white
-                            break;
-                    }
-                    break;
+                int randomNumber = ft.rollDice(1, 3);
+
+                switch (randomNumber)
+                {
+                    case 1:
+                        int rValue = ft.rollDice(1, cap);
+                        if (r + rValue <= range)
+                        {
+                            r += rValue;
+                            cap -= rValue;
+                        }
+                        break;
+                    case 2:
+                        int gValue = ft.rollDice(1, cap);
+                        if (g + gValue <= range)
+                        {
+                            g += gValue;
+                            cap -= gValue;
+                        }
+                        break;
+                    case 3:
+                        int bValue = ft.rollDice(1, cap);
+                        if (b + bValue <= range)
+                        {
+                            b += bValue;
+                            cap -= bValue;
+                        }
+                        break;
+                }
             }
+
+            // Create a Pixel object with the resulting values
+            Pixel pixel = new Pixel(level, r, g, b);
+
+        }
+
+
+
+
+    /*
+    ColorRGB[] level1 = new ColorRGB[8];
+
+    level1[1] = new ColorRGB(1, 0, 0);
+    level1[2] = new ColorRGB(0, 1, 0);
+    level1[3] = new ColorRGB(0, 0, 1);
+    level1[4] = new ColorRGB(1, 1, 0);
+    level1[5] = new ColorRGB(1, 0, 1);
+    level1[6] = new ColorRGB(0, 1, 1);
+    level1[7] = new ColorRGB(1, 1, 1);
+
+    for (int i = 0; i < quantity; i++)
+    {
+        int r = ft.rollDice(1, 4);  //only results in Y,M,C,W
+
+        if (i < 6)                 //first 6 pixels are always secondary colors
+            r = ft.rollDice(1, 3);
+
+        int q = ft.rollDice(2, 4);
+
+        switch (r)
+        {
+            case 1:
+                ProductionQueue.Add(new workOrder(q, 1, 2, 4,4));  //make yellow
+                break;
+            case 2:
+                ProductionQueue.Add(new workOrder(q, 1, 3, 5,4));  //makes magenta
+                break;
+            case 3:
+                ProductionQueue.Add(new workOrder(q, 2, 3, 6,4)); //makes cyan
+                break;
+            case 4:
+                switch (ft.rollDice(1, 3))
+                {
+                    case 1:
+                        ProductionQueue.Add(new workOrder(q, 3, 4, 7,4)); //white
+                        break;
+                    case 2:
+                        ProductionQueue.Add(new workOrder(q, 2, 5, 7,4)); //white
+                        break;
+                    case 3:
+                        ProductionQueue.Add(new workOrder(q, 1, 6, 7,4)); //white
+                        break;
+                }
+                break;
         }
     }
-    public void setupInventory(int init)  //init the inventory
+
+    */
+}
+    public void setupInventory()  //init the inventory // NEED TO CHECK THAT THIS WORKS.
     {
-        for (int i = 0; i < inventory.Length; i++)
-        {
-           // if (i < 4)
-                inventory[i] = init; //set everything to start as zero
-            //else inventory[i] = 0;
-        }    
+
+            int level = 1;
+            int range = (int)Math.Pow(2, level);
+
+        /*
+            inventory.AddPixels(new Pixel(level, 0, 0, 0), 0); //ORE AKA black
+            inventory.AddPixels(new Pixel(level, 1, 0, 0), 0); //RED
+            inventory.AddPixels(new Pixel(level, 0, 1, 0), 0); //GREEN
+            inventory.AddPixels(new Pixel(level, 0, 0, 1), 0); //BLUE
+            inventory.AddPixels(new Pixel(level, 1, 1, 0), 0); //YELLOW
+            inventory.AddPixels(new Pixel(level, 1, 0, 1), 0); //CYAN
+            inventory.AddPixels(new Pixel(level, 0, 1, 1), 0); //MAGENTA
+            inventory.AddPixels(new Pixel(level, 1, 1, 1), 0); //WHITE
+        */
+
+            //  //
+            //OR//
+            //  //
+
+                for (int b = 0; b < range; b++)
+                    for (int g = 0; g < range; g++)
+                        for (int r = 0; r < range; r++)
+                            inventory.addPixels(new Pixel(level, r, g, b), 0);            
             
     }
     public void setupEmployees(int quantity)
@@ -634,8 +744,8 @@ public class LogicCenter : MonoBehaviour
     #region expenses
     public void runExpenses()  //break expenses up
     {
-        employeeCosts();
-        factoryCosts();
+        employeeCosts();  //This should be in employee manager
+        factoryCosts();  //this should be in factorymanager
     }
 
     public void employeeCosts()
@@ -663,7 +773,7 @@ public class LogicCenter : MonoBehaviour
 
         if (factory.elapsedTime > 60)  //pay rent every minute
         {
-            int highestValue = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
+            //int highestValue = Math.Max(Math.Max(inventory.GetQuantity(Pixel.RED()), inventory.GetQuantity(Pixel.GREEN())), inventory.GetQuantity(Pixel.BLUE()));
 
             factory.elapsedTime = 0f;
 
@@ -671,18 +781,64 @@ public class LogicCenter : MonoBehaviour
         }
     }
 
-    public void payBill(int c)
+    public void payBill(int c)  //this works but is a little weird.
     {
-        int highestValueIndex = highestQuantityColorIndex();
+        Pixel highestPixel = getMax(); 
 
-        inventory[highestValueIndex] -= c;
+        inventory.subtractPixels(highestPixel,c);
         
-        if (inventory[highestValueIndex] < 0)  //this is wrong but works for now.
-            inventory[highestValueIndex] = 0;
+        if (inventory.GetQuantity(highestPixel)-c < 0)  //this is wrong but works for now.
+            inventory.setQuantity(highestPixel,0);
     }
 
-    public int highestQuantityColorIndex()
+    public Pixel getMax()   //payment color
     {
+
+        Pixel highestValueColor = new Pixel(0,0,0,0);
+
+        int highestValueQuantity = int.MinValue;
+
+        foreach (var kvp in inventory.getInventory())
+        {
+            if (kvp.Value > highestValueQuantity && primaryPixel(kvp.Key))
+            {
+                highestValueColor = kvp.Key;            //pixel
+                highestValueQuantity = kvp.Value;       //int  -- this isn't being used
+            }
+        }
+
+        return highestValueColor;
+    }
+
+    public Pixel getMin()   //payment color
+    {
+
+        Pixel lowestValueColor = new Pixel(0, 0, 0, 0);
+
+        int lowestValueQuantity = int.MaxValue;
+
+        foreach (var kvp in inventory.getInventory())
+        {
+            if (kvp.Value < lowestValueQuantity && primaryPixel(kvp.Key))
+            {
+                lowestValueColor = kvp.Key;            //pixel
+                lowestValueQuantity = kvp.Value;       //int  -- this isn't being used
+            }
+        }
+
+        return lowestValueColor;
+    }
+
+    public bool primaryPixel(Pixel p)
+    {
+        if (p== Pixel.RED() || p==Pixel.GREEN() || p==Pixel.BLUE())
+            return true;
+        else return false;
+    }
+
+
+
+        /*
 
         int highestValueQuantity = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
         int highestValueIndex = 0;
@@ -694,10 +850,10 @@ public class LogicCenter : MonoBehaviour
         }
 
         return highestValueIndex;
+        */
 
-    }
-
-    public int calculateExpenses()
+    /*
+    public int calculateExpenses()  //this isn't being used anywhere
     {
         int totalExpenses = 0;
         int employeeExpenses = calculateEmployeeExpenses();
@@ -710,7 +866,7 @@ public class LogicCenter : MonoBehaviour
 
         return totalExpenses;
 
-    }
+    }*/
 
     public int calculateEmployeeExpenses()
     {
@@ -722,6 +878,9 @@ public class LogicCenter : MonoBehaviour
         return employeeExpenses;
     }
 
+
+     //not being used 
+    /*
     public int maxInventorySlot()
     {
         int max = Math.Max(Math.Max(inventory[1], inventory[2]), inventory[3]);
@@ -733,7 +892,7 @@ public class LogicCenter : MonoBehaviour
         int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
         return min;
     }
-
+    */
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -831,31 +990,43 @@ public class LogicCenter : MonoBehaviour
     #region employees
     private void employeeHarvester(Employee e)  // this is all of the things an employee can do, if any action is taken, the consume their action.
     {
+
+        /*
         int min = Math.Min(Math.Min(inventory[1], inventory[2]), inventory[3]);
 
         if (inventory[0] >= harvestCapacity)
             if(competance(e))
             {
                 employeeSelectColor(min);
-                harvest();    //if they have initiatve
+                harvest();    //if they have are competant
+                return;
+            }*/
+
+        Pixel p = getMin();
+        if (inventory.GetQuantity(p) >= harvestCapacity)
+            if(competance(e))
+            {
+                employeeSelectColor(p);
+                harvest();
                 return;
             }
+
     }
-    private void employeeSelectColor(int min)
+    private void employeeSelectColor(Pixel min) ///////////////////hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
     {
-        if (min == inventory[1])
+        if (min==Pixel.RED())
         {
             selectColor(1);
         }
-        else if (min == inventory[2])
+        else if (min == Pixel.GREEN())
         {
             selectColor(2);
         }
-        else if (min == inventory[3])
+        else if (min == Pixel.BLUE())
         {
             selectColor(3);
         }
-
+        tabgroup.updateColor();
 
     }
     private void employeeRunMachine(Employee e)
@@ -903,7 +1074,9 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region Machine Functions
-    private void runMachines()
+
+    /*
+    private void runMachines()  //this function is great.  The rest feel complicated.
     {
         updateProductionUI();
 
@@ -916,28 +1089,91 @@ public class LogicCenter : MonoBehaviour
                 
                 case 1:
                     machineIsLoading(ref machine);
+                    //machine.IsLoading();
                     break;
                 case 2:
                     machineIsRunning(ref machine);
+                    //machine.IsRunning();
+                    updateEvents(5);
                     break;
                 case 3:
                     machineIsUnloading(ref machine);
+                    //machine.IsUnloading();
+
+                    //findDestination()
                     break;
                 case 4:
                     machineIsComplete(ref machine);
+                    //machine.IsComplete();
                     break;
                 case 5:
                     machineIsBroken(ref machine); // Assuming you have a method for this
+                    //machine.IsBroken();
                     break;
                 case 6:
                     machineIsRepairing(ref machine); // Assuming you have a method for this
+                    //machine.IsRepairing();
                     break;
             }
 
             machines[i] = machine;   //check in
         }
     }
-    public void machineIsLoading(ref Machine machine)
+    */
+    private void runMachines()  //this function is great.  The rest feel complicated.
+    {
+        updateProductionUI();
+
+        for (int i = 0; i < machines.Count; i++)
+        {
+            Machine machine = machines[i];  //check out
+
+            switch (machine.status)
+            {
+
+                case 1:
+                    machine.isLoading();
+                    break;
+                case 2:
+                    machine.isRunning();
+                    updateEvents(5);
+
+                    break;
+                case 3:
+                    machine.isUnloading();
+                    break;
+                case 4:
+                    //findDestination();  //find where the pixels belong., move them.
+                    //transfer();      //transfer the pixels to the right location
+
+                    /* should this be written more like:
+                     *  destination[findDestionation()]+=machine.isCompleted();
+                     * 
+                     */
+
+
+                    if (machine.isCompleted())  //this is a hack to check if completed was successful or not
+                    {
+                        findDestination();
+                        transfer();
+                    }
+                    break;
+                case 5:
+                    
+                    machine.isBroken();
+                    break;
+                case 6:
+                    machine.isRepairing();
+                    break;
+            }
+
+            machines[i] = machine;   //check in
+        }
+    }
+
+
+    /*  this is all legacy machine code
+    public void machineIsLoading(ref Machine machine)  //step 1
     {
         machine.elapsedTime += Time.deltaTime;
 
@@ -949,19 +1185,106 @@ public class LogicCenter : MonoBehaviour
             machine.status = MACHINE_RUNNING; // Assuming MACHINE_RUNNING is a constant or static readonly field
         }
     }
-    public void machineIsRunning(ref Machine machine)
+    public void machineIsRunning(ref Machine machine)  //step 2
     {
         machine.elapsedTime += Time.deltaTime;
 
         if (machine.elapsedTime >= machine.cycleTime)
         {
             machine.status = MACHINE_UNLOADING; // Assuming MACHINE_UNLOADING is a constant or static readonly field
-            machine.runMachine(); // Assuming runMachine is a method that exists within the Machine struct
+            machine.isRunning(); // Assuming runMachine is a method that exists within the Machine struct
             machine.elapsedTime = 0f;
             updateEvents(5);
         }
     }
-    public void machineIsUnloading(ref Machine machine)
+    public void machineIsUnloading(ref Machine machine)   ///step 3
+    {
+        machine.elapsedTime += Time.deltaTime;
+
+        if (machine.elapsedTime >= machine.cycleTime)
+        {
+            workOrder order = ProductionQueue[machine.orderIndex];
+            int destination = order.destination;
+
+            Debug.Log("UNLOADING - ACTIVE CONTRACTS:" + activeContracts.Count);
+
+            workOrderDestination(ref machine,destination);
+            
+
+            //this might get cut and moved into workOrderOutput (likely)
+           // int inventoryIndex = ProductionQueue[machine.orderIndex].c3index;
+           // inventory[inventoryIndex] += machine.unloadMachine(); // Assuming unloadMachine is a method that exists within the Machine struct
+            
+            machine.status = MACHINE_COMPLETED; // Assuming MACHINE_COMPLETED is a constant or static readonly field
+            machine.elapsedTime = 0f;
+
+            ProductionQueue[machine.orderIndex] = order; //I'm not sure where this line of code goes yet.
+        }
+    }*/
+
+
+    public void workOrderDestination(ref Machine machine, int destination)  //called whenever a workorder is unloading. It determines where it goes.
+    {
+
+        //what is the right sequence here of priority?  Should this be a setting the user gets?
+        switch(destination)
+        {
+            case 1: checkWorkOrders(ref machine); break;  // if this resource is allocated to a specific machine for another order
+            case 2: checkJobs(ref machine); break;        // is used to fill a contract for an image
+            case 3: checkTrades(ref machine); break;      //
+        }
+        if(machine.c3>0)  //if there is any leftovers put them in the inventory
+            //inventory.addPixels(machine.pixel, machines[order.machineIndex].unloadMachine()); // Assuming unloadMachine is a method that exists within the Machine struct || unloadMachine has been depricated
+    }
+    public void checkWorkOrders(ref Machine machine) //THIS IS USED FOR SEQUENCING TOGETHER
+    {
+        // Iterate through the production queue to find work orders waiting for this color
+        for (int i = 0; i < ProductionQueue.Count; i++)
+        {
+            workOrder queuedOrder = ProductionQueue[i];
+
+            // Only proceed if the work order status indicates it's waiting for input
+            if (queuedOrder.waiting())  //status is waiting
+            {
+                Debug.Log("There is a work order to be filled");
+                // Determine the quantity that can be transferred based on the matching color index
+                int transferQuantity = DetermineTransferQuantity(ref order, ref queuedOrder);
+
+                // Add to queuedOrder and remove from order
+                queuedOrder.quantity += transferQuantity;
+                order.quantity -= transferQuantity;
+
+                // Update the work order in the queue
+                ProductionQueue[i] = queuedOrder;
+
+                // If the current order is depleted, break out of the loop
+                if (order.quantity <= 0) break;
+            }
+        }
+
+        // If there's any remaining quantity, send it to inventory or next destination
+        if (order.quantity > 0)
+        {
+            sendToInventory(ref order);
+        }
+    }
+    private int DetermineTransferQuantity(ref workOrder order, ref workOrder queuedOrder) //support method for checkWorkOrders
+    {
+        // Check if the queued order requires the color from the current order
+        if (order.pixel == queuedOrder.c1index)
+        {
+            return Math.Min(order.quantity, queuedOrder.requiredAQuantity - queuedOrder.currentAQuantity);
+        }
+        else if (order.quantity == queuedOrder.c2index)
+        {
+            return Math.Min(order.quantity, queuedOrder.requiredBQuantity - queuedOrder.currentBQuantity);
+        }
+        return 0; // No transfer needed if color indices don't match
+    }
+
+
+    /*
+       public void machineIsUnloading(ref Machine machine)
     {
         machine.elapsedTime += Time.deltaTime;
 
@@ -995,7 +1318,7 @@ public class LogicCenter : MonoBehaviour
             case 3: checkJobs(ref order); break;
         }
         if(order.quantity>0)  //if there is any leftovers put them in the inventory
-            inventory[order.c3index] += machines[order.machineIndex].unloadMachine(); // Assuming unloadMachine is a method that exists within the Machine struct
+            inventory.addPixels(order.pixel, machines[order.machineIndex].unloadMachine()); // Assuming unloadMachine is a method that exists within the Machine struct
     }
     public void checkWorkOrders(ref workOrder order) //THIS IS USED FOR SEQUENCING TOGETHER
     {
@@ -1005,7 +1328,7 @@ public class LogicCenter : MonoBehaviour
             workOrder queuedOrder = ProductionQueue[i];
 
             // Only proceed if the work order status indicates it's waiting for input
-            if (queuedOrder.status == 5)
+            if (queuedOrder.waiting())  //status is waiting
             {
                 Debug.Log("There is a work order to be filled");
                 // Determine the quantity that can be transferred based on the matching color index
@@ -1032,16 +1355,21 @@ public class LogicCenter : MonoBehaviour
     private int DetermineTransferQuantity(ref workOrder order, ref workOrder queuedOrder) //support method for checkWorkOrders
     {
         // Check if the queued order requires the color from the current order
-        if (order.c3index == queuedOrder.c1index)
+        if (order.pixel == queuedOrder.c1index)
         {
             return Math.Min(order.quantity, queuedOrder.requiredAQuantity - queuedOrder.currentAQuantity);
         }
-        else if (order.c3index == queuedOrder.c2index)
+        else if (order.quantity == queuedOrder.c2index)
         {
             return Math.Min(order.quantity, queuedOrder.requiredBQuantity - queuedOrder.currentBQuantity);
         }
         return 0; // No transfer needed if color indices don't match
-    }
+    } 
+
+
+
+
+     */
     public void checkTrades(ref workOrder order)  //need to re-write trades
     {
         // Iterate through active trades to find trades waiting for this color
@@ -1049,14 +1377,14 @@ public class LogicCenter : MonoBehaviour
         {
             Trade trade = activeTrades[i];
             // Assuming we match trades by color index and there's a quantity to send
-            if (trade.sendColor == order.c3index && trade.sendQuantity > 0)
+            if (trade.send.pixel == order.product.pixel && trade.send.quantity> 0)
             {
 
                 Debug.Log("There is a trade order to be filled");
                 // Determine the quantity that can be transferred
-                int transferQuantity = Math.Min(order.quantity, trade.sendQuantity);  //pull as much of the order as possible.
+                int transferQuantity = Math.Min(order.quantity, trade.send.quantity);  //pull as much of the order as possible.
 
-                trade.sendQuantity -= transferQuantity;
+                trade.send.quantity -= transferQuantity;
                 order.quantity -= transferQuantity;
 
                 // Update the trade
@@ -1073,59 +1401,90 @@ public class LogicCenter : MonoBehaviour
             sendToInventory(ref order);
         }
     }
-    public void checkJobs(ref workOrder order)
+    public void checkJobs(ref workOrder order)  //Sends work to the 
     {
 
         if (activeContracts.Count >= 0)// Iterate through active contracts to find jobs waiting for this color
-        for (int i = 0; i < activeContracts.Count; i++)
-        {
-            Contract contract = activeContracts[i];
-            int index = order.c3index;
-                // Check if the contract requires this color and has an outstanding quantity
+            for (int i = 0; i < activeContracts.Count; i++)
+            {
+                Contract contract = activeContracts[i];
+                int index = order.quantity;
+                Pixel pixel = order.product.pixel;
 
-                
-                
-                
-                if (contract.requirements[index] > 0)
+                int requirement = contract.remainingPixels()[pixel];
+
+
+                if (requirement > 0)
                 {
+                    int fulfillQuantity = Math.Min(order.quantity, requirement);
 
-                    // Determine the quantity that can be fulfilled
-                    int fulfillQuantity = Math.Min(order.quantity, contract.requirements[index]);
-
-
-                    contract.requirements[index] -= fulfillQuantity;
+                    contract.remainingPixels()[pixel] -= fulfillQuantity;
                     order.quantity -= fulfillQuantity;
 
-
-
-                    activeContracts[i] = contract;  // Update the contract
-
+                    activeContracts[i] = contract;  //updates the database
 
                     if (contract.isComplete())
                     {
                         Debug.Log("Contract Finished");        /////////////////This needs work
                                                                // Contract fulfillment logic here
-                        canvasGrid.SaveAsJPEG();
-                        canvasGrid.clearCanvas();
-                        activeContracts.RemoveAt(i);
-                    }
+                        canvasGrid.SaveAsJPEG();  //saves the image to your folder
+                        canvasGrid.clearCanvas(); //clears the Canvas
+                        activeContracts.RemoveAt(i);  //removes the contract
 
-                // If the current order is depleted, break out of the loop
-                if (order.quantity <= 0) break;
+                    }
+                }
+
+                if (order.quantity <= 0) return;  //exits the loop and function if the order is empty
             }
+
+
+            sendToInventory(ref order); //this only gets called if there are leftover quantity.
+
+    }
+        // Check if the contract requires this color and has an outstanding quantity
+
+
+        /*
+        if (contract.requirements[index] > 0)  //THIS USED TO RETURN THE QUANTITY OF A SPECIFIC COLOR PIXEL
+        {
+
+            // Determine the quantity that can be fulfilled
+            int fulfillQuantity = Math.Min(order.quantity, contract.requirements[index]);
+
+
+            contract.requirements[index] -= fulfillQuantity;
+            order.quantity -= fulfillQuantity;
+
+            activeContracts[i] = contract;  // Update the contract
+
+
+            if (contract.isComplete())
+            {
+                Debug.Log("Contract Finished");        /////////////////This needs work
+                                                        // Contract fulfillment logic here
+                canvasGrid.SaveAsJPEG();
+                canvasGrid.clearCanvas();
+                activeContracts.RemoveAt(i);
+            }
+
+        // If the current order is depleted, break out of the loop
+        if (order.quantity <= 0) break;
+        }
         }
 
         // If there's any remaining quantity, send it to inventory
+       
         if (order.quantity > 0)
         {
             sendToInventory(ref order);
         }
-    }
-    private void sendToInventory(ref workOrder order)
+        */
+
+    private void sendToInventory(ref workOrder order)  //leftovers getting sent to the inventory
     {
         // Add remaining quantity to inventory
-        int index = order.c3index;
-        inventory[index] += order.quantity;
+        Pixel pixel = order.product.pixel;
+        inventory.addPixels(pixel,order.quantity);
         order.quantity = 0; // Clear the order quantity as it's now in inventory
     }
     public void machineIsComplete(ref Machine machine)
@@ -1248,10 +1607,10 @@ public class LogicCenter : MonoBehaviour
     }
     public void addNewMachine() //add new random machine
     {
-        if (inventory[highestQuantityColorIndex()] > 25)
+        if (inventory.getEntry(getMax()) > MACHINE_COST && machines.Count<4)  //if the inventory has 25 extra pixels and there are <4 machines, buy a machine.
         {
-            machines.Add(new Machine(ft.generateMachineName(), 1, ft.rollDice(3, 6), ft.rollDice(3, 6), ft.rollDice(3, 3) + 1, 103 - ft.rollDice(3, 6)));
-            payBill(25); //right now machines cost 25 pixels each
+            machines.Add(new Machine(TYPE_ASSEMBLER));
+            payBill(MACHINE_COST); //right now machines cost 25 pixels each to buy
         }
     }
     public void selectMachine(int index)
@@ -1324,11 +1683,12 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region New Work Order
 
-    public void setNewWorkOrderColor(int val)  //sets the new color
+    public void setNewWorkOrderColor(int val)  //sets the new color  //this gets called in Unity. I don't know how to handle that party yet
     {
         val += 4; //This accounts for the list only having some entries.
         newWorkOrderColor = val;
 
+        // newWorkOrderPixelImg.color = Pixel p.toColor();
         UpdateUIColor(newWorkOrderPixelImg, val);
     }
 
@@ -1389,8 +1749,10 @@ public class LogicCenter : MonoBehaviour
         }
 
         // Create a new work order based on the color  ? means it might be null
-        workOrder? newOrder = CreateWorkOrder(newWorkOrderColor, newWorkOrderQuantity);
+        Pixel p = oldtoNewColor(newWorkOrderColor);
+        workOrder? newOrder = new workOrder(p,newWorkOrderQuantity);
 
+        
 
         // Add the new work order to the front of the queue
         if (newOrder.HasValue)  // Check if newOrder is not null
@@ -1402,22 +1764,48 @@ public class LogicCenter : MonoBehaviour
         CloseNewWorkOrderWindow();
     }
 
-    public workOrder? CreateWorkOrder(int color, int quantity)
+    public Pixel oldtoNewColor(int color)
     {
-        switch (color)
+        Pixel p = new Pixel(0,0,0,0);
+        switch(color)
         {
+            case 0:
+                p = new Pixel(1, 0, 0, 0);
+                break; 
+            case 1:
+                p = new Pixel(1, 1, 0, 0);
+                break; 
+            case 2:
+                p = new Pixel(1, 0, 1, 0);
+                break; 
+            case 3:
+                p = new Pixel(1, 0, 0, 1);
+                break; 
             case 4:
-                return new workOrder(quantity, 1, 2, color,4);
+                p = new Pixel(1, 1, 1, 0);
+                break; 
             case 5:
-                return new workOrder(quantity, 1, 3, color,4);
+                p = new Pixel(1, 1, 0, 1);
+                break; 
             case 6:
-                return new workOrder(quantity, 2, 3, color,4);
+                p = new Pixel(1, 0, 1, 1);
+                break; 
             case 7:
-                int randomCase = ft.rollDice(1, 3);
-                return new workOrder(5, randomCase == 1 ? 3 : randomCase == 2 ? 2 : 1, randomCase + 3, color,4);
-            default:
-                return null;
+                p = new Pixel(1, 1, 1, 1);
+                break;
         }
+
+        return p;
+
+
+    }
+
+    public workOrder CreateWorkOrder(int color, int quantity)  //major re-write needed
+    {
+        Pixel p = oldtoNewColor(color);
+
+        return new workOrder(p,quantity);
+
     }
 
     private void OffsetActiveWorkOrders()
@@ -1548,9 +1936,10 @@ public class LogicCenter : MonoBehaviour
         {
             
             Trade selected = availableTrades[selectedTrade];
-            int tradeColorIndex = selected.sendColor;
+            //int tradeColorIndex = selected.sendColor;
+            Pixel pixel = selected.send.pixel;
 
-            if (inventory[tradeColorIndex] > selected.sendQuantity)  //if there's enough for the trade it does it, otherwise it doesn't.
+            if (inventory.getEntry(pixel) > selected.send.quantity)  //if there's enough for the trade it does it
             {
                 // Get the selected trade
 
@@ -1582,8 +1971,10 @@ public class LogicCenter : MonoBehaviour
     {
         Trade t = activeTrades[i]; // check trade out
 
-        inventory[t.sendColor] -= t.sendQuantity; // swap send
-        inventory[t.recieveColor] += t.recieveQuantity; // swap receive
+
+        inventory -= t.send;
+        inventory += t.recieve;
+
 
         t.length -= 1; // reduce the iterations by 1.
         if (t.length < 1) // if it's run the length of its trade, remove it from the queue
@@ -1612,19 +2003,18 @@ public class LogicCenter : MonoBehaviour
     }
     public void UpdateInventoryUI()
     {
-        oreValueText.text = inventory[0].ToString() + "/" + harvestCapacity;
 
-
-        redPixelText.text = inventory[1].ToString();
-        greenPixelText.text = inventory[2].ToString();
-        bluePixelText.text = inventory[3].ToString();
-        yellowPixelText.text = inventory[4].ToString();
-        magentaPixelText.text = inventory[5].ToString();
-        cyanPixelText.text = inventory[6].ToString();
-        whitePixelText.text = inventory[7].ToString();
-
+        redPixelText.text = inventory.getEntry(PIXEL_ORE).ToString();
+        redPixelText.text = inventory.getEntry(PIXEL_RED).ToString();
+        redPixelText.text = inventory.getEntry(PIXEL_GREEN).ToString();
+        redPixelText.text = inventory.getEntry(PIXEL_BLUE).ToString();
+        redPixelText.text = inventory.getEntry(PIXEL_YELLOW).ToString();
+        redPixelText.text = inventory.getEntry(PIXEL_MAGENTA).ToString();
+        redPixelText.text = inventory.getEntry(PIXEL_CYAN).ToString();
+        redPixelText.text = inventory.getEntry(PIXEL_WHITE).ToString();
 
     }
+
     public void UpdateEventUI()
     {
         for (int i = 0; i < history.Length; i++)
@@ -1700,13 +2090,28 @@ public class LogicCenter : MonoBehaviour
         {
             if (i < ProductionQueue.Count)
             {
-                productionEntry[i].SetActive(true);
-                int outputIndex = ProductionQueue[i].c3index;
+                productionEntry[i].SetActive(true);  //what does this do?
 
+                int machineIndex = ProductionQueue[i].machineIndex;
+                
+                
+                Pixel ingredientA = machines[machineIndex].ingredientA.p;
+                Pixel ingredientB = machines[machineIndex].ingredientB.p;
+                Pixel result = ProductionQueue[i].product.pixel;
+
+                productionPixelImg[i].color = result.toColor();
+                productionIngredientAImg[i].color = ingredientA.toColor();  //these don't work rn
+                productionIngredientBImg[i].color = ingredientB.toColor();  //these don't work rn
+                productionNameText[i].text = ProductionQueue[i].name;
+
+                /*
+                int outputIndex = ProductionQueue[i].c3index
                 int ingredientAindex = ProductionQueue[i].c1index;
                 int ingredientBindex = ProductionQueue[i].c2index;
-                //Debug.Log("ingredient A: "+ ProductionQueue[i].c1index);           RESUME HERE
-                //Debug.Log("ingredient B: " + ProductionQueue[i].c2index);
+
+
+                
+
 
                 Color tempColor = new Color(colorLib.colors[outputIndex].r, colorLib.colors[outputIndex].g, colorLib.colors[outputIndex].b);
                 Color ingredientA = new Color(colorLib.colors[ingredientAindex].r, colorLib.colors[ingredientAindex].g, colorLib.colors[ingredientAindex].b);
@@ -1720,7 +2125,7 @@ public class LogicCenter : MonoBehaviour
                 //if (!ProductionQueue[i].isActive)
                 productionQuantityText[i].text = ProductionQueue[i].quantity.ToString();
                 ///else productionQuantityText[i].text = ProductionQueue[i].quantity.ToString() + "(-" + machines[ProductionQueue[i].machineIndex].c2q +")";
-
+                */
             }
             else
             {
@@ -1751,7 +2156,7 @@ public class LogicCenter : MonoBehaviour
                 else
                     machineMenuAssignementText[i].text = ProductionQueue[m.orderIndex].name;
 
-                machineMenuDMDText[i].text = m.durability + "/" + m.maxDurability;
+                machineMenuDMDText[i].text = m.durability + "/" + m.durability.max;
                 machineMenuBText[i].text = m.batchSize.ToString();
                 machineMenuCText[i].text = m.cycleTime.ToString();
                 machineMenuYText[i].text = m.Yield.ToString() + "%";
@@ -1823,10 +2228,15 @@ public class LogicCenter : MonoBehaviour
                 tradeEntry[i].SetActive(true);
                 tradeCadenceText[i].text = availableTrades[i].cadence.ToString();
                 tradeLengthText[i].text = availableTrades[i].length.ToString();
-                tradeSendText[i].text = availableTrades[i].sendQuantity.ToString();
-                UpdateUIColor(tradeSendIMG[i], availableTrades[i].sendColor);
-                UpdateUIColor(tradeRecieveIMG[i], availableTrades[i].recieveColor);
-                tradeRecieveText[i].text = availableTrades[i].recieveQuantity.ToString();
+                
+                tradeSendText[i].text = availableTrades[i].send.quantity.ToString();
+                tradeSendText[i].color = availableTrades[i].send.pixel.toColor();
+                //UpdateUIColor(tradeSendIMG[i], availableTrades[i].sendColor);
+
+                tradeRecieveText[i].text = availableTrades[i].recieve.quantity.ToString();
+                tradeRecieveText[i].color = availableTrades[i].recieve.pixel.toColor();
+                //UpdateUIColor(tradeRecieveIMG[i], availableTrades[i].recieveColor);
+                
             }
             else
             {
@@ -1840,10 +2250,15 @@ public class LogicCenter : MonoBehaviour
             if (i < activeTrades.Count)
             {
                 activeTradeEntry[i].SetActive(true);
-                activeTradeSendText[i].text = activeTrades[i].sendQuantity.ToString();
-                UpdateUIColor(activeTradeSendIMG[i], activeTrades[i].sendColor);
-                UpdateUIColor(activeTradeRecieveIMG[i], activeTrades[i].recieveColor);
-                activeTradeRecieveText[i].text = activeTrades[i].recieveQuantity.ToString();
+                
+                activeTradeSendText[i].text = activeTrades[i].send.quantity.ToString();
+                activeTradeSendIMG[i].color = activeTrades[i].send.pixel.toColor();
+                //UpdateUIColor(activeTradeSendIMG[i], activeTrades[i].sendColor);
+
+                activeTradeRecieveText[i].text = activeTrades[i].recieve.quantity.ToString();
+                activeTradeRecieveIMG[i].color = activeTrades[i].recieve.pixel.toColor();
+                //UpdateUIColor(activeTradeRecieveIMG[i], activeTrades[i].recieveColor);
+                
             }
             else
             {
@@ -1876,7 +2291,7 @@ public class LogicCenter : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region Production
-    public void updateQueue()  // Pairs orders to machines // Could use an update if an order is too large.
+    public void updateQueue()  // Pairs orders to machines // Could use an update if an order is too large and needs to be broken apart.
     {
         int firstAvailableMachineIndex = FindFirstAvailableMachine();
         int firstUnassignedOrderIndex = FindFirstUnassignedOrder();
@@ -1886,6 +2301,12 @@ public class LogicCenter : MonoBehaviour
             AssignOrderToMachine(firstAvailableMachineIndex, firstUnassignedOrderIndex);
             
         }
+    }
+
+    public void addToQueue(workOrder w)
+    {
+        ProductionQueue.Add(w);
+
     }
     private int FindFirstAvailableMachine()
     {
@@ -1902,13 +2323,15 @@ public class LogicCenter : MonoBehaviour
     {
         for (int i = 0; i < ProductionQueue.Count; i++)
         {
-            if (!ProductionQueue[i].isActive)
+            if (ProductionQueue[i].status<1)  //it is inactive
             {
                 return i;
             }
         }
         return -1;
     }
+
+    /*
     private void AssignOrderToMachine(int machineIndex, int orderIndex)
     {
         workOrder wo = ProductionQueue[orderIndex];
@@ -1931,7 +2354,7 @@ public class LogicCenter : MonoBehaviour
 
             ProductionQueue[orderIndex] = wo;
 
-            wo.isActive = true;
+            wo.isActive() = true;
 
             machine.assignOrder(wo);
             inventory[machine.c1] -= c1Quantity;
@@ -1943,6 +2366,50 @@ public class LogicCenter : MonoBehaviour
         machines[machineIndex] = machine;
         ProductionQueue[orderIndex] = wo;
     }
+    */
+
+
+    private void AssignOrderToMachine(int machineIndex, int orderIndex)  //this should add the ingredients to the machine.
+    {
+        workOrder wo = ProductionQueue[orderIndex];
+        Machine machine = machines[machineIndex];
+        Pixel p1 = machine.ingredientA.p;  //this doesn't have any pixels in it.
+        Pixel p2 = machine.ingredientB.p;
+
+        int ingredientAQuantity = inventory.getEntry(machine.ingredientA.p);
+        int ingredientBQuantity = inventory.getEntry(machine.ingredientB.p);
+
+
+        if (machine.batchSize < wo.quantity) //This sets the number of cycles needed to produce the whole amount.
+            while (machine.productionCycles * machine.batchSize < wo.quantity)
+            {
+                machine.productionCycles++;
+            }
+
+        if (ingredientAQuantity == wo.quantity)  //it's a full order
+        {
+
+            //vv is there a better way to do this vv
+            wo.machineIndex = machineIndex; //sets the machine being used for the order.
+            machine.orderIndex = orderIndex;  //sets the order being run for the machine
+            //^^ is there a better way to do this ^^
+
+            ProductionQueue[orderIndex] = wo;
+
+            wo.status = 1;  //does this break things elsewhere?  Does something else set this to 1?
+
+            machine.assignOrder(wo);
+            inventory.subtractPixels(machine.ingredientA.p,ingredientAQuantity);
+            inventory.subtractPixels(machine.ingredientB.p, ingredientBQuantity);
+            machine.loadMachine(machine.ingredientA, machine.ingredientB);  //just sends the two pixels
+
+        }
+
+        machines[machineIndex] = machine;
+        ProductionQueue[orderIndex] = wo;
+    }
+
+/*
     private int calculateAvailableQuantity(int componentIndex, int requiredQuantity)  //checks if there is enough to fill the full order or not.
     {
         int availableQuantity = inventory[componentIndex];
@@ -1955,6 +2422,24 @@ public class LogicCenter : MonoBehaviour
         else
         {
             quantityToUse = availableQuantity;
+        }
+
+        return quantityToUse;
+    }
+*/
+
+    private int calculateAvailableQuantity(Pixel p, int requiredQuantity)  //checks if there is enough to fill the full order or not.
+    {
+        int availableQuantity = inventory.getEntry(p);
+        int quantityToUse;
+
+        if (availableQuantity >= requiredQuantity)  //if you have more than you need
+        {
+            quantityToUse = requiredQuantity;  //take as much as you need
+        }
+        else
+        {
+            quantityToUse = availableQuantity;  //otherwise use what you have (which is less than what you need.)
         }
 
         return quantityToUse;
@@ -2031,21 +2516,31 @@ public class LogicCenter : MonoBehaviour
         {
             distribution = 1; // Reset distribution
             lastChosenColor = chosenColor; // Update last chosen color
-            inventory[0] = 0; // Reset ore inventory
+            inventory.setQuantity(PIXEL_ORE,0); // Reset ore inventory
             oreValueText.text = "0"; // Update text display
         }
     }
-    private void IncrementAndCapInventory()
+    private void IncrementAndCapInventory()  //distribute and update distribution
     {
-        if (inventory[0] < harvestCapacity && chosenColor != 0)
+        if (inventory.ORE() < harvestCapacity && chosenColor != 0)
         {
-            inventory[0] = Math.Min(inventory[0] + distribution++, harvestCapacity);
-            oreValueText.text = inventory[0].ToString(); // Update text display
+            
+            int oreQuantity = Math.Min(inventory.ORE() + distribution++, harvestCapacity);  //checks the cap and gives you the quantity, and increments distribution by 1
+                /*
+                 * should it be more like this?
+                 * 
+            int oreQuantity = inventory.ORE() + Math.Min(distribution++,harvestCapacity);  //checks the cap and gives you the quantity, and increments distribution by 1
+                 *
+                 */
+
+
+            inventory.setQuantity(PIXEL_ORE, oreQuantity); //sets the 
+            oreValueText.text = inventory.ORE().ToString(); // Update text display
         }
     }
     private void CheckHarvestCapacity()
     {
-        if (inventory[0] == harvestCapacity) // Check if inventory is full
+        if (inventory.ORE() == harvestCapacity) // Check if inventory is full
         {
             oreValueText.color = Color.red; // Change text color to red
             updateEvents(10); // Trigger full capacity event
@@ -2053,18 +2548,21 @@ public class LogicCenter : MonoBehaviour
     }
     public void harvest()
     {
-        if (inventory[0] > 0)
+        if (inventory.ORE() > 0)
         {
             updateEvents(8);
-            cg.available();
+            //cg.available();  //commented out for re-write
             cg.UpdateTexture();
             oreValueText.color = Color.white; // Reset text color
 
             TransferOreToColorInventory();
         }
     }
-    private void TransferOreToColorInventory()  //what does this do?
+
+    /*
+    private void TransferOreToColorInventory()  //This function converts the ore to a pixel color based on whichever color is chosen.
     {
+
         if (chosenColor >= 1 && chosenColor <= 3)
         {
             inventory[chosenColor] += inventory[0];
@@ -2075,16 +2573,40 @@ public class LogicCenter : MonoBehaviour
         {
             Debug.Log("Color not selected for harvesting");
         }
+    }*/
+
+
+    private void TransferOreToColorInventory()  //This function converts the ore to a pixel color based on whichever color is chosen.
+    {
+        //im not sure if it's chosenPainColor2.  THe original was "chosenColor"
+        inventory.addPixels(chosenPaintColor2, inventory.ORE());
+        inventory.clearORE();
+
+        if (chosenColor >= 1 && chosenColor <= 3)
+        {
+            inventory.getInventory()[chosenPaintColor2] += inventory.getInventory()[PIXEL_ORE];
+            inventory.getInventory()[PIXEL_ORE] = 0;
+            UpdatePixelText(chosenColor);
+        }
+        else
+        {
+            Debug.Log("Color not selected for harvesting");
+        }
     }
+
+
+
     private void UpdatePixelText(int colorIndex)
     {
         switch (colorIndex)
         {
-            case 1: redPixelText.text = inventory[1].ToString(); break;
-            case 2: greenPixelText.text = inventory[2].ToString(); break;
-            case 3: bluePixelText.text = inventory[3].ToString(); break;
+            case 1: redPixelText.text = inventory.getInventory()[PIXEL_RED].ToString(); break;
+            case 2: greenPixelText.text = inventory.getInventory()[PIXEL_GREEN].ToString(); break;
+            case 3: bluePixelText.text = inventory.getInventory()[PIXEL_BLUE].ToString(); break;
         }
     }
+
+    /*
     public void harvestUpgrade()
     {
         if (inventory[chosenColor] >= harvestCapacity)
@@ -2096,7 +2618,23 @@ public class LogicCenter : MonoBehaviour
             harvestCapacity++;
             UpdatePixelText(chosenColor); // Update text display based on color
         }
+    }*/
+
+    public void harvestUpgrade()
+    {
+        if (inventory.getEntry(chosenPaintColor2) >= harvestCapacity)  //if theres enough to pay for it.
+        {
+            updateEvents(9);
+            oreValueText.color = Color.white; // Reset text color
+
+            inventory.subtractPixels(chosenPaintColor2,harvestCapacity);  //pay the cost (your harvest capacity)
+            harvestCapacity++;
+            UpdatePixelText(chosenColor); // Update text display based on color
+        }
     }
+
+
+
     #endregion
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2105,22 +2643,26 @@ public class LogicCenter : MonoBehaviour
     {
         chosenPaintColor = i;
     }
+    public void setPaintColor(Pixel i)  //updated version  || needs to be re-written in UNITY to pass a function and not an integer
+    {
+        chosenPaintColor2 = i;
+    }
     public void convertToContract()
     {
         Contract c = new Contract();
-        c.setRequirements(canvasGrid.pixelValues); // Assuming pixelValues is directly assignable to requirements
+        c.setRequirements(canvasGrid.pixelValues2); // Assuming pixelValues is directly assignable to requirements
 
 
         processInventory(ref c); //does this assign it correctly?
         
-        c.updateCurrentRequirements();  //this one isn't working, but the one inside is.
+        //c.updateRequirements();  //this one isn't working, but the one inside is.
 
-        c.updateCurrentCost();  //this doesn't.
+        //c.updateCurrentCost();  //this doesn't.
 
 
         // Remove fully satisfied contracts
 
-        if (c.totalRequirements > 0)
+        if (c.totalRequirements() > 0)
         {
             //Debug.Log("requirements are above 0");
             c.clientName = "SEANYE";
@@ -2133,12 +2675,14 @@ public class LogicCenter : MonoBehaviour
     }
 
     // Helper method to process inventory against requirements
+
+    /*
     private void processInventory(ref Contract c)  //should this get moved to the Contract class?
     {
-
-        for (int i = 1; i < c.requirements.Length; i++)
+        foreach 
+        for (int i = 1; i < c.uniquePixelsLeft(); i++)  //this line is bad.
         {
-            if (c.requirements[i] <= inventory[i])   //if there is enough
+            if (c.getEntry(i) <= inventory[i])   //if there is enough
             {
                 // If inventory can cover the requirements, subtract and reset requirement
                 inventory[i] -= c.requirements[i];
@@ -2157,6 +2701,37 @@ public class LogicCenter : MonoBehaviour
         }
     }
 
+    */
+    private void processInventory(ref Contract c)  //should this get moved to the Contract class?
+    {
+        foreach (var kvp in c.remainingPixels())
+        {
+            Pixel p = kvp.Key;  //the key
+            int q = kvp.Value;
+
+            if (c.getEntry(p) <= inventory.getEntry(p))   //if there is enough
+            {
+            inventory.subtractPixels(p,q);
+                
+            //c.inventory.remaining.getInventory()[kvp.Key] = 0;  //is there a better way to write this?
+            c.setQuantity(p, 0);  //sets the remaining to 0;
+            }
+            else  //if there is not enough
+            {
+                int inventoryQuantity = inventory.getEntry(p);
+                // If inventory can't cover, add a workOrder for the shortfall and reset inventory
+                int shortfall = q - inventoryQuantity;  // Calculate the shortfall
+                c.subtractPixels(p, inventoryQuantity);  //clears what you have from the contract
+                //c.requirements[i] -= inventory[i]; // Requirement is set to zero as it will now be processed by the work order
+                inventory.setQuantity(p,0); // Inventory is depleted for this item
+                
+                if (!Pixel.isPrimary(p))  // Add the shortfall amount to the production queue if it's craftable
+                    ProductionQueue.Add(new workOrder(p,shortfall)); 
+            }
+        }
+    }
+
+    /*
     // Helper method to generate a work order based on shortfall
     private workOrder generateWorkOrder(int shortfall, int index)
     {
@@ -2178,7 +2753,7 @@ public class LogicCenter : MonoBehaviour
                 // Handle default case or throw an exception if index is out of expected range
                 throw new ArgumentException("Invalid index for work order generation");
         }
-    }
+    }*/
 
     public void openCanvas()
     {
@@ -2210,10 +2785,10 @@ public class LogicCenter : MonoBehaviour
     public void addContract(Contract c)  //it doesn't seem like this gets called.
     {
 
-        c.clientName = "SEANYEf";
+        c.clientName = "SEANYE";
         c.contractName = "water bottle";
         c.status = 1;
-        c.progress = c.currentRequirements / c.totalRequirements;
+        c.progress = c.inventory.remaining.totalPixels() / c.inventory.total.totalPixels();
         activeContracts.Add(c);
     }
     #endregion

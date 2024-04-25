@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorLibrary
+public class ColorLibrary  //THIS SHOULD GET DEPRECATED
 {
     // Start is called before the first frame update
     public ColorRGB[] colors;

@@ -717,10 +717,10 @@ public class FlavorText
 
 
 
-    System.Random r = new System.Random();
+    public System.Random r = new System.Random();
 
     public int currentYear = DateTime.Now.Year;
-    public string generateMachineName()
+    public string generateMachineName()  //I don't think this is used anymore actually
     {
 
         // Define the characters and numbers to be used in each segment

@@ -23,9 +23,8 @@ public struct Employee
     public Employee(int job)
     {
         f = new FlavorText();
-        stats = new int[3];
 
-       
+        stats = new int[3];
 
         elapsedTime = 0;
         firstName = f.rollDice(1,f.firstNames.Length)-1;

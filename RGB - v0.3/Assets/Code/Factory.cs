@@ -21,8 +21,12 @@ public struct Factory
         minEmployeeCapacity = 0;
         maxMachineCapacity = 0;
         upkeep = 0;
-        
 
+        setContraints();
+    }
+
+    public void setContraints()
+    {
         switch (tier)
         {
             case 1:
@@ -56,15 +60,19 @@ public struct Factory
                 upkeep = 20;
                 break;
         }
+
+
     }
 
     public void upgradeFactory()
     {
         tier += 1;
+        setContraints();
     }
 
     public void downgradeFactory()
     {
         tier -= 1;
+        setContraints();
     }
 }

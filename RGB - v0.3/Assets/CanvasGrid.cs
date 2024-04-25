@@ -10,60 +10,65 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
 
     public LogicCenter lc;
-    ColorLibrary ColorLibrary = new ColorLibrary();
+    //ColorLibrary ColorLibrary = new ColorLibrary();
 
     public RawImage canvasImage;
     private Texture2D canvasTexture;
     private Color[] pixels;  //This is the actual canvas texture
 
-    public int[,] pixelValues;  //This is the grid of pixel colors.
-    public int[] quantity = new int[8];
+    public int[,] pixelValues;  //This is the grid of pixel colors with the value being which color is being used. // deprecated
+    public Inventory CanvasPixels = new Inventory();  //this should be used to store the quantity and the pixel //deprecated
+
+
+    public Pixel[,] pixelValues2;
+
     private Contract contract;
 
+    //private Inventory canvas;
 
-    public float requiredPixels;  //This is the amount of additional pixels required to make this picture.
+
+    public float requiredPixels;  //This is the amount of total addition pixels required to make this picture.
 
     FlavorText ft = new();
 
     private int canvasWidth = 500;  // 50 pixels * 10 width each
     private int canvasHeight = 500; // 50 pixels * 10 height each
+
     [SerializeField] private int pixelSize;
 
     void Start()
     {
-        //init the quantity of each pixel
-        quantity = new int[8];
+        // Create a new contract instance
+        contract = new();
 
-         contract = new();
-
-        for (int i = 0; i < quantity.Length; i++)  //init to zero
-        {
-            quantity[i] = 0;
-        }
+        // Get the RectTransform component of the game object this script is attached to
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
 
+        // Set canvasWidth and canvasHeight based on the RectTransform's dimensions
         canvasWidth = (int)rectTransform.rect.width;
         canvasHeight = (int)rectTransform.rect.height;
 
-        // Initialize Texture2D
+        // Initialize a Texture2D with the specified dimensions
         canvasTexture = new Texture2D(canvasWidth, canvasHeight);
 
-        // Initialize pixel array
+        // Initialize an array of Color to represent the pixels in the canvas
         pixels = new Color[canvasWidth * canvasHeight];
 
-        pixelValues = new int[canvasWidth / pixelSize, canvasHeight / pixelSize];
+        // Initialize a 2D integer array to represent pixelValues
+        // The dimensions are determined by dividing canvasWidth and canvasHeight by pixelSize
+        //pixelValues = new int[canvasWidth / pixelSize, canvasHeight / pixelSize];
 
-
-
-        // Set initial color to black
+        // Set the initial color of the canvas to black
         clearCanvas();
 
-        // Apply changes to texture and assign to RawImage
+        // Apply the changes made to the texture and assign it to the RawImage component
         UpdateTexture();
         canvasImage.texture = canvasTexture;
     }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region IO
     public void OnPointerDown(PointerEventData eventData)
     {
         paint(eventData);
@@ -72,8 +77,10 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
     {
         paint(eventData);
     }
+    #endregion
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region paint/canvas
     public void paint(PointerEventData eventData)
     {
         // Convert screen position to local position within the RawImage
@@ -87,47 +94,61 @@ public class CanvasGrid : MonoBehaviour, IPointerDownHandler, IDragHandler
         if (clickedRow >= 0 && clickedRow < (canvasHeight / pixelSize) && clickedCol >= 0 && clickedCol < (canvasWidth / pixelSize))
         {
 
-            pixelValues[clickedRow, clickedCol] = lc.chosenPaintColor;
-            //Debug.Log("pixel Value:" + pixelValues[clickedRow, clickedCol]);
+            pixelValues2[clickedRow, clickedCol] = lc.chosenPaintColor2;
+            
+            Pixel coloredPixel = lc.chosenPaintColor2;
 
-            // Loop to color the 10x10 area representing the "pixel"
-            for (int y = 0; y < pixelSize; y++)
-            {
-                for (int x = 0; x < pixelSize; x++)
+
+                // Loop to color the 10x10 area representing eachj "pixel"
+                for (int y = 0; y < pixelSize; y++)
                 {
-                    int pixelIndex = (clickedRow * pixelSize + y) * canvasWidth + (clickedCol * pixelSize + x);
-                    pixels[pixelIndex] = ColorLibrary.colors[lc.chosenPaintColor].toColor();  // Set color to black (or any other color)
+                    for (int x = 0; x < pixelSize; x++)
+                    {
+                        int pixelIndex = (clickedRow * pixelSize + y) * canvasWidth + (clickedCol * pixelSize + x);
+                        pixels[pixelIndex] = coloredPixel.toColor();  // Set color to black (or any other color)  //THIS LINE IS NOW BROKEN
+                    }
                 }
-            }
-            // Update the texture
-            UpdateTexture();
+                // Update the texture
+                UpdateTexture();
         }
 
     }
+
     public void clearCanvas()
     {
-
         for (int i = 0; i < pixels.Length; i++)
         {
             pixels[i] = Color.black;
-
         }
 
-        for (int i = 0; i < quantity.Length; i++)
+        int numRows = pixelValues2.GetLength(0);
+        int numCols = pixelValues2.GetLength(1);
+
+        for (int row = 0; row < numRows; row++)
         {
-            quantity[i] = 0;   //this gets overwritten when updateTexture() is called.
+            for (int col = 0; col < numCols; col++)
+            {
+                pixelValues2[row, col] = new Pixel(); // You can customize this based on your Pixel struct/class
+            }
         }
-
-        for (int y = 0; y < pixelValues.GetLength(0); y++)
-            for (int x = 0; x < pixelValues.GetLength(1); x++)
-                pixelValues[y, x] = 0;
-
-
-
-
-        UpdateTexture();
     }
-public void SaveAsJPEG()
+
+    public void UpdateTexture()  //for painting
+    {
+        canvasTexture.SetPixels(pixels);
+        canvasTexture.Apply();
+
+        //c.setRequirements(pixelValues);
+        updateHueQuantities();  //what
+        updateHueUI();
+        updateJobStats();
+        //available();
+    }
+    #endregion 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////   
+    #region saveImage
+    public void SaveAsJPEG()
 {
     byte[] bytes = canvasTexture.EncodeToJPG();
     string filePath = GetUniqueFilePathOnDesktop("Work of Art.jpg");
@@ -135,7 +156,7 @@ public void SaveAsJPEG()
     Debug.Log("Does this run?");
 }
 
-private string GetUniqueFilePathOnDesktop(string fileName)
+    private string GetUniqueFilePathOnDesktop(string fileName)
 {
     string desktopPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory)+"/art";
     string filePath = Path.Combine(desktopPath, fileName);
@@ -158,54 +179,44 @@ private string GetUniqueFilePathOnDesktop(string fileName)
 
     return filePath;
 }
+    #endregion
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region work order
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-public void UpdateTexture()
+    public void updateHueQuantities()  //updates the running total  DOES THIS WORK?
     {
-        canvasTexture.SetPixels(pixels);
-        canvasTexture.Apply();
 
-        //c.setRequirements(pixelValues);
-        updateHueQuantities();
-        updateHueUI();
-        updateJobStats();
-        //available();
-    }
-
-    public void updateHueQuantities()
-    {
-        for (int i = 0; i < quantity.Length; i++)
-            quantity[i] = 0;
-        if(pixelValues.GetLength(0) > 0)
-            for (int i = 0; i < pixelValues.GetLength(0); i++)
-                for (int j = 0; j < pixelValues.GetLength(1); j++)
-                    quantity[pixelValues[i, j]]++;  //adds quantity per pixel in the image.
+        CanvasPixels.Clear();   //not sure if this needed
+        for (int i = 0; i < pixelValues2.GetLength(0); i++)
+            for (int j = 0; j < pixelValues2.GetLength(1); j++)
+                CanvasPixels.addPixels(pixelValues2[i, j], 1);  //adds quantity per pixel in the image.
 
 
     }
+
     public void updateJobStats() //updates the UI
     {
-        int total = updateTotal();
+        int total = 0;  //not sure what this is trying to do.
         int totalValue = 15;
         float valueDensity = 0f;
 
 
         if (lc.activeContracts.Count>0)
         {
-            total = updateTotal();
-            totalValue = lc.activeContracts[0].totalCost;
+            total = CanvasPixels.totalPixels(); //this doesn't seem right.  It's only the first contract.
+            totalValue = lc.activeContracts[0].inventory.remaining.totalValue();  //amount of value in the first contract.
         }
 
         
         if (total > 0) { 
-            valueDensity = (float)totalValue/total;
+            valueDensity = (float)totalValue/total;   //how dense is the value of the pixels?
         }
 
         if (lc.pictureStats != null)  //the detail stats
         {
             lc.pictureStats.text = "TOTAL PIXELS: " + total.ToString() + "\nTOTAL VALUE: " + totalValue.ToString() + "\nVALUE DENSITY: " + valueDensity.ToString("0.00") + "x\n\n";
-            lc.pictureStats.text += "AVAILABLE: " + available().ToString("P0")+"\n";
+            lc.pictureStats.text += "AVAILABLE: " + available().ToString("P0")+"\n";  //available() has been gutted. 
             //lc.pictureStats.text += "Est. completion: "+estimate().ToString()+" seconds \n";
         }
     }    
@@ -213,24 +224,38 @@ public void UpdateTexture()
     {
         
         int length = lc.hueQuantitiesText.Length;
+
         for (int i = 1; i < length;i++)  //we're not using 0 for anything because it's ore and not a value in this system.
         {
 
-           // Debug.Log("i:"+i+"Quantity:"+quantity[i]);
-
+            /*
             if (lc.hueQuantitiesText[i] != null)
                 lc.hueQuantitiesText[i].text = quantity[i].ToString() + "x";
+            */
+
+            if (lc.hueQuantitiesText[i] != null)
+                lc.hueQuantitiesText[i].text = CanvasPixels.totalPixels().ToString() + "x"; //should this be CanvasPixels or Pixels[,]
+
         }
             
     }
 
-    public void convertToWorkOrder()
+    public void convertToWorkOrder()   //some logic could be changed here to put trades in for R,G,B tokens that don't require production
     {
-        Contract contract = new Contract();
-        contract.setRequirements(pixelValues);
+        Contract contract = new Contract(pixelValues2);
         lc.activeContracts.Add(contract);
 
-    
+
+
+        foreach (var kvp in contract.remainingPixels()) //should pull every entry in the contract and add it to the work order.
+        {
+            Pixel pixel = new Pixel(kvp.Key.Level, kvp.Key.Red, kvp.Key.Green, kvp.Key.Blue);
+            int quantity = kvp.Value;
+
+            lc.addToQueue(new workOrder(pixel, quantity)); ///how should workOrder work now?
+
+        }
+        /*
 
         
         for (int i = 4; i < quantity.Length; i++)
@@ -264,34 +289,49 @@ public void UpdateTexture()
                 }
             }
         }
+
+        */
+
+
+
+
     }
+
+    #endregion
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region stats
     public float available()  //what % of the image do you have the resources to make?
     {
+        /*
         requiredPixels = 0;
+        
         float total = contract.currentCost;
 
         for (int i = 0; i < quantity.Length; i++)  //if you have enough
         {
             int job = quantity[i];
-            int available = lc.inventory[i];
+            int available = lc.inventory.GetQuantity(); ///how does this work?
 
             if (job > available)
                 requiredPixels += job - available;
         }
 
         float difference = requiredPixels / total;
-
+        
         if (difference == float.NaN) //this doesn't seem to work.
             return 0f;
         else return (1f - difference);
-      
+        */
+        return 0f;
+
     }
     public int estimate()  //used for other things not implemented yet // how long it would take to make this.  It's broken currently, I think?
     {
-        int t = 0;
 
+        
+        int t = 0;  //time?
+        /*
         for(int i = 0; i < quantity.Length; i++)
         {
             if (i < 4)
@@ -300,18 +340,10 @@ public void UpdateTexture()
                 t += quantity[i] / (int)lc.machineAverage();
             else t += quantity[i] / (int)lc.machineAverage() * 2;
         }
-
+        */
         return t;
+
     }
 
-    public int updateTotal()
-    {
-        int totalPixels = 0;
-
-        for (int i = 1; i < quantity.Length; i++)
-            totalPixels += quantity[i];
-
-
-        return totalPixels;
-    }
+    #endregion
 }

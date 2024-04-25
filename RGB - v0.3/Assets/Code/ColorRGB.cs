@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct ColorRGB
+public struct ColorRGB   //GETTING DEPRECIATED
 {
     public int r;
     public int g;

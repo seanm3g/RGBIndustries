@@ -8,12 +8,10 @@ public struct Trade
 
     FlavorText f;
 
-    public float cadence;
-    public float length;
-    public int sendQuantity;
-    public int sendColor;
-    public int recieveQuantity;
-    public int recieveColor;
+    public float cadence;           //frequency
+    public float length;            //
+
+    public (Pixel pixel, int quantity) send, recieve;
     
     public float elapsedTime;
     public bool isActive;
@@ -28,13 +26,15 @@ public struct Trade
         //length = f.rollDice(1, 10);
         cadence = 1;
         length = 1;
-        sendQuantity = 5 * f.rollDice(1, 10);  //sets the initial quantity
-        sendColor = f.rollDice(1,7);
-        recieveColor = f.rollDice(1,7);
-        while (recieveColor == sendColor) //if it's the same, then redo it.
-            recieveColor = f.rollDice(1,7);
+        send.quantity = 5 * f.rollDice(1, 10);  //sets the initial quantity
+        send.pixel = Pixel.randomPixel(1);  //this shouldn't be 1 by default
+        recieve.quantity = 5 * f.rollDice(1, 10);  //sets the initial quantity
+        recieve.pixel = Pixel.randomPixel(1);  //this shouldn't be 1 by default
 
-        recieveQuantity = 0;
+        while (recieve.pixel == send.pixel) //if it's the same, then redo it.
+            recieve.pixel = Pixel.randomPixel(1);
+
+        recieve.quantity = 0;
 
        
         
@@ -54,40 +54,37 @@ public struct Trade
         float sendModifier = 1;
         float recieveModifier = 1;
 
-        // Assuming sendColor and recieveColor are integers declared elsewhere
-        if (sendColor < 4)
+
+        if (Pixel.isPrimary(send.pixel))
             sendModifier = 1;
-        else if (sendColor < 7)
+        else if (send.pixel != new Pixel(1, 1, 1, 1))
             sendModifier = 2;
-        else
-            sendModifier = 3;
+        else sendModifier = 3;
 
-        if (recieveColor < 4)
+        if (Pixel.isPrimary(recieve.pixel))
             recieveModifier = 1;
-        else if (recieveColor < 7)
+        else if (recieve.pixel != new Pixel(1, 1, 1, 1))
             recieveModifier = 2;
-        else
-            recieveModifier = 3;
+        else recieveModifier = 3;
 
-        // Cast sendQuantity to float for the calculation, then cast the result back to int
-        recieveQuantity = (int)((float)sendQuantity * sendModifier / recieveModifier);  //compares the amount of each color to adjust
+        recieve.quantity = (int)((float)send.quantity * sendModifier / recieveModifier);
 
-        if(recieveQuantity<0)
+        if (recieve.quantity < 0)  //what does this code do?
         {
-            recieveQuantity = recieveQuantity * -1;
-            sendQuantity += recieveQuantity;
+            recieve.quantity = recieve.quantity * -1;
+            send.quantity += recieve.quantity;
         }
-        // Assuming f is an object with a rollDice method
-        if (f.rollDice(1, 2) > 1)  //randomly do one or the other.
-            recieveQuantity += f.rollDice(1, 5);
+
+        if (f.rollDice(1, 2) > 1)
+            recieve.quantity += f.rollDice(1, 5);
         else
-            recieveQuantity -= f.rollDice(1, 5);
+            recieve.quantity -= f.rollDice(1, 5);
     }
 
     public bool isFulfilled()
     {
 
-        if (quantity >= sendQuantity) //if the order is full  
+        if (quantity >= send.quantity) //if the order is full  
             return true;
         else
             return false;

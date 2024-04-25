@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -9,14 +10,7 @@ public class Contract
     public LogicCenter lc;
     public FlavorText ft = new FlavorText();
 
-    public int[] requirements;
-    public int currentRequirements;  //what is the remaining pixels required
-    public int currentCost;  //what is remaining cost to be filled?
-
-    public int totalRequirements;  //what is the total number of pixels required
-    public int totalCost;  //what is the total cost of those pixels?
-
-    
+    public (Inventory remaining, Inventory total) inventory;
 
     public string clientName;
     public string contractName;
@@ -24,130 +18,90 @@ public class Contract
     public float progress;
     #endregion
 
+
     public Contract()
+    {
+        clientName = ft.companyNames[ft.rollDice(1, ft.companyNames.Length) - 1];
+        contractName = ft.contractName[ft.rollDice(1, ft.contractName.Length) - 1];
+
+
+        inventory.total = new Inventory();
+        inventory.remaining = new Inventory();
+
+    }
+
+    public Contract(Pixel[,] reqs)
     {
         clientName = ft.companyNames[ft.rollDice(1,ft.companyNames.Length)-1];
         contractName = ft.contractName[ft.rollDice(1, ft.contractName.Length) - 1];
-        requirements = new int[8];
+        setRequirements(reqs);
 
-        for (int i = 0; i < requirements.Length; i++)  //init to zero
-        {
-            requirements[i] = -1;
-        }
+
+
+        inventory.total = new Inventory();
+        inventory.remaining = new Inventory();
+
     }
 
-    public void setRequirements(int[,] pixelValues)
+    public void setRequirements(Pixel[,] pixelValues)
     {
-        for (int i = 0; i < requirements.Length; i++)  //sets to zero
-            requirements[i] = 0;
+
+        inventory.total.Clear();
 
 
         for (int i = 0; i < pixelValues.GetLength(0); i++)
             for (int j = 0; j < pixelValues.GetLength(1); j++)
-                requirements[pixelValues[i, j]]++;  //adds quantity per pixel in the image.
+                inventory.total.addPixels(pixelValues[i, j],1);  //adds quantity per pixel in the image.
+
+        //updateRequirements();
 
 
-
-        //Debug.Log("CYAN REQUIREMENTS:" + requirements[6]);
-        //Debug.Log("MAGENTA REQUIREMENTS:" + requirements[5]);
-
-        updateCurrentRequirements();
-        setTotal();
-        setTotalCost();
-
-        /*
-         * updateTotal();
-         updateCurrentCost();
-         */
     }
 
-    public void setTotal()
+
+    public Dictionary<Pixel, int> getInventory()  //this has to possible returns
     {
-        totalRequirements = 0;
-
-        for (int i = 1; i < requirements.Length; i++) //start at one to remove canvas color
-            totalRequirements += requirements[i];
-    }
-    public void fillRequirements()  //this isn't getting called anywhere.
-    {
-        for (int i = 0;i < requirements.Length;i++)
-        {
-            int req = requirements[i];
-            int inv = lc.inventory[i];
-
-            if (req > 0 && inv > 0)
-            {
-                if (req > inv)
-                {
-                    req -= inv;
-                    inv = 0;
-
-                }
-                else //inv >= req
-                {
-                    inv -= req;
-                    req = 0;
-                }
-            }
-            requirements[i] = req;
-            lc.inventory[i] = inv;
-        }
-    }
-    public void updateCurrentRequirements()  //this isn't getting updated.
-    {
-        currentRequirements = 0;
-
-        for (int i = 1; i < requirements.Length; i++) //start at one to ignore canvas color
-        {
-            currentRequirements += requirements[i];
-        }
-
-        if (totalRequirements > 0)
-            progress = 1-((float)currentRequirements / totalRequirements);
+            return inventory.total.getInventory();
     }
 
-    public void setTotalCost()  //cost of the pixels (based on expense of making each pixel)
+    public Dictionary<Pixel, int> remainingPixels()  //this has to possible returns
     {
-        totalCost = 0;
-        int valueMultiplier = 1;
-
-        for (int i = 0; i < requirements.Length; i++)
-        {
-            if (i < 4)
-                valueMultiplier = 1;
-            else if (i < 7)
-                valueMultiplier = 2;
-            else valueMultiplier = 3;
-
-            totalCost += requirements[i] * valueMultiplier;
-        }
+        return inventory.remaining.getInventory();
     }
-    public void updateCurrentCost()
+
+    public int uniquePixelsLeft()
     {
-        currentCost = 0;
-        int valueMultiplier = 1;
+        return inventory.remaining.getInventory().Count;
+    }
 
-        for (int i = 0; i < requirements.Length; i++)
-        {
-            if (i < 4)
-                valueMultiplier = 1;
-            else if (i < 7)
-                valueMultiplier = 2;
-            else valueMultiplier = 3;
+    public int getEntry(Pixel p)
+    {
+        return inventory.remaining.getInventory()[p];
+    }
 
-            currentCost += requirements[i] * valueMultiplier;
-        }         
+    public void subtractPixels(Pixel p, int q)
+    {
+        inventory.remaining.subtractPixels(p,q);
+
+    }
+
+    public void setQuantity(Pixel p, int q)
+    {
+        inventory.remaining.setQuantity(p, q);
+
     }
     public bool isComplete()
     {
-        for(int i = 1; i < requirements.Length; i++)
-        {
-            if (requirements[i] != 0)  //if any entry has some left
-            {
-                return false;
-            }
-        }
-        return true;
+        if(inventory.remaining.isEmpty())
+            return true;
+        else return false;
+    }
+
+    public int totalRequirements()
+    {
+
+        return inventory.total.totalPixels();
+
     }
 
 }

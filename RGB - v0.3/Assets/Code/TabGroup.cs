@@ -78,12 +78,17 @@ public class TabGroup : MonoBehaviour
 
     }
 
-    public void updateColor()
+    public void updateColor()  //this needs updating
     {
         if(selectedTab != null)
         {
             childText = selectedTab.GetComponentInChildren<Text>();
 
+            selectedTab.bg.color = new Color(1, 0, 0);
+            childText.color = new Color(1, 1, 1);
+
+
+            /*
             switch (lc.chosenColor)
             {
                 case 1:
@@ -99,7 +104,7 @@ public class TabGroup : MonoBehaviour
                 
                         childText.color = new Color(1, 1, 1);
                     break;
-            }
+            }*/
         }
     }
     public void resetTabs()
