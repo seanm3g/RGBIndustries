@@ -8,12 +8,13 @@ public class MachineManager
 {
     private List<Machine> machines;
     //private List<workOrder> workOrders;
-    public MachineManager(List<Machine> machines, List<workOrder> workOrders)
+    public MachineManager(List<Machine> machines)
     {
         this.machines = machines;
     }
 
 
+    /*
     public void Update()
     {
         // Iterate through each machine and update its logic based on deltaTime
@@ -36,12 +37,14 @@ public class MachineManager
     private bool openOrders()
     {
 
+        
         if (workOrders.Count > 0)
             return true;
         else return false;
+        
     }
 
-    /*
+    
     public void Update()
     {
         foreach (var machine in machines)
@@ -82,7 +85,7 @@ public class MachineManager
                     // Add other status handling as needed
             }
         }
-    }*/
+    }
 
 
     public void AssignOrderToAvailableMachine(workOrder order)
@@ -115,4 +118,5 @@ public class MachineManager
                 // Add other status handling as needed
         }
     }
+    */
 }

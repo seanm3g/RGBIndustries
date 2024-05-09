@@ -56,6 +56,7 @@ public class LogicCenter : MonoBehaviour
     #region machines
 
     public List<Machine> machines = new List<Machine>();
+    public MachineManager machineManager = new MachineManager(machines);
 
     public GameObject[] machineEntry = new GameObject[12];
     public Text[] machineMenuNameText = new UnityEngine.UI.Text[12];
