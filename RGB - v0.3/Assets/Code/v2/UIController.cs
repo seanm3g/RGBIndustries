@@ -5,23 +5,25 @@ using UnityEngine;
 public class UIController
 {
     // Start is called before the first frame update
-{
-
-    
-
-    void setup()
+    public void setup()
     {
 
         //do stuff
 
     }
 
-// Update is called once per frame
+    public void update()
+    {
+
+
+    }
+
+    // Update is called once per frame
 
     public void startingPage()  //sets the window that shows up when the game is run.
     {
-        SelectMenu.SetActive(true);
-        ProductionPage.SetActive(false);
-        newWorkOrderWindow.SetActive(false);
+        //SelectMenu.SetActive(true);
+       // ProductionPage.SetActive(false);
+       // newWorkOrderWindow.SetActive(false);
     }
 }

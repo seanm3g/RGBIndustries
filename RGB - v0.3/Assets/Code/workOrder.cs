@@ -5,83 +5,64 @@ using UnityEngine;
 
 public class workOrder
 {
-    // Things like "checkWorkOrders" should be in this class as order.check(order) instead of ref order stuff.
+    public (Pixel pixel, int quantity) ingredientA, ingredientB, product;
+    
 
-    // A workorder becomes a work order when it has a Ingredient A and Ingredient B
+    public enum stat
+    {
+        INACTIVE = 0,
+        INPRODUCTION = 1,
+        IDLE = 2,
+        FINISHED = 3,
+        WAITING = 5
+    }
+    public enum dest
+    {
+        NONE = 0,
+        WORKORDER = 1,
+        TRADE = 2,
+        CONTRACT = 3,
+        INVENTORY = 4
+    }
 
-    public (Pixel pixel,int quantity) ingredientA, ingredientB, product;
-   
-
-
-    public int status;  ///status 5 = waiting on input color
-
-    public const int STATUS_INACTVE = 0;
-    public const int STATUS_IN_PRODUCTION = 1;
-    public const int STATUS_IDLE = 2;
-    public const int STATUS_FINSHED = 3;
-    public const int STATUS_WAITING = 5; 
+    public stat status;
+    public dest destination;
 
 
     public int machineIndex;
     public string name;
-    FlavorText fl;
-
-    public int destination;
-
-    //ADD CONSTANTS FOR EACH STATE
-
-    private const int DESTINATION_NONE = 0;
-    private const int DESTINATION_WORK_ORDER = 1;
-    private const int DESTINATION_TRADE = 2;
-    private const int DESTINATION_CONTRACT = 3;
-    private const int DESTINATION_INVENTORY = 4;
+    private FlavorText fl;
 
     public workOrder((Pixel p, int q) a, (Pixel p, int q) b, (Pixel p, int q) pro)
     {
         fl = new FlavorText();
-
-        name = fl.orderName();  //what does this do?  line 2038 in logicCenter
-
-        destination = DESTINATION_NONE;
-
-        status = STATUS_INACTVE;
-
+        name = fl.orderName();
+        destination = dest.NONE;
+        status = stat.INACTIVE;
         ingredientA = a;
         ingredientB = b;
         product = pro;
-
         machineIndex = -1;
-
     }
 
-    public bool waiting()  //should this have the other statuses?
+    public bool Waiting()
     {
-        if (status == STATUS_WAITING)
-            return true;
-        else return false;
+        return status == stat.WAITING;
     }
 
-    public bool isActive()
+    public bool IsActive()
     {
-        if (status != STATUS_INACTVE)
-            return true;
-        else return false;
-
-
+        return status != stat.WAITING;
     }
-    //////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////
-    public void reset()
+
+    public void Reset()
     {
-        machineIndex= -1;
+        machineIndex = -1;
         ingredientA.pixel.Clear();
         ingredientA.quantity = -1;
-        
         ingredientB.pixel.Clear();
         ingredientB.quantity = -1;
-        
         product.pixel.Clear();
         product.quantity = -1;
     }
-
 }

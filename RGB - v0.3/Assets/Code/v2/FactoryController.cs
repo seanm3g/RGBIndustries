@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class FactoryController
 {
-    void setup()
+    public void setup()
     {
 
         //do stuff
+
+    }
+
+    public void update()
+    {
+
 
     }
 }

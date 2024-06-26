@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class TradeController
 {
-    void setup()
+    public void setup()
     {
 
         //do stuff
+
+    }
+
+    public void update()
+    {
+
 
     }
 }

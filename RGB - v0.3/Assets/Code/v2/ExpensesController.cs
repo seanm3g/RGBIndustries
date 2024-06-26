@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class ExpensesController
 {
-    void setup()
+    public void setup()
     {
 
         //do stuff
+
+    }
+
+    public void update()
+    {
+
 
     }
 }

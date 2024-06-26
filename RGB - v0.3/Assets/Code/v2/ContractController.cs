@@ -4,17 +4,27 @@ using UnityEngine;
 
 public class ContractController
 {
-    // Start is called before the first frame update
-    void setup()
+
+
+
+    public List<Contract> contracts { get; set; }
+
+    public ContractController(int i)
+    {
+        contracts = new List<Contract>(i);
+
+
+    }
+    public void setup()
     {
 
         //do stuff
 
     }
 
-    // Update is called once per frame
-    void Update()
+    public void update()
     {
-        
+
+
     }
 }

@@ -2,17 +2,35 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
-public struct Employee
+public class Employee
 {
     public int firstName,lastName;
     public int job;
     public int age;
-    public int status;
+    
     public int hobby; //values like this will all be index's in the master library of names, hobbies, flavortext, etc.
     FlavorText f;
-    public int[] stats;
+
+
+
+    public int status;
+    
+    public const int INIT = 1;
+    public const int REL = 2;
+    public const int SPE = 3;
+
+    public const int IDLE = 0;
+    public const int ACTIVE = 1;
+    public const int MISBEHAVE = 2;
+
+    public int assignedMachineId;  //the id of the machine assigned (what is this?)
+
+
+    public (int initalization, int reliability,int speed) stats{ get; private set; }
+    public (int initalization, int reliability, int speed) statsMax { get; private set; }
     public int compensation;
     public int sunSign;
     public int hometown;
@@ -24,9 +42,14 @@ public struct Employee
     {
         f = new FlavorText();
 
-        stats = new int[3];
-
         elapsedTime = 0;
+
+        statsMax = (20,20,20);
+
+        stats = (f.rollDice(1, statsMax.initalization), 
+                 f.rollDice(1, statsMax.reliability), 
+                 f.rollDice(1, statsMax.speed));
+
         firstName = f.rollDice(1,f.firstNames.Length)-1;
         lastName = f.rollDice(1, f.lastNames.Length)-1;
         hometown = f.rollDice(1,f.cities.Length)-1;
@@ -39,38 +62,13 @@ public struct Employee
 
         birthdate = f.GenerateRandomDate(f.currentYear - age);
 
-        sunSign = 0;
         sunSign = setSunSign();
-        createStats();
 
     }
 
     public override string ToString()
     {
-        return $"Person [First Name: {f.firstNames[firstName]}\nLast Name: {f.lastNames[lastName]}\nAge: {age}\nHobby: {f.hobbies[this.hobby]}\nStatus: {f.employmentStatuses[this.status]}\n Initiative: {stats[0]}\n Reliability: {stats[0]}\n Speed: {stats[0]}";
-    }
-
-    public void createStats()
-    {
-        stats[0] = f.rollDice(1, 3);  // SPEED
-        //stats[0] = 1;  // SPEED
-        stats[1] = f.rollDice(1, 2);  // RELIABILITY
-        stats[2] = f.rollDice(1, 20);  // INTELLIGENCE
-    }
-
-    public int getSpeed()
-    {
-        return stats[0];
-    }
-
-    public int getReliability()
-    {
-        return stats[1];
-    }
-
-    public int getIntelligence()
-    {
-        return stats[2]; 
+        return $"Person [First Name: {f.firstNames[firstName]}\nLast Name: {f.lastNames[lastName]}\nAge: {age}\nHobby: {f.hobbies[this.hobby]}\nStatus: {f.employmentStatuses[this.status]}\n Initiative: {stats.initalization}\n Reliability: {stats.reliability}\n Speed: {stats.speed}";
     }
 
     public int setSunSign()
@@ -104,5 +102,59 @@ public struct Employee
             return 12;
         else
             return -1;
+    }
+    public void isBirthday(int month, int day)
+    {
+        if(month==birthdate.Month&& day ==birthdate.Day)
+            age++;
+            //event (happy birthday!);
+
+    }
+
+
+    public bool rollStat(int i)  //checks the employees specific stat
+    {
+        bool pass;
+
+        int tempStat = 0;
+        switch(i)
+        {
+            case 1:
+                tempStat = stats.initalization;
+                break;
+            case 2:
+                tempStat = stats.reliability;
+                break;
+            case 3:
+                tempStat = stats.speed;
+                break;
+        }
+
+        if (f.rollDice(1, 20) < tempStat)
+            pass = true;
+        else pass = false;
+
+        return pass;
+    }
+
+    public int getStat(int i)
+    {
+
+        int tempStat = 0;
+
+        switch (i)
+        {
+            case 1:
+                tempStat = stats.initalization;
+                break;
+            case 2:
+                tempStat = stats.reliability;
+                break;
+            case 3:
+                tempStat = stats.speed;
+                break;
+        }
+
+        return tempStat;
     }
 }

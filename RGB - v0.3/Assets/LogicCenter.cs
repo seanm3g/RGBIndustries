@@ -944,7 +944,7 @@ public class LogicCenter : MonoBehaviour
             e.elapsedTime += Time.deltaTime;
 
             //Debug.Log("i:" +i+"\nElapsed Time: " + e.elapsedTime);
-            if (e.elapsedTime >= 5 - e.getSpeed())
+            if (e.elapsedTime >= 5 - e.getStat(Employee.SPE))
             {
                 e.elapsedTime = 0f;
 

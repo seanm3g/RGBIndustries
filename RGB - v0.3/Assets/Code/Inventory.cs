@@ -13,17 +13,19 @@ public class Inventory
     private Dictionary<Pixel, int> inventory = new Dictionary<Pixel, int>();
     private System.Random random = new System.Random();
 
+    int capacity;
 
     Pixel ore = new Pixel(1, 0, 0, 0);
 
-    #region static methods
-
+    public Inventory(int c)
+    {
+        capacity = c;
+    }
 
     #region core
     public int ORE()
     {
         return inventory[ore];
-
     }
 
     public void setORE(int quantity)
@@ -37,6 +39,8 @@ public class Inventory
 
     }
     #endregion
+
+    #region static methods
 
     public static Inventory operator -(Inventory inventory, (Pixel p, int q) pixel)
     {
