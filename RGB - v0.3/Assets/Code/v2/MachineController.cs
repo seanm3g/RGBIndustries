@@ -5,7 +5,7 @@ public class MachineController
 {
     public List<Machine> Machines { get; private set; }
 
-    public MachineController(int i)
+    public MachineController(int i,workOrderController wc)
     {
         Machines = new List<Machine>(i);
     }

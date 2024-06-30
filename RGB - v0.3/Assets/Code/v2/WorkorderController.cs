@@ -4,7 +4,7 @@ public class workOrderController
 {
     private List<workOrder> workOrders;
 
-    public workOrderController(int i)
+    public workOrderController(int i,MachineController mc)
     {
         workOrders = new List<workOrder>(i);
     }

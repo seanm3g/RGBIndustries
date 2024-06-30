@@ -91,12 +91,13 @@ public class logiccenter2 : MonoBehaviour
         
 
             inventory = new(10);
-            harvest = new(startingCapacity);
-            machines = new(startingMachines);
-            workorders = new(startingQueue);
+            harvest = new(startingCapacity,inventory);
+
+            machines = new(startingMachines,workorders);
+            workorders = new(startingQueue,machines);
             trades = new();
             contracts = new(startingContracts);
-            employees = new(startingEmployees);
+            employees = new(startingEmployees,harvest,machines);
             factory = new();
             expenses = new();
             ui = new();
