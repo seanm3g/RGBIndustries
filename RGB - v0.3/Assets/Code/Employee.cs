@@ -38,7 +38,8 @@ public class Employee
     public float elapsedTime;
     public DateTime birthdate;
 
-    List<Relationship> relationships = new();
+
+    public List<Relationship> relationships = new();
 
 
     public Employee(int job)
@@ -170,6 +171,18 @@ public class Employee
         return tempStat;
     }
 
+    public void addRelationship(Employee other)
+    {
+        relationships.Add(new Relationship(other));  //adds a new person to your friends list.
+        
+    }
+
+    public Relationship getRandomRelationship()
+    {
+        return relationships[f.rollDice(1, relationships.Count - 1)];
+
+    }
+
 }
 
 
@@ -224,5 +237,11 @@ public class Relationship
         if (standing < -5) standing = -5;
 
         setStatus();
+    }
+
+    public Employee getPerson()
+    {
+        return other;
+
     }
 }

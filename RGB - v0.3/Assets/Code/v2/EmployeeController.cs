@@ -134,14 +134,14 @@ public class EmployeeController
         const int mildThreshold = 70;
 
 
-        if (roll > severeThreshold)
+        if (roll > severeThreshold)  //did a bad thing
             severeBehavior(e);
-        else if (roll > moderateThreshold)
+        else if (roll > moderateThreshold)  //did a meh thing
             moderateBehavior(e);
-        else if (roll > mildThreshold)
+        else if (roll > mildThreshold)  //did a mild thing
             mildBehavior(e);
         else
-            doNothing();
+            doNothing();  //zoned out
 
         // roll for nothing, minor, major, catastrophic
         // pull event from those lists
@@ -155,37 +155,31 @@ public class EmployeeController
 
         switch (roll)
         {
-            case 1: gossip(); break;
-            case 2: fallAsleep(); break;
-            case 3: breakmachine(e);  break;
+            case 1: gossip(e); break;
+            case 2: fallAsleep(e); break;
+            case 3: break;
             case 4: break;
             case 5: break;
 
         }
-
-
     }
 
-    private void doNothing(Employee e){ }
+    private void doNothing(){ }
 
     public void gossip(Employee e)
     {
-        //pull from existing relatoinships 80% of the time. 20% other people.
+        int roll = ft.rollDice(1,100);
+        Employee other = null;
+        if (roll > 80)
+            other = e.getRandomRelationship().other;
 
+        else other = getRandomEmployee();
+
+        //pull from existing relatoinships 80% of the time. 20% other people.
     }
 
     private void fallAsleep(Employee e)
     {
-
-
-
-    }
-
-    private void breakMachine(Employee e)
-    {
-        //e.breakMachine(e);
-        mc.breakMachine(e.assignedMachineId);
-
     }
 
     public void moderateBehavior(Employee e)
@@ -195,13 +189,19 @@ public class EmployeeController
         switch (roll)
         {
             case 1: fight(e); break;
-            case 2: break;
+            case 2: breakMachine(e);  break;
             case 3: break;
             case 4: break;
             case 5: break;
 
         }
 
+    }
+
+    private void breakMachine(Employee e)
+    {
+        //e.breakMachine(e);
+        mc.breakMachine(e.assignedMachineId);
 
     }
 
@@ -253,6 +253,13 @@ public class EmployeeController
     public List<Employee> getIdleEmployees()
     {
         return employees.FindAll(e => e.status == Employee.IDLE);
+
+    }
+
+    public Employee getRandomEmployee()
+    {
+        int upper = employees.Count-1;  //does this need -1?
+        return employees[ft.rollDice(1, upper)];
 
     }
     #endregion
