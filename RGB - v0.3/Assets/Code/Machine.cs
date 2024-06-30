@@ -15,7 +15,7 @@ public class Machine
     public int ProductionCycles { get; private set; }
     public workOrder? CurrentOrder { get; private set; }
 
-    public int Id { get; private set; }
+    public int ID { get; private set; }
 
     public Employee AssignedEmployee { get; private set; }
 
@@ -29,6 +29,7 @@ public class Machine
         Yield = yield;
         ProductionCycles = -1;
         CurrentOrder = null;
+        ID = IDGenerator.getNextID();
         OEE = CalculateOEE();
     }
 

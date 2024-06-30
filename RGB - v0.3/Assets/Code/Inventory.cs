@@ -16,10 +16,16 @@ public class Inventory
     int capacity;
 
     Pixel ore = new Pixel(1, 0, 0, 0);
+    Pixel red = new Pixel(1, 1, 0, 0);
+    Pixel green = new Pixel(1, 0, 1, 0);
+    Pixel blue = new Pixel(1, 0, 0, 1);
+
+    int min;
 
     public Inventory(int c)
     {
         capacity = c;
+
     }
 
     #region core
@@ -37,6 +43,26 @@ public class Inventory
     {
         inventory[ore] = 0;
 
+    }
+
+    public Pixel getMinPrimitive()
+    {
+        int redValue = inventory.ContainsKey(red) ? inventory[red] : int.MaxValue;
+        int greenValue = inventory.ContainsKey(green) ? inventory[green] : int.MaxValue;
+        int blueValue = inventory.ContainsKey(blue) ? inventory[blue] : int.MaxValue;
+
+        if (redValue <= greenValue && redValue <= blueValue)
+        {
+            return red;
+        }
+        else if (greenValue <= redValue && greenValue <= blueValue)
+        {
+            return green;
+        }
+        else
+        {
+            return blue;
+        }
     }
     #endregion
 

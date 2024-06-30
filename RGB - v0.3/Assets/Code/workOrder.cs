@@ -11,10 +11,11 @@ public class workOrder
     public enum stat
     {
         INACTIVE = 0,
-        INPRODUCTION = 1,
-        IDLE = 2,
-        FINISHED = 3,
-        WAITING = 5
+        PENDING = 1,
+        PRODUCTION = 2,
+        IDLE = 3,
+        FINISHED = 4,
+ 
     }
     public enum dest
     {
@@ -45,14 +46,14 @@ public class workOrder
         machineIndex = -1;
     }
 
-    public bool Waiting()
+    public bool pending()
     {
-        return status == stat.WAITING;
+        return status == stat.PENDING;
     }
 
     public bool IsActive()
     {
-        return status != stat.WAITING;
+        return status != stat.PRODUCTION;
     }
 
     public void Reset()

@@ -1,15 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
-using UnityEngine;
 
 public class Employee
 {
     public int firstName,lastName;
-    public int job;
+
     public int age;
+
+    public int job { get; private set; }
+    public int ID { get; private set; }
     
     public int hobby; //values like this will all be index's in the master library of names, hobbies, flavortext, etc.
     FlavorText f;
@@ -26,7 +26,7 @@ public class Employee
     public const int ACTIVE = 1;
     public const int MISBEHAVE = 2;
 
-    public int assignedMachineId;  //the id of the machine assigned (what is this?)
+    public int assignedMachineId;  //the id of the machine assigned (what is this?) Is it a number? ###? 
 
 
     public (int initalization, int reliability,int speed) stats{ get; private set; }
@@ -38,10 +38,14 @@ public class Employee
     public float elapsedTime;
     public DateTime birthdate;
 
+    List<Relationship> relationships = new();
+
+
     public Employee(int job)
     {
         f = new FlavorText();
 
+        ID = IDGenerator.getNextID();
         elapsedTime = 0;
 
         statsMax = (20,20,20);
@@ -61,6 +65,8 @@ public class Employee
         this.compensation = f.rollDice(1,2);
 
         birthdate = f.GenerateRandomDate(f.currentYear - age);
+
+        assignedMachineId = -1;
 
         sunSign = setSunSign();
 
@@ -137,6 +143,12 @@ public class Employee
         return pass;
     }
 
+    public void makeActive()
+    {
+        status = ACTIVE;
+
+    }
+
     public int getStat(int i)
     {
 
@@ -156,5 +168,61 @@ public class Employee
         }
 
         return tempStat;
+    }
+
+}
+
+
+public class Relationship
+{
+    public Employee other;  //the person they're friends with.
+    
+    public int standing;  //this goes up and down
+
+    public String status;
+
+    public Relationship(Employee other)
+    {
+        this.other = other;
+        standing = 0;
+    }
+
+    void setStatus()
+    {
+        switch(standing)
+        {
+            case > 3:
+                status = "Best Friends";
+                break;
+            case > 0:
+                status = "friends";
+                break;
+            case 0:
+                status = " coworkers";
+                break;
+            case > -2:
+                status = "friend";
+                break;
+            case < -5:
+                status = " Enemies";
+                break;
+            default: 
+                status = "no relationship";
+                break;
+        }
+    }
+
+    String getStatus()
+    {
+        return status;
+
+    }
+    public void moment(int experience)
+    {
+        standing += experience;  //events will typically be -1,0,+1.
+        if (standing > 5) standing = 5;
+        if (standing < -5) standing = -5;
+
+        setStatus();
     }
 }

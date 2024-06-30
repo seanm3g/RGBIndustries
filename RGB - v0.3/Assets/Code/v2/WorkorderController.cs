@@ -1,33 +1,32 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class WorkOrderController
+public class workOrderController
 {
-    private List<WorkOrder> workOrders;
+    private List<workOrder> workOrders;
 
-    public WorkOrderController(int i)
+    public workOrderController(int i)
     {
-        workOrders = new List<WorkOrder>(i);
+        workOrders = new List<workOrder>(i);
     }
 
 
 
     public void update()
     {
-        CheckWorkOrders();  //this isn't written yet, but this is the infrastructure
+        CheckworkOrders();  //this isn't written yet, but this is the infrastructure
     }
 
-    public void AddWorkOrder(WorkOrder order)
+    public void AddworkOrder(workOrder order)
     {
         workOrders.Add(order);
     }
 
-    public void RemoveWorkOrder(WorkOrder order)
+    public void RemoveworkOrder(workOrder order)
     {
         workOrders.Remove(order);
     }
 
-    public void CheckWorkOrders()     //needs to be written
+    public void CheckworkOrders()     //needs to be written
     {
         foreach (var order in workOrders)
         {
@@ -35,31 +34,37 @@ public class WorkOrderController
         }
     }
 
-    public List<WorkOrder> GetActiveWorkOrders()
+    public workOrder getPendingWorkOrder()
+    {
+        return workOrders[3];  //this is gibberish
+
+    }
+
+    public List<workOrder> GetActiveworkOrders()
     {
         return workOrders.FindAll(order => order.IsActive());
     }
 
-    public List<WorkOrder> GetWaitingWorkOrders()
+    public List<workOrder> GetPendingworkOrders()
     {
-        return workOrders.FindAll(order => order.Waiting());
+        return workOrders.FindAll(order => order.pending());
     }
 
-    public void AssignWorkOrderToMachine(WorkOrder order, int machineIndex)
+    public void AssignworkOrderToMachine(workOrder order, int machineIndex)
     {
-        if (order.status == WorkOrder.STATUS_WAITING)
+        if (order.status == workOrder.stat.PRODUCTION)
         {
             order.machineIndex = machineIndex;
-            order.status = WorkOrder.STATUS_IN_PRODUCTION;
+            order.status = workOrder.stat.PRODUCTION;
         }
     }
 
-    public void ResetWorkOrder(WorkOrder order)
+    public void ResetworkOrder(workOrder order)
     {
         order.Reset();
     }
 
-    public void UpdateWorkOrders()
+    public void UpdateworkOrders()
     {
         // Update logic for work orders, if necessary
     }

@@ -2,18 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using System.Collections.Generic;
-
 public class EmployeeController
 {
-    private List<Employee> employees { get; set;}
-    
-    private MachineController machineController;
+    private List<Employee> employees { get; set; }  //where all of the employees information lives.
+
+    FlavorText ft = new();
+    private MachineController mc;
+    private harvestController harvest;
     //private WorkOrderController workOrderController;  //not sure if this needed yet.
 
-    public EmployeeController(int initialCapacity)
+    public EmployeeController(int initialCapacity, harvestController harvest, MachineController mc)
     {
         employees = new List<Employee>(initialCapacity);
+        this.harvest = harvest;
+        this.mc = mc;
     }
 
     public void HireEmployee(Employee employee)
@@ -29,86 +31,230 @@ public class EmployeeController
     public void update()
     {
         // Update logic for employees, such as aging or status changes
+
+        bool init = false;
+        bool rel = false;
+
+        List<Employee> IDLEEmployees = getIdleEmployees();
+
         foreach (var employee in employees)
         {
-            runEmployee(employee);
+            init = employee.rollStat(Employee.INIT);
+            rel = employee.rollStat(Employee.REL);
+            if (init && rel)                            //productive!
+                employee.status = Employee.ACTIVE;
+            else if (init && !rel)                      //unproductive
+                employee.status = Employee.MISBEHAVE;
+            else employee.status = Employee.IDLE;       //lazy
 
         }
+
+        ExecuteEmployeeJob();
     }
 
-    private void runEmployee(Employee e)
+    public void ExecuteEmployeeJob()
     {
-        e.elapsedTime += Time.deltaTime;
+        List<Employee> activeEmployees = getActiveEmployees();
 
-        if (e.rollStat(Employee.INIT))  //checks intelligence
+        foreach (var e in activeEmployees)
         {
-            takesInitiative(e);
-        }
-        else
-        {
-            //reset timer
-            e.status = Employee.IDLE;   //employee didn't do anything.
-        }
-    }
-
-    private void takesInitiative(Employee e)  //action is taken
-    {
-        if (e.rollStat(Employee.REL) || e.rollStat(Employee.REL))  //reliablity // DO they do their job or something else?
-        {
-            e.status = Employee.ACTIVE;
-
-            switch (e.job)  //this might not be necessary.
+            if (e.status != Employee.IDLE)
             {
-                case 0: break;
-                case 1: employeeHarveter(e); break;  //should jobs be a class?
-                case 2: employeeRunMachine(e); break;
-                case 3: employeeManage(e); break;   //adds a roll to their teams's reliability
-                case 4: employeeAssign(e); break;   // assign work order tasks.
+                if (e.status == Employee.ACTIVE)
+                    switch (e.job)
+                    {
+                        case 1:
+                            employeeHarvest();
+                            break;
+                        case 2:
+                            assignWorkOrder();
+                            break;
+                        case 3:
+                            harvestSelect(); //updates the color being harvested
+                            break;
+                        case 4:
+                            employeeManage();  //adds bonus to employee rolls
+                            break;
+                        case 5:
+                            employeeRunMachine(e);
+                            break;
+                            // Add other job types as needed
+                    }
+                else
+                    employeeMisbehave(e);
+
+                e.status = Employee.IDLE;  //this needs to happen at the end of the task. several cycles?
             }
-
         }
-        else
-            employeeMisbehave(e);
-
     }
 
+    #region JOBS
 
-    public List<Employee> GetActiveEmployees()
+    private void employeeHarvest()
     {
-        return employees.FindAll(e => e.status == 1); // Assuming status 1 means active or working
-
-
+        harvest.distribute();  //shares Logiccenter2
     }
 
-    private void employeeHarveter(Employee e)    //job
+    private void harvestSelect()
     {
-
+        harvest.setToMin();
     }
 
-    private void employeeRunMachine(Employee e)  //job
+    void assignWorkOrder()
     {
-
     }
 
-    private void employeeManage(Employee e)  //manage
+    private void employeeManage()
     {
-
     }
 
-    private void employeeAssign(Employee e)   //assign
+    private void employeeRunMachine(Employee e)
     {
 
+        //does this happen here, or just trigger the flag that happens when the employee is active?
+        //is it weird for this to be only true for this specific job?
+
+        /*
+        if (e.assignedMachineId > 0)
+        { machines.update(Time.deltaTime); }
+        */
 
     }
 
+    #endregion
+
+
+    #region MISBEHAVIOR
     private void employeeMisbehave(Employee e)
     {
-        e.status = Employee.MISBEHAVE;
+        int roll = ft.rollDice(1, 100);
+
+        const int severeThreshold = 99;
+        const int moderateThreshold = 98;
+        const int mildThreshold = 70;
+
+
+        if (roll > severeThreshold)
+            severeBehavior(e);
+        else if (roll > moderateThreshold)
+            moderateBehavior(e);
+        else if (roll > mildThreshold)
+            mildBehavior(e);
+        else
+            doNothing();
+
+        // roll for nothing, minor, major, catastrophic
+        // pull event from those lists
+        // find people for the event
+        // adjust data vales, break things
     }
+
+    public void mildBehavior(Employee e)  //this should be a table
+    {
+        int roll = ft.rollDice(1, 5);
+
+        switch (roll)
+        {
+            case 1: gossip(); break;
+            case 2: fallAsleep(); break;
+            case 3: breakmachine(e);  break;
+            case 4: break;
+            case 5: break;
+
+        }
+
+
+    }
+
+    private void doNothing(Employee e){ }
+
+    public void gossip(Employee e)
+    {
+        //pull from existing relatoinships 80% of the time. 20% other people.
+
+    }
+
+    private void fallAsleep(Employee e)
+    {
+
+
+
+    }
+
+    private void breakMachine(Employee e)
+    {
+        //e.breakMachine(e);
+        mc.breakMachine(e.assignedMachineId);
+
+    }
+
+    public void moderateBehavior(Employee e)
+    {
+        int roll = ft.rollDice(1, 5);
+
+        switch (roll)
+        {
+            case 1: fight(e); break;
+            case 2: break;
+            case 3: break;
+            case 4: break;
+            case 5: break;
+
+        }
+
+
+    }
+
+    private void fight(Employee e) { }
+    public void severeBehavior(Employee e)
+    {
+        int roll = ft.rollDice(1, 5);
+
+        switch (roll)
+        {
+            case 1: die(e); break;
+            case 2: break;
+            case 3: break;
+            case 4: break;
+            case 5: break;
+
+        }
+
+    }
+
+    private void die(Employee e)
+    {
+        
+
+    }
+
+    #endregion
+
+
+    #region getMethods
+
+    public Employee GetEmployeeById(int id)
+    {
+        return employees.Find(e => e.ID == id);
+    }
+
 
     public List<Employee> getEmployees()
     {
         return employees;
     }
+
+    public List<Employee> getActiveEmployees()
+    {
+        return employees.FindAll(e => e.status == Employee.ACTIVE);
+
+    }
+
+    public List<Employee> getIdleEmployees()
+    {
+        return employees.FindAll(e => e.status == Employee.IDLE);
+
+    }
+    #endregion
 }
 

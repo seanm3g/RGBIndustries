@@ -1,9 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.UIElements;
-
 public class harvestController
 {
     private int harvestCapacity;
@@ -11,9 +5,13 @@ public class harvestController
     private int lastChosenColor;
     private int chosenColor;
 
-    public harvestController(int i)
+    private Pixel chosen;
+    private Inventory inventory;
+
+    public harvestController(int capacity, Inventory inv)  
     {
-        harvestCapacity = i;
+        inventory = inventory;
+        harvestCapacity = capacity;
     }
 
 
@@ -35,22 +33,31 @@ public class harvestController
 
     }
 
-    public (Pixel, int) distribute()
+    
+
+    public void distribute()
     {
-
-
-        int tempDistr = distribution;
+        inventory.addPixels(chosen, distribution);
         reset();
+    }
 
-        return (new Pixel(1, 1, 0, 0), tempDistr);
+    public void setToMin()
+    {
+        updateSelection(inventory.getMinPrimitive());
 
+
+    }
+
+    public void updateSelection(Pixel p)  //there's no safeguard on this now
+    {
+        chosen = p;
     }
 
 
     void reset()
     {
         distribution = 0;
-        lastChosenColor = chosenColor;
+        lastChosenColor = chosenColor;  //what does this do?
     }
 
     public void upgradeCapacity()

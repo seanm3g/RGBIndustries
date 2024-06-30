@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 
 public class MachineController
@@ -26,7 +24,7 @@ public class MachineController
         }
     }
 
-    private void UpdateMachine(Machine machine, float deltaTime)
+    private void UpdateMachine(Machine machine, float deltaTime)  //this should not trigger events, only update them.
     {
 
         if (machine.AssignedEmployee != null && machine.AssignedEmployee.status == 1)
@@ -90,6 +88,7 @@ public class MachineController
     private void Unloading(Machine machine)
     {
         machine.setStatus(Machine.Status.COMPLETED);
+        machine.AssignedEmployee.status = Employee.IDLE;
     }
 
     public void CompleteOrder(Machine machine)
@@ -97,8 +96,26 @@ public class MachineController
         machine.ClearOrder();
     }
 
+    public void breakMachine(int machineID)
+    {
+        GetMachineById(machineID).setStatus(Machine.Status.BROKEN);
+    }
+
+    public Machine GetMachineById(int id)
+    {
+        return Machines.Find(m => m.ID == id);
+    }
+
     public void NotifyMaintenance(Machine machine)
     {
-        Debug.Log($"Machine {machine.Type} needs maintenance.");
+        //Debug.Log($"Machine {machine.Type} needs maintenance.");
+    }
+
+    public void assignWorkOrderToMachine(Machine assigned, workOrder wo)
+    {
+        //ASSIGN
+
+
+
     }
 }

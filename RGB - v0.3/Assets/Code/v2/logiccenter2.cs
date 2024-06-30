@@ -1,7 +1,8 @@
-using System.Collections;
+
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using Unity.Jobs.LowLevel.Unsafe;
 
 public class logiccenter2 : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class logiccenter2 : MonoBehaviour
     public harvestController harvest;
 
     public MachineController machines;
-    public WorkOrderController workorders;
+    public workOrderController workorders;
     public TradeController trades;
     public ContractController contracts;
     public EmployeeController employees;
@@ -35,7 +36,7 @@ public class logiccenter2 : MonoBehaviour
     public FlavorText flavor;
     #endregion
 
-    private Dictionary<string, ScheduledTask> scheduledTasks = new Dictionary<string, ScheduledTask>();
+    private Dictionary<string, ScheduledTask> systems = new Dictionary<string, ScheduledTask>();
     #endregion
 
     #region SETUP
@@ -105,20 +106,6 @@ public class logiccenter2 : MonoBehaviour
             InitializeScheduledTasks();
     }
 
-
-    private void InitializeScheduledTasks()  //creates a task and how often that function happens.
-    {
-        scheduledTasks.Add("harvestIncrement", new ScheduledTask(() => harvest.increment(), 1));
-        scheduledTasks.Add("machinesUpdate", new ScheduledTask(() => machines.update(Time.deltaTime), 1));
-        scheduledTasks.Add("workordersUpdate", new ScheduledTask(() => workorders.update(), 1));
-        scheduledTasks.Add("contractsUpdate", new ScheduledTask(() => contracts.update(), 1));
-        scheduledTasks.Add("tradesUpdate", new ScheduledTask(() => trades.update(), 1));
-        scheduledTasks.Add("employeesUpdate", new ScheduledTask(() => employees.update(), 1));
-        scheduledTasks.Add("factoryUpdate", new ScheduledTask(() => factory.update(), 1));
-        scheduledTasks.Add("expensesUpdate", new ScheduledTask(() => expenses.update(), 60));   //once a minute
-        scheduledTasks.Add("uiUpdate", new ScheduledTask(() => ui.update(), 1));
-        scheduledTasks.Add("eventsUpdate", new ScheduledTask(() => events.update(), 1));
-    }
     #endregion
 
     #region UPDATE
@@ -140,11 +127,11 @@ public class logiccenter2 : MonoBehaviour
     }
     #endregion
 
-    void runSystems()
+    void runSystems()  //does ticks ever reset?  it should reset after the longest Task
     {
         ticks++;
 
-        foreach (var task in scheduledTasks.Values)
+        foreach (var task in systems.Values)
         {
             if (ticks - task.LastExecution >= task.Interval)
             {
@@ -155,13 +142,28 @@ public class logiccenter2 : MonoBehaviour
     }
 
 
-    void assignWorkOrder()
+    private void InitializeScheduledTasks()  //creates a task and how often that function happens.
     {
 
+        systems.Add("employeesUpdate", new ScheduledTask(() => employees.update(), 1));
+
+        systems.Add("harvestIncrement", new ScheduledTask(() => harvest.increment(), 1));
+        systems.Add("machinesUpdate", new ScheduledTask(() => machines.update(Time.deltaTime), 1));
+        systems.Add("workordersUpdate", new ScheduledTask(() => workorders.update(), 1));
+        systems.Add("contractsUpdate", new ScheduledTask(() => contracts.update(), 1));
+        systems.Add("tradesUpdate", new ScheduledTask(() => trades.update(), 1));
 
 
 
+        systems.Add("factoryUpdate", new ScheduledTask(() => factory.update(), 1));
+        systems.Add("expensesUpdate", new ScheduledTask(() => expenses.update(), 60));   //once a minute
+        systems.Add("uiUpdate", new ScheduledTask(() => ui.update(), 1));
+        systems.Add("eventsUpdate", new ScheduledTask(() => events.update(), 1));
     }
+
+
+
+
 
     /*
     public void harvestUpgrade() //used for reference
@@ -176,8 +178,14 @@ public class logiccenter2 : MonoBehaviour
             UpdatePixelText(chosenColor); // Update text display based on color
         }
     }*/
-}
 
+
+    
+
+
+    
+
+}
 
 public class ScheduledTask  //used to organize what systems need to be run // This can be used in other classes too.
 {
@@ -185,10 +193,21 @@ public class ScheduledTask  //used to organize what systems need to be run // Th
     public int Interval { get; private set; }
     public int LastExecution { get; set; }
 
+
     public ScheduledTask(Action task, int interval)
     {
         Task = task;
         Interval = interval;
         LastExecution = 0;
+    }
+}
+
+public static class IDGenerator  //used to simplify identifying matching objects for pairing, etc.
+{
+    private static int currentID = 0;
+
+    public static int getNextID()
+    {
+        return currentID++;
     }
 }

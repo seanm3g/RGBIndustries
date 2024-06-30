@@ -706,14 +706,150 @@ public class FlavorText
 };
 
 
-    public string[] factoryJobs = {"N/A","Harvest Engineer", "Machine Operator", "Quality Inspector", "Forklift Driver", "Maintenance Technician", "Welder", "Packager", "Material Handler", "Production Supervisor", "Safety Manager" };
-    public string[] employmentStatuses = { "Full-Time", "Part-Time", "Temporary", "Contract", "Intern", "Freelance", "Remote", "On Leave", "Unemployed", "Retired" };
+    public string[] factoryJobs = {
+        "N/A",
+        "Harvest Engineer", 
+        "Machine Operator", 
+        "Quality Inspector", 
+        "Forklift Driver", 
+        "Maintenance Technician", 
+        "Welder", "Packager", 
+        "Material Handler", 
+        "Production Supervisor", 
+        "Safety Manager" };
+    public string[] employmentStatuses = { 
+        "Full-Time", 
+        "Part-Time", 
+        "Temporary", 
+        "Contract", 
+        "Intern", 
+        "Freelance", 
+        "Remote", 
+        "On Leave", 
+        "Unemployed", 
+        "Retired" };
     public string[] employeeStatus = {"idle","working"};
-    public string[] machineStatuses = { "IDLE", "Loading", "RUNNING", "Unloading", "Completed", "Incomplete","IDLE", "Faulted", "Blocked", "Starved", "Changeover", "Maintenace", "Available", "Ready" };
-    public string[] factoryEvents = { "Machine Malfunction", "Safety Inspection", "Inventory Restock", "Employee Training", "Quality Control Audit", "Shift Change", "Power Outage", "Scheduled Maintenance", "Product Launch", "Emergency Drill" };
-    public string[] eventStatuses = { "", "Red Chosen!", "Green Chosen!", "Blue Chosen!", "Job is processed", "Machine is Running", "Random Event/Flavor Text", "Machine is Starved", "harvesting...", "Upgrade Harvest Capacity", "Harvester at capacity", "Maintenance", "Refinery Started", "Seasonal", "System","Production Idle","Pay Employees","Pay Rent"};
-    public string[] woStatuses = {"N/A","In Queue","Loading","In Production","Unloading","Completed","Incomplete",""};
-    public string[] zodiacSigns = {"N/A","Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"};
+    public string[] machineStatuses = { 
+        "IDLE", 
+        "Loading", 
+        "RUNNING", 
+        "Unloading", 
+        "Completed", 
+        "Incomplete",
+        "IDLE", 
+        "Faulted", 
+        "Blocked", 
+        "Starved", 
+        "Changeover", 
+        "Maintenace", 
+        "Available", 
+        "Ready" };
+    public string[] factoryEvents = { "Machine Malfunction", 
+        "Safety Inspection", 
+        "Inventory Restock", 
+        "Employee Training", 
+        "Quality Control Audit", 
+        "Shift Change", 
+        "Power Outage", 
+        "Scheduled Maintenance", 
+        "Product Launch", 
+        "Emergency Drill" };
+    public string[] eventStatuses = { 
+        "", 
+        "Red Chosen!", 
+        "Green Chosen!", 
+        "Blue Chosen!", 
+        "Job is processed", 
+        "Machine is Running", 
+        "Random Event/Flavor Text", 
+        "Machine is Starved", 
+        "harvesting...", 
+        "Upgrade Harvest Capacity", 
+        "Harvester at capacity", 
+        "Maintenance", 
+        "Refinery Started", 
+        "Seasonal", 
+        "System",
+        "Production Idle",
+        "Pay Employees",
+        "Pay Rent"};
+
+    public string[] woStatuses = {
+        "N/A",
+        "In Queue",
+        "Loading",
+        "In Production",
+        "Unloading",
+        "Completed",
+        "Incomplete",
+        ""};
+    public string[] zodiacSigns = {
+        "N/A",
+        "Aries",
+        "Taurus",
+        "Gemini",
+        "Cancer",
+        "Leo",
+        "Virgo",
+        "Libra",
+        "Scorpio",
+        "Sagittarius",
+        "Capricorn",
+        "Aquarius",
+        "Pisces"};
+
+    public string[] employeeMisbehaviors = {
+    "Talk to a coworker",
+    "Be on your phone",
+    "Hide in the bathroom",
+    "Start a fight",
+    "Fall asleep",
+    "Ignore safety rules",
+    "Damage equipment",
+    "Leave early",
+    "Arrive late",
+    "Skip tasks",
+    "Take extra breaks",
+    "Eat at workstation",
+    "Argue with supervisor",
+    "Gossip",
+    "Use foul language",
+    "Steal materials",
+    "Horseplay",
+    "Ignore instructions",
+    "Disrespect coworkers",
+    "Fail to wear safety gear",
+    "Smoke in non-smoking area",
+    "Use unauthorized tools",
+    "Slack off",
+    "Distract others",
+    "Play loud music",
+    "Misuse company property",
+    "Ignore quality standards",
+    "Fake injury",
+    "Refuse to help",
+    "Overuse supplies",
+    "Complain excessively",
+    "Ignore deadlines",
+    "Mislabel products",
+    "Work unsafely",
+    "Leave workstation messy",
+    "Use personal devices",
+    "Argue with customers",
+    "Break company policy",
+    "Refuse to work overtime",
+    "Leave without notice",
+    "Ignore maintenance issues",
+    "Spread rumors",
+    "Violate privacy",
+    "Sabotage work",
+    "Bring unauthorized visitors",
+    "Use inappropriate language",
+    "Tamper with machines",
+    "Fail to report issues",
+    "Show up intoxicated",
+    "Sleep on the job"
+};
 
 
 
@@ -790,7 +926,29 @@ public class FlavorText
         return roll;
     }
 
-    public bool skillCheck(int skill)
+    public int rollDice(int dice, int sides, int tries)  //takes the best roll from each "try"
+    {
+        int totalRoll = 0;
+
+        for (int i = 0; i < dice; i++)  //for each dice
+        {
+            int bestRoll = 0;   
+
+            for (int j = 0; j < tries; j++)  //for each try
+            {
+                int roll = r.Next(1, sides+1);  //roll
+                if (roll > bestRoll)  //if this roll is better than the best roll so far save it
+                {
+                    bestRoll = roll;
+                }
+            }
+            totalRoll += bestRoll;
+        }
+
+        return totalRoll;
+    }
+
+    public bool skillCheck(int skill)  //what is this?
     {
         if (rollDice(1, 2) > skill)
             return false;
